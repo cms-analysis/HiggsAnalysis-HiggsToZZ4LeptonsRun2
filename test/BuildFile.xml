@@ -1,0 +1,10 @@
+<flags ADD_SUBDIR="1" />
+
+<flags FFLAGS="-O3 -ffree-form -ffree-line-length-none -Dcompiler=2 "/>
+
+<use name="FWCore/ParameterSet"/>
+<use name="root"/>
+
+<export>
+  <lib   name="1"/>
+</export>
