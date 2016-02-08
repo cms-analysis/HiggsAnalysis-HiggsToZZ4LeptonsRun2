@@ -1395,7 +1395,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       arraysize_mu[0] = RECO_NMU;
       int iL_loose_mu[arraysize_mu[0]];
       delete [] arraysize_mu;
-
+      
+      for( int i = 0; i < RECO_NMU; ++i ){
+	iL_loose_mu[i]=-999.;
+      }
  
       for( int i = 0; i < RECO_NMU; ++i ){
 
@@ -1428,6 +1431,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       arraysize_e[0] = RECO_NELE;
       int iL_loose_e[arraysize_e[0]];
       delete [] arraysize_e;
+
+      for( int i = 0; i < RECO_NELE; ++i ){
+	iL_loose_e[i]=-999.;
+      }
+
 
       for( int i = 0; i < RECO_NELE; ++i ){
 	
@@ -1762,7 +1770,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		  << endl ;
 
       for(int i=0.;i<Nphotons;i++) {
-	if (iLp_l[i]!=-1 && iLp_tagEM[i]==0) cout << "There is photon with pT= " << RECOPFPHOT_PT[i] << " attached to a muon with pT= " << RECOMU_PT[iLp_l[i]] << endl;
+	if (iLp_l[i]!=-1 && iLp_tagEM[i]==0) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " attached to a muon with pT= " << RECOMU_PT[iLp_l[i]] << endl;
       };
 
      // *** end FSR
@@ -2674,7 +2682,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       cout << "Good Z passing ghost removal are " << goodZ.size() << endl; 
       for (int i=0;i<goodZ.size();i++){
-       	cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;	\
+       	cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;	
        	bool duplicate=false;
        	for (int j=0;j<cleanedgoodZ.size();++j){
        	  if (goodZ.at(i).massvalue == cleanedgoodZ.at(j).massvalue){
@@ -2905,7 +2913,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      if (vindexZZ.size()==1){
        cout << "Just one Z1+Z2 pair" << endl;
        if (icleanedgoodZsv.at(vindexZZ.at(0)).at(0)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(1); 
-       if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);;
+       if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);
      }
      else {     
        int indexZ2tmp=-999;
@@ -3128,7 +3136,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		   );
 	}
 	  
-	output_txt  << leptformat << endl;;
+	output_txt  << leptformat << endl;
 
        if( i == 0){
 	 hPtLep1_5->Fill( RECOMU_PT[ ipt[i] ],newweight ) ;
