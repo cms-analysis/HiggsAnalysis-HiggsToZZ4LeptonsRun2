@@ -609,7 +609,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   //           Create Branches for Vertices variables
   //
   //=============================================================
-  mytree->Branch( "RECO_NVTX", &RECO_NVTX);
+  mytree->Branch( "RECO_NVTX", &RECO_NVTX, "RECO_NVTX/I");
   mytree->Branch( "RECO_VERTEX_x", &RECO_VERTEX_x);
   mytree->Branch( "RECO_VERTEX_y", &RECO_VERTEX_y);
   mytree->Branch( "RECO_VERTEX_z", &RECO_VERTEX_z);
@@ -625,7 +625,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   //           Create Branches for Tracks variables
   //
   //=============================================================
-  mytree->Branch( "RECO_NTRACK", &RECO_NTRACK);
+  mytree->Branch( "RECO_NTRACK", &RECO_NTRACK, "RECO_NTRACK/I");
   mytree->Branch( "RECO_TRACK_PT", &RECO_TRACK_PT);
   mytree->Branch( "RECO_TRACK_ETA", &RECO_TRACK_ETA);
   mytree->Branch( "RECO_TRACK_PHI", &RECO_TRACK_PHI);
@@ -695,7 +695,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   //           Create Branchs for Muons variables
   //
   //=============================================================
-  mytree->Branch("RECO_NMU",&RECO_NMU);
+  mytree->Branch("RECO_NMU",&RECO_NMU, "RECO_NMU/I");
   mytree->Branch("RECOMU_isPFMu",&RECOMU_isPFMu);
   mytree->Branch("RECOMU_isGlobalMu",&RECOMU_isGlobalMu);
   mytree->Branch("RECOMU_isStandAloneMu",&RECOMU_isStandAloneMu);
@@ -808,7 +808,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   //  Create Branches for Electron Tree
   //
   //=============================================================
-  mytree->Branch("RECO_NELE",&RECO_NELE);
+  mytree->Branch("RECO_NELE",&RECO_NELE, "RECO_NELE/I");
   mytree->Branch("RECOELE_isEcalDriven",&RECOELE_isEcalDriven);
   mytree->Branch("RECOELE_isTrackerDriven",&RECOELE_isTrackerDriven);
   mytree->Branch("RECOELE_CHARGE",&RECOELE_CHARGE);
@@ -839,6 +839,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   mytree->Branch("RECOELE_PFphoton",&RECOELE_PFphoton);
   mytree->Branch("RECOELE_PFPUchAllPart",&RECOELE_PFPUchAllPart);
   mytree->Branch("RECOELE_PFX_dB",&RECOELE_PFX_dB);
+  mytree->Branch("RECOELE_PFX_rho",&RECOELE_PFX_rho);
   // Vertexing DA
   mytree->Branch("RECOELE_SIP",&RECOELE_SIP);
   mytree->Branch("RECOELE_IP",&RECOELE_IP);
@@ -924,12 +925,12 @@ void HZZ4LeptonsRootTree::beginJob() {
   //  Create vectors for Photons Tree
   //
   //=============================================================
-  mytree->Branch("RECO_NPHOT",&RECO_NPHOT);
+  mytree->Branch("RECO_NPHOT",&RECO_NPHOT,"RECO_NPHOT/I");
   mytree->Branch("RECOPHOT_PT",&RECOPHOT_PT);
   mytree->Branch("RECOPHOT_ETA",&RECOPHOT_ETA);
   mytree->Branch("RECOPHOT_PHI",&RECOPHOT_PHI);
   mytree->Branch("RECOPHOT_THETA",&RECOPHOT_THETA);
-  mytree->Branch("RECO_NPFPHOT",&RECO_NPFPHOT);
+  mytree->Branch("RECO_NPFPHOT",&RECO_NPFPHOT,"RECO_NPFPHOT/I");
   mytree->Branch("RECOPFPHOT_PT",&RECOPFPHOT_PT);
   mytree->Branch("RECOPFPHOT_PTError",&RECOPFPHOT_PTError);
   mytree->Branch("RECOPFPHOT_ETA",&RECOPFPHOT_ETA);
@@ -1261,7 +1262,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   //           Create Branches for jets variables
   //=============================================================
   // PFJets
-  mytree->Branch( "RECO_PFJET_N",   &RECO_PFJET_N);
+  mytree->Branch( "RECO_PFJET_N",   &RECO_PFJET_N,"RECO_PFJET_N/I");
   mytree->Branch( "RECO_PFJET_CHARGE",  &RECO_PFJET_CHARGE);
   mytree->Branch( "RECO_PFJET_ET",  &RECO_PFJET_ET);
   mytree->Branch( "RECO_PFJET_PT",  &RECO_PFJET_PT);
@@ -1297,8 +1298,8 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
     cout << "Instataneous luminosity= " << Avginstlumi << endl;
   }
 
-  fillTracks(evt);
-  fillVertices(evt);
+  //GIORGIA fillTracks(evt);
+  //GIORGIA fillVertices(evt);
   if (fillPUinfo) fillPU(evt);
 
   // fill HLT block
@@ -1334,7 +1335,7 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
     fillCP4mu(evt);
     fillCP4e(evt);
   }
-
+  
   //GENMET
   if (fillMCTruth) {
     edm::Handle<reco::GenMETCollection> genmetHandle;
@@ -1343,13 +1344,20 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
       genmet = i->pt();
     }
   }
+ 
   // Filling electron and muons vectors
   fillMuons(evt,es);
   fillElectrons(evt,es);
   fillPhotons(evt);  
   fillIsolationByRings(evt,es);
+
+  //btagging
   fillBTagging(evt);
+
+  //RECO MET
   fillMET(evt);
+
+  //Beam Spot
   fillBeamSpot(evt);
 
   // Geometrical discriminant 
@@ -1412,12 +1420,12 @@ void HZZ4LeptonsRootTree::endJob() {
 //
 //=============================================================
 void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
-  RECO_NPHOT.clear();
+  RECO_NPHOT=0;
   RECOPHOT_PT.clear();
   RECOPHOT_ETA.clear();
   RECOPHOT_PHI.clear();
   RECOPHOT_THETA.clear();
-  RECO_NPFPHOT.clear();
+  RECO_NPFPHOT=0;
   RECOPFPHOT_PT.clear();
   RECOPFPHOT_PTError.clear();
   RECOPFPHOT_ETA.clear();
@@ -1436,7 +1444,7 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
   // Photons
   edm::Handle<edm::View<reco::Photon> > photons;
   iEvent.getByLabel(photonsTag_, photons);
-  RECO_NPHOT.push_back(photons->size());
+  RECO_NPHOT=photons->size();
   edm::Handle<edm::Association<vector<reco::GenParticle> > > GenParticlesMatchPhot;
   iEvent.getByLabel("goodGammaMCMatch", GenParticlesMatchPhot);
   edm::Handle<reco::CandidateCollection > CollPhot;
@@ -1446,6 +1454,7 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
   int iphot=0;
   for (edm::View<reco::Photon>::const_iterator cand = photons->begin(); cand != photons->end(); ++cand) {
     if (iphot>19) break;
+    //RECO_NPHOT.push_back(iphot);
     RECOPHOT_PT.push_back(cand->pt());
     RECOPHOT_ETA.push_back(cand->eta());
     RECOPHOT_PHI.push_back(cand->phi());
@@ -1488,10 +1497,11 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
   edm::Handle<edm::ValueMap<double> > isoPFPUphmap; 
   iEvent.getByLabel(photonPFIsoValuePUTag_, isoPFPUphmap);
   iphot=0;
-  RECO_NPFPHOT.push_back(pfphotons->size());
-  //cout << "There are " << pfphotons->size() << " photons" << endl;
+  RECO_NPFPHOT=pfphotons->size();
+  cout << "There are " << pfphotons->size() << " photons" << endl;
   for (edm::View<reco::PFCandidate>::const_iterator cand = pfphotons->begin(); cand != pfphotons->end(); ++cand) {
     if (iphot>19) break;
+    //RECO_NPFPHOT.push_back(iphot);
     edm::Ref<edm::View<reco::PFCandidate> > phtrackref(pfphotons,iphot); 
     RECOPFPHOT_PT.push_back(cand->pt());
     // error on pt of photon taken from #include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
@@ -1607,7 +1617,7 @@ void HZZ4LeptonsRootTree::fillBTagging(const edm::Event& iEvent)
 //=============================================================
 void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
 {
-  RECO_PFJET_N.clear();
+  RECO_PFJET_N=0;
   RECO_PFJET_CHARGE.clear();
   RECO_PFJET_ET.clear();
   RECO_PFJET_PT.clear();
@@ -1630,11 +1640,12 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
     iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
     iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
   }
-  RECO_PFJET_N.push_back(pfjets->size());
-  //cout << "Number of PFJets in the event= " << RECO_PFJET_N << endl;
+  RECO_PFJET_N=pfjets->size();
+  cout << "Number of PFJets in the event= " << RECO_PFJET_N << endl;
   int index_jets = 0;
   for ( PFJetCollection::const_iterator i=pfjets->begin(); i!=pfjets->end(); i++) {  
     if (index_jets>99) continue;
+    //RECO_PFJET_N.push_back(index_jets);
     edm::Ref<reco::PFJetCollection> pfjetref(pfjets,index_jets);      
     float mva = 0.;
     int idflag = -1;
@@ -1759,7 +1770,7 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
     iEvent.getByLabel(rhojetsTag_,rhoHandle); 
     if (rhoHandle.isValid() ) {
       RHO_mu=*rhoHandle;
-      //cout << "RHO mu fastjet= " << RHO_mu << endl; 
+      cout << "RHO mu fastjet= " << RHO_mu << endl; 
     }
     else {
       cout << "Not valid RHO collection" << endl;
@@ -2472,7 +2483,7 @@ void HZZ4LeptonsRootTree::IntialValues()
 //=============================================================
 void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSetup& iSetup)
 { 
-  RECO_NMU.clear();
+  RECO_NMU=0;;
   RECOMU_isPFMu.clear();
   RECOMU_isGlobalMu.clear();
   RECOMU_isStandAloneMu.clear();
@@ -2687,19 +2698,27 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
   }
   //
   int indexbis=0;
+  cout<<"SIZE MuCandidates :"<<MuCandidates->size()<<endl; 
+  RECO_NMU=MuCandidates->size();
   for (edm::View<reco::Muon>::const_iterator cand = MuCandidates->begin();
        cand != MuCandidates->end(); ++cand) {
-    if (cand->globalTrack().isNull()) continue;
-    if (cand->track().isNull()) continue;
-    RECO_NMU.push_back(indexbis);
+    // if (cand->globalTrack().isNull()) continue;
+    // if (cand->track().isNull()) continue;
+    //RECO_NMU.push_back(indexbis);
     edm::Ref<edm::View<reco::Muon> > mutrackref(MuCandidates,indexbis);
     edm::Ref<edm::View<reco::Muon> > mutrackrefv(VertMuCandidates,indexbis); 
     //coding as Nicola
     RECOMU_isPFMu.push_back(cand->isPFMuon());
+    cout<<"RECOMU_isPFmu SIZE: "<<RECOMU_isPFMu.size()<<endl;
     RECOMU_isGlobalMu.push_back(cand->isGlobalMuon());
+    cout<<"RECOMU_isGlobal SIZE: "<<RECOMU_isGlobalMu.size()<<endl;
     RECOMU_isStandAloneMu.push_back(cand->isStandAloneMuon());
+    cout<<"RECOMU_isSTAMU SIZE: "<<RECOMU_isStandAloneMu.size()<<endl;
     RECOMU_isTrackerMu.push_back(cand->isTrackerMuon());
+    cout<<"RECOMU_IS_trkMU SIZE: "<<RECOMU_isTrackerMu.size()<<endl;
     RECOMU_isCaloMu.push_back(cand->isCaloMuon());
+    cout<<"RECOMU_IS_CaloMU SIZE: "<<RECOMU_isCaloMu.size()<<endl;
+    
     /* std::cout << "\n Muon in the event: "
 	<<   "  isPF=" << RECOMU_isPFMu[indexbis]
 	<<   "  isGB=" << RECOMU_isGlobalMu[indexbis]
@@ -2801,7 +2820,9 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
       << "  LIP="      << RECOMU_LIP[indexbis]
       << "  LIPerror=" << RECOMU_LIPERROR[indexbis]
       << std::endl;*/
+
     RECOMU_PFX_dB.push_back((cand->pfIsolationR04().sumChargedHadronPt + max(0.0,cand->pfIsolationR04().sumNeutralHadronEt+cand->pfIsolationR04().sumPhotonEt-0.5*cand->pfIsolationR04().sumPUPt))/cand->p4().pt());
+
     EffectiveArea=0.;
     if (use2011EA){
       if (fabs(cand->p4().eta()) >= 0.0 && fabs(cand->p4().eta()) < 1.0 ) EffectiveArea = 0.132;
@@ -2819,8 +2840,11 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
       if (fabs(cand->p4().eta()) >= 2.2 && fabs(cand->p4().eta()) < 2.3 ) EffectiveArea = 0.821;
       if (fabs(cand->p4().eta()) >= 2.3 )                                 EffectiveArea = 0.660;
     }
+
     
     //RECOMU_PFX_rho.push_back(rhoIso);
+    //RECOMU_PFX_rho.push_back((cand->pfIsolationR04().sumChargedHadronPt + max( (cand->pfIsolationR04().sumNeutralHadronEt + cand->pfIsolationR04().sumPhotonEt - max(RHO_mu,0.0)*(EffectiveArea)),0.0))/double(cand->p4().pt()));
+
     
     // Other properties
     RECOMU_numberOfMatches.push_back(cand->numberOfMatches());
@@ -2992,7 +3016,7 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
 //=============================================================
 void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  RECO_NELE.clear();
+  RECO_NELE=0;
   RECOELE_isEcalDriven.clear();
   RECOELE_isTrackerDriven.clear();
   RECOELE_CHARGE.clear();
@@ -3023,6 +3047,7 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   RECOELE_PFphoton.clear();
   RECOELE_PFPUchAllPart.clear();
   RECOELE_PFX_dB.clear();
+  RECOELE_PFX_rho.clear();
   // Vertexing DA
   RECOELE_SIP.clear();
   RECOELE_IP.clear();
@@ -3312,6 +3337,7 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   iSetup.get<EcalChannelStatusRcd>().get(pChannelStatus);
   //    chStatus = pChannelStatus.product();
   int index=0;
+  RECO_NELE=EleRefs->size();
   // Matching
   edm::Handle<edm::Association<vector<reco::GenParticle> > > GenParticlesMatchEle;
   iEvent.getByLabel("goodElectronMCMatch", GenParticlesMatchEle);
@@ -3325,7 +3351,7 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   for (edm::View<reco::GsfElectron>::const_iterator cand = EleRefs->begin(); 
        cand != EleRefs->end(); ++cand) {
     if(index>99) break;
-    RECO_NELE.push_back(index);
+    //RECO_NELE.push_back(index);
     edm::Ref<edm::View<reco::GsfElectron> > eletrackref(EleRefs,index);
     edm::Ref<edm::View<reco::GsfElectron> > eletrackrefv(VertEleCandidates,index);
     // Global variables
@@ -3418,7 +3444,8 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
     RECOELE_PFneuHad.push_back((*isoPFNeutralelemap)[eletrackref]);
     RECOELE_PFphoton.push_back((*isoPFGammaelemap)[eletrackref]);
     RECOELE_PFPUchAllPart.push_back((*isoPFPUelemap)[eletrackref]);
-    RECOELE_PFX_dB.push_back(((*isoPFChargedelemap)[eletrackref] + max((*isoPFGammaelemap)[eletrackref]+(*isoPFNeutralelemap)[eletrackref]-0.5*(*isoPFPUelemap)[eletrackref],0.0))/eletrackref->pt());   
+    RECOELE_PFX_dB.push_back(((*isoPFChargedelemap)[eletrackref] + max((*isoPFGammaelemap)[eletrackref]+(*isoPFNeutralelemap)[eletrackref]-0.5*(*isoPFPUelemap)[eletrackref],0.0))/eletrackref->pt());  
+ 
     EffectiveArea=0.0;
     if (use2011EA){
       if (fabs(sclRef->eta()) >= 0.0   && fabs(sclRef->eta()) < 1.0 )   EffectiveArea = 0.18;
@@ -3436,8 +3463,7 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
       if (fabs(cand->p4().eta()) >= 2.0   && fabs(cand->p4().eta()) < 2.2 )   EffectiveArea = 0.1565;
       if (fabs(cand->p4().eta()) >= 2.2 )                                     EffectiveArea = 0.2680;
     }
-    /*RECOELE_PFX_rho.push_back((RECOELE_PFchHad[index]+
-      max( (RECOELE_PFneuHad[index]+RECOELE_PFphoton[index]-max(RHO_ele,0.0)*EffectiveArea),0.0) )/cand->p4().pt(); */
+    //RECOELE_PFX_rho.push_back(((*isoPFChargedelemap)[eletrackref]+ max( ((*isoPFNeutralelemap)[eletrackref]+(*isoPFGammaelemap)[eletrackref]- max(RHO_ele,0.0)*EffectiveArea),0.0))/cand->p4().pt()); 
        
     // Vertexing DA
     RECOELE_SIP.push_back((*vertexelemap)[eletrackrefv]);
@@ -5346,7 +5372,7 @@ void HZZ4LeptonsRootTree::fillMCCP(const edm::Event& iEvent)
 //Vertices
 void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
 {
-  RECO_NVTX.clear();
+  RECO_NVTX=0;
   RECO_VERTEX_x.clear();
   RECO_VERTEX_y.clear();
   RECO_VERTEX_z.clear();
@@ -5358,12 +5384,12 @@ void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
   RECO_VERTEX_isValid.clear();
   edm::Handle<reco::VertexCollection> recoPrimaryVertexCollection;
   iEvent.getByLabel(verticesTag_,recoPrimaryVertexCollection);
-  //RECO_NVTX.push_back(recoPrimaryVertexCollection->size());
+  RECO_NVTX=recoPrimaryVertexCollection->size();
   //cout << "Number of Vertices in the event= " << RECO_NVTX << endl;
   int index_vertex = 0;
   for (VertexCollection::const_iterator i=recoPrimaryVertexCollection->begin(); i!=recoPrimaryVertexCollection->end();i++) {
     if(index_vertex>14) break;
-    RECO_NVTX.push_back(index_vertex);
+    //RECO_NVTX.push_back(index_vertex);
     RECO_VERTEX_x.push_back(i->x());
     RECO_VERTEX_y.push_back(i->y());
     RECO_VERTEX_z.push_back(i->z());
@@ -5372,11 +5398,11 @@ void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
     RECO_VERTEX_ntracks.push_back(i->tracksSize());
     RECO_VERTEXPROB.push_back(ChiSquaredProbability(i->chi2(),i->ndof()));
     RECO_VERTEX_isValid.push_back(i->isValid());
-    //cout << "Vertex made by " << i->tracksSize() << " tracks with chi2="<< i->chi2() << " and ndof=" << i->ndof() << " and prob=" << RECO_VERTEXPROB[index_vertex] << endl;
+    cout << "Vertex made by " << i->tracksSize() << " tracks with chi2="<< i->chi2() << " and ndof=" << i->ndof() << " and prob=" << RECO_VERTEXPROB[index_vertex] << endl;
     int indice=0;
     for(std::vector<reco::TrackBaseRef>::const_iterator iter = i->tracks_begin();
 	iter != i->tracks_end(); iter++) {
-      //cout << "pT of tracks building the vertex= " << (**iter).pt() << endl; 
+      cout << "pT of tracks building the vertex= " << (**iter).pt() << endl; 
       if (indice <100) RECO_VERTEX_TRACK_PT.push_back((**iter).pt());
       indice++;
     }
@@ -5387,7 +5413,7 @@ void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
 //Tracks
 void HZZ4LeptonsRootTree::fillTracks(const edm::Event& iEvent)
 {
-  RECO_NTRACK.clear();
+  RECO_NTRACK=0;
   RECO_TRACK_PT.clear();
   RECO_TRACK_ETA.clear();
   RECO_TRACK_PHI.clear();
@@ -5401,12 +5427,14 @@ void HZZ4LeptonsRootTree::fillTracks(const edm::Event& iEvent)
   RECO_TRACK_DZERR.clear();
   edm::Handle<reco::TrackCollection> tracks;
   iEvent.getByLabel(tracksTag_, tracks);
-  //RECO_NTRACK.push_back(tracks->size());
-  //cout << "Number of Tracks in the event= " << RECO_NTRACK << endl;
+  //GIORGIA
+  RECO_NTRACK=tracks->size();
+  //
+  cout << "Number of Tracks in the event= " << RECO_NTRACK << endl;
   int countk=0;
   for ( TrackCollection::const_iterator i=tracks->begin(); i!=tracks->end(); i++) { 
     if (countk>199) break;
-    RECO_NTRACK.push_back(countk);
+    //RECO_NTRACK=countk;
     RECO_TRACK_PT.push_back(i->pt());
     RECO_TRACK_ETA.push_back(i->eta());
     RECO_TRACK_PHI.push_back(i->phi());

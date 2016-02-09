@@ -375,7 +375,7 @@ private:
       //     Create Branches for Vertices variables
       //
       //==================================================
-      std::vector<int> RECO_NVTX;
+      int RECO_NVTX;
       std::vector<float> RECO_VERTEX_x;
       std::vector<float> RECO_VERTEX_y;
       std::vector<float> RECO_VERTEX_z;
@@ -390,7 +390,7 @@ private:
       //           Create Branches for Tracks variables
       //
       //=============================================================
-      std::vector<int> RECO_NTRACK;
+      int RECO_NTRACK;
       std::vector<float> RECO_TRACK_PT;
       std::vector<float> RECO_TRACK_ETA;
       std::vector<float> RECO_TRACK_PHI;
@@ -407,7 +407,7 @@ private:
       //           Create vectors for Muons variables
       //
       //==================================================
-      std::vector<int> RECO_NMU;
+      int RECO_NMU;
       std::vector<float> RECOMU_isPFMu;
       std::vector<float> RECOMU_isGlobalMu;
       std::vector<float> RECOMU_isStandAloneMu;
@@ -570,7 +570,7 @@ private:
       //
       //====================================================
       double RHO,RHO_ele,RHO_mu;
-      std::vector<int> RECO_PFJET_N;
+      int RECO_PFJET_N;
       std::vector<int> RECO_PFJET_CHARGE;
       std::vector<float> RECO_PFJET_ET;
       std::vector<float> RECO_PFJET_PT;
@@ -584,12 +584,12 @@ private:
       //
       //=============================================================
       int iphot;
-      std::vector<int> RECO_NPHOT;
+      int RECO_NPHOT;
       std::vector<float> RECOPHOT_PT;
       std::vector<float> RECOPHOT_ETA;
       std::vector<float> RECOPHOT_PHI;
       std::vector<float> RECOPHOT_THETA;
-      std::vector<int> RECO_NPFPHOT;
+      int RECO_NPFPHOT;
       std::vector<float> RECOPFPHOT_PT;
       std::vector<float> RECOPFPHOT_PTError;
       std::vector<float> RECOPFPHOT_ETA;
@@ -654,7 +654,7 @@ private:
       //     Create vectors for Electrons variables
       //
       //==================================================
-      std::vector<int> RECO_NELE;
+      int RECO_NELE;
       std::vector<int> RECOELE_isEcalDriven;
       std::vector<int> RECOELE_isTrackerDriven;
       std::vector<int> RECOELE_CHARGE;
@@ -684,7 +684,8 @@ private:
       std::vector<float> RECOELE_PFneuHad;
       std::vector<float> RECOELE_PFphoton;
       std::vector<float> RECOELE_PFPUchAllPart;
-      std::vector<float> RECOELE_PFX_dB;;
+      std::vector<float> RECOELE_PFX_dB;
+      std::vector<float> RECOELE_PFX_rho;
       // Vertexing DA
       std::vector<float> RECOELE_SIP;
       std::vector<float> RECOELE_IP;
