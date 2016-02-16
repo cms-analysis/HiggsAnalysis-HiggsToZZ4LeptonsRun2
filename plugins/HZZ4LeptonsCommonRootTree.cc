@@ -1,7 +1,8 @@
 
 /* Original author:  Nicola De Filippis - Politecnico and INFN Bari 
- * Contributions by: 
- *                  G.S. Chahal, S.S.Chhibra                      - Univ. Bari
+ * Contribution by:
+ *              Sherif Elgammal - British University of Egypt
+ *              Giorgia Miniello - Università di Bari
  */
 
 

@@ -46,6 +46,7 @@
 <use   name="TrackingTools/TrackAssociator"/>
 <use   name="TrackingTools/TrajectoryState"/>
 <use   name="TrackPropagation/SteppingHelixPropagator"/>
+<use   name="EgammaAnalysis/ElectronTools"/>
 <use   name="CondFormats/CSCObjects"/>
 <use   name="CondFormats/DTObjects"/>
 <use   name="CondFormats/EcalObjects"/>
@@ -54,8 +55,6 @@
 <use   name="PhysicsTools/CandUtils"/>
 <use   name="PhysicsTools/RecoAlgos"/>
 <use   name="PhysicsTools/IsolationAlgos"/>
-<use   name="Muon/MuonAnalysisTools"/>
-# <use   name="EGamma/EGammaAnalysisTools"/>
 <use   name="HLTrigger/HLTcore"/>
 <use   name="MagneticField/Records"/>
 <use   name="MagneticField/Engine"/>

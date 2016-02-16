@@ -271,8 +271,8 @@
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterFunctionBaseClass.h"
 #include "TrackingTools/GsfTools/interface/MultiTrajectoryStateTransform.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
-#include "Muon/MuonAnalysisTools/interface/MuonMVAEstimator.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
+//#include "Muon/MuonAnalysisTools/interface/MuonMVAEstimator.h"
+//#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 
 // Transient tracks
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
@@ -280,7 +280,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 
 
 //Full Error
@@ -291,7 +291,6 @@
 #include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
 
 #include <TMatrixD.h>
-
 
 class TFile;
 
@@ -311,7 +310,7 @@ class HZZ4LeptonsRootTree : public edm::EDAnalyzer {
       //void EventsReWeighting(const edm::Event& evt);
       float delR(float eta1,float phi1,float eta2,float phi2);
       void triggermatching(const edm::Event& iEvent);
-      bool IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel); 
+      bool IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<std::string> HLTMuNames,double DR,double DPtRel); 
       std::string getParticleName(int id) const;
       bool match(double mass, double pt, int charge,const reco::CandidateCollection *c1Coll);
       bool matchParticle(double mass, double pt, int charge, const reco::Candidate *c1);

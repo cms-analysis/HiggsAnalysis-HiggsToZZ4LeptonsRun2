@@ -91,8 +91,8 @@
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterFunctionBaseClass.h"
 #include "TrackingTools/GsfTools/interface/MultiTrajectoryStateTransform.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
-#include "Muon/MuonAnalysisTools/interface/MuonMVAEstimator.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
+//#include "Muon/MuonAnalysisTools/interface/MuonMVAEstimator.h"
+//#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 
 // Transient tracks
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
@@ -100,7 +100,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
+#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 
 
 //Full Error

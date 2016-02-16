@@ -90,8 +90,6 @@
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterFunctionBaseClass.h"
 #include "TrackingTools/GsfTools/interface/MultiTrajectoryStateTransform.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
-#include "Muon/MuonAnalysisTools/interface/MuonMVAEstimator.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 
 // Transient tracks
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
@@ -99,8 +97,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
-#include "CMGTools/External/interface/PileupJetIdentifier.h"
-
+#include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 
 //Full Error
 #include "TrackingTools/AnalyticalJacobians/interface/JacobianCurvilinearToCartesian.h"
@@ -475,17 +472,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     // btagging
     tCHighEff_bTag_         = pset.getParameter<edm::InputTag>("tCHighEff_bTagLabel");
     tCHighPur_bTag_         = pset.getParameter<edm::InputTag>("tCHighPur_bTagLabel");
-/*     jPHighEff_bTag_         = pset.getParameter<edm::InputTag>("jPHighEff_bTagLabel"); */
-/*     jBP_bTag_               = pset.getParameter<edm::InputTag>("jBP_bTagLabel"); */
-/*     sSVHighEff_bTag_        = pset.getParameter<edm::InputTag>("sSVHighEff_bTagLabel"); */
-/*     sSVHighPur_bTag_        = pset.getParameter<edm::InputTag>("sSVHighPur_bTagLabel"); */
     cSV_bTag_               = pset.getParameter<edm::InputTag>("cSV_bTagLabel");
-/*     cSVMVA_bTag_            = pset.getParameter<edm::InputTag>("cSVMVA_bTagLabel"); */
-/*     sEByIP3d_bTag_          = pset.getParameter<edm::InputTag>("sEByIP3d_bTagLabel"); */
-/*     sEByPt_bTag_            = pset.getParameter<edm::InputTag>("sEByPt_bTagLabel"); */
-/*     sM_bTag_                = pset.getParameter<edm::InputTag>("sM_bTagLabel"); */
-/*     sMByIP3d_bTag_          = pset.getParameter<edm::InputTag>("sMByIP3d_bTagLabel"); */
-/*     sMByPt_bTag_            = pset.getParameter<edm::InputTag>("sMByPt_bTagLabel"); */
 
     // Conversion finder
     ConvMapDistTag_       = pset.getParameter<edm::InputTag>("ConvMapDist");
@@ -678,10 +665,10 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     //Tree_->Branch("RECOcollNameLLLLssos_MASS",RECOcollNameLLLLssos_MASS,"RECOcollNameLLLLssos_MASS[20]/F");
     //Tree_->Branch("RECOcollNameLLLLssos_PT",RECOcollNameLLLLssos_PT,"RECOcollNameLLLLssos_PT[5][20]/F");
 
-    Tree_->Branch("RECO_LLLL_MASS", RECO_LLLL_MASS, "RECO_LLLL_MASS[7][100]/F");
-    Tree_->Branch("RECO_LLLL_PT", RECO_LLLL_PT, "RECO_LLLL_PT[7][100]/F");
-    Tree_->Branch("RECO_LLLL_ETA", RECO_LLLL_ETA, "RECO_LLLL_ETA[7][100]/F");
-    Tree_->Branch("RECO_LLLL_PHI", RECO_LLLL_PHI, "RECO_LLLL_PHI[7][100]/F");
+    Tree_->Branch("RECO_LLLL_MASS", RECO_LLLL_MASS, "RECO_LLLL_MASS[7][50]/F");
+    Tree_->Branch("RECO_LLLL_PT", RECO_LLLL_PT, "RECO_LLLL_PT[7][50]/F");
+    Tree_->Branch("RECO_LLLL_ETA", RECO_LLLL_ETA, "RECO_LLLL_ETA[7][50]/F");
+    Tree_->Branch("RECO_LLLL_PHI", RECO_LLLL_PHI, "RECO_LLLL_PHI[7][50]/F");
  
    
 
@@ -1644,7 +1631,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     
     
     for (int j=0; j<7;j++){
-      for (int i=0; i<100;i++){
+      for (int i=0; i<50;i++){
 	RECO_LLLL_MASS[j][i]=-999.;
 	RECO_LLLL_PT[j][i]=-999.;
 	RECO_LLLL_ETA[j][i]=-999.;
@@ -3039,7 +3026,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     iEvent.getByLabel(RECOcollNameLLLL, CandidatesLLLL);
     kk=0;    
     for( edm::View<Candidate>::const_iterator cand = CandidatesLLLL->begin();cand != CandidatesLLLL->end(); ++ cand ) {
-      if (kk>99) break;
+      if (kk>49) break;
       cout << "4lepton (any flavour and charge) candidate of type=" << RECOcollNameLLLL.label() << " of mass=" << cand->p4().mass() << " and pt=" << cand->p4().pt() <<endl;
       
       RECO_LLLL_MASS[0][kk]=cand->p4().mass();
@@ -3500,7 +3487,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 	if (fabs(RECOELE_scl_Eta[index]) >= 2.3   && fabs(RECOELE_scl_Eta[index]) < 2.4 )   EffectiveArea = 0.22;
 	if (fabs(RECOELE_scl_Eta[index]) >= 2.4 )                                       EffectiveArea = 0.29;
       }
-      else {
+      else { // 7_4_X use eta 
 	if (fabs(RECOELE_ETA[index]) >= 0.0   && fabs(RECOELE_ETA[index]) < 0.8 )   EffectiveArea = 0.1830;
 	if (fabs(RECOELE_ETA[index]) >= 0.8   && fabs(RECOELE_ETA[index]) < 1.3 )   EffectiveArea = 0.1734;
 	if (fabs(RECOELE_ETA[index]) >= 1.3   && fabs(RECOELE_ETA[index]) < 2.0 )   EffectiveArea = 0.1077;
@@ -4477,7 +4464,8 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 
   void fillPhotons(const edm::Event& iEvent){
     // Photons
-    edm::Handle<edm::View<reco::Candidate> > photons;
+    //edm::Handle<edm::View<reco::Candidate> > photons;
+    edm::Handle<edm::View<reco::Photon> > photons;
     iEvent.getByLabel(photonsTag_, photons);
     RECO_NPHOT=photons->size();
 
@@ -4489,7 +4477,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     if (CollPhot.isValid()) ismyGammas=true;
     
     int iphot=0;
-    for (edm::View<reco::Candidate>::const_iterator cand = photons->begin(); cand != photons->end(); ++cand) {
+    for (edm::View<reco::Photon>::const_iterator cand = photons->begin(); cand != photons->end(); ++cand) {
       if (iphot>19) break;
       RECOPHOT_PT[iphot]=cand->pt();
       RECOPHOT_ETA[iphot]=cand->eta();
@@ -5623,21 +5611,21 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 	
 //      New Selection
 	if(i->pt()>20.){
-	  if(i->eta()>3.){
-	    if(mva<=-0.45)pupass=0;
-	  }else if(i->eta()>2.75){
-	    if(mva<=-0.55)pupass=0;
-	  }else if(i->eta()>2.5){
-	    if(mva<=-0.6)pupass=0;
-	  }else if(mva<=-0.63)pupass=0;
+	  if(fabs(i->eta())>3.){
+	    if(mva<=-0.45) pupass=0;
+	  }else if(fabs(i->eta())>2.75){
+	    if(mva<=-0.55) pupass=0;
+	  }else if(fabs(i->eta())>2.5){
+	    if(mva<=-0.6) pupass=0;
+	  }else if(mva<=-0.63) pupass=0;
 	}else{
-	  if(i->eta()>3.){
-	    if(mva<=-0.95)pupass=0;
-	  }else if(i->eta()>2.75){
-	    if(mva<=-0.94)pupass=0;
-	  }else if(i->eta()>2.5){
-	    if(mva<=-0.96)pupass=0;
-	  }else if(mva<=-0.95)pupass=0;
+	  if(fabs(i->eta())>3.){
+	    if(mva<=-0.95) pupass=0;
+	  }else if(fabs(i->eta())>2.75){
+	    if(mva<=-0.94) pupass=0;
+	  }else if(fabs(i->eta())>2.5){
+	    if(mva<=-0.96) pupass=0;
+	  }else if(mva<=-0.95) pupass=0;
 	}
 	
 
@@ -6386,7 +6374,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
   float ConvMapDist[100],ConvMapDcot[100];
 
   // MVA Ring Isolation
-  MuonMVAEstimator *fMuonIsoMVA;
+  //MuonMVAEstimator *fMuonIsoMVA;
 
   // Magnetic Field
   edm::ESHandle<MagneticField> magfield_;

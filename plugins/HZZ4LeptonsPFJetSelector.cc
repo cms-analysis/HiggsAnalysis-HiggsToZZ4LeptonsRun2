@@ -69,7 +69,7 @@ void HZZ4LeptonsPFJetSelector::produce(edm::Event& iEvent, const edm::EventSetup
       if (fabs(mIter->eta()) <= 3.0  ){
 	if ( mIter->neutralHadronEnergyFraction() < 0.99 && 
 	     mIter->neutralEmEnergyFraction() < 0.99 && 
-	     mIter->getPFConstituents().size() > 1) {
+	     (mIter->chargedMultiplicity()+mIter->neutralMultiplicity()) > 1) {
 	  if (fabs(mIter->eta()) <= 2.4  ){
 	    if (mIter->chargedHadronEnergyFraction() > 0. && 
 		mIter->chargedMultiplicity() > 0. && 
