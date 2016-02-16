@@ -81,18 +81,18 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     PFMuonsLabel             = cms.InputTag("hTozzTo4leptonsPFtoRECOMuon"),                                           
 
     # Particle Flow Isolation
-    MuonPFIsoValueChargedAll    = cms.InputTag("muPFIsoValueChargedAll04"),
-    MuonPFIsoValueCharged       = cms.InputTag("muPFIsoValueCharged04"),
-    MuonPFIsoValueNeutral       = cms.InputTag("muPFIsoValueNeutral04"),
-    MuonPFIsoValueGamma         = cms.InputTag("muPFIsoValueGamma04"),
-    MuonPFIsoValuePU            = cms.InputTag("muPFIsoValuePU04"),
+    MuonPFIsoValueChargedAll    = cms.InputTag("muPFIsoValueChargedAll03PFBRECO"),
+    MuonPFIsoValueCharged       = cms.InputTag("muPFIsoValueCharged03PFBRECO"),
+    MuonPFIsoValueNeutral       = cms.InputTag("muPFIsoValueNeutral03PFBRECO"),
+    MuonPFIsoValueGamma         = cms.InputTag("muPFIsoValueGamma03PFBRECO"),
+    MuonPFIsoValuePU            = cms.InputTag("muPFIsoValuePU03PFBRECO"),
 
 
-    ElectronPFIsoValueChargedAll = cms.InputTag("elPFIsoValueChargedAll04PFId"),
-    ElectronPFIsoValueCharged    = cms.InputTag("elPFIsoValueCharged04PFId"),
-    ElectronPFIsoValueNeutral    = cms.InputTag("elPFIsoValueNeutral04PFId"),
-    ElectronPFIsoValueGamma      = cms.InputTag("elPFIsoValueGamma04PFId"),
-    ElectronPFIsoValuePU         = cms.InputTag("elPFIsoValuePU04PFId"),
+    ElectronPFIsoValueChargedAll = cms.InputTag("elPFIsoValueChargedAll04PFIdPFBRECO"),
+    ElectronPFIsoValueCharged    = cms.InputTag("elPFIsoValueCharged04PFIdPFBRECO"),
+    ElectronPFIsoValueNeutral    = cms.InputTag("elPFIsoValueNeutral04PFIdPFBRECO"),
+    ElectronPFIsoValueGamma      = cms.InputTag("elPFIsoValueGamma04PFIdPFBRECO"),
+    ElectronPFIsoValuePU         = cms.InputTag("elPFIsoValuePU04PFIdPFBRECO"),
 
     PFPhotonsLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton"),                                           
     PFpterrorLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton:ErrorMap"),
@@ -180,7 +180,7 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     eleID_HZZTightTag         = cms.InputTag("eidHZZHyperTight1"),
 
     # MVA ele ID BDT
-    mvaTrigV0MapTag           = cms.InputTag("mvaTrigV025nsCSA14"),
+    mvaTrigV0MapTag           = cms.InputTag("mvaTrigV025nsPHYS14"),
     mvaNonTrigV0MapTag        = cms.InputTag("mvaNonTrigV025nsPHYS14"),
                                         
     # GD                                          

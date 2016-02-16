@@ -17,9 +17,8 @@ hTozzTo4leptonsRunEventFilter = cms.EDFilter("HZZ4LeptonsRunEventFilter",
 # EventList = cms.vint32(78478019)
 
 RunList = cms.vint32(1),
-LumiSectionList = cms.vint32(2033),
-EventList = cms.vint32(203206)
-
+LumiSectionList = cms.vint32(1148),
+EventList = cms.vint32(112021)
                                                
 )
 

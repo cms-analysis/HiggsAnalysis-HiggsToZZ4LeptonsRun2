@@ -150,8 +150,8 @@ else:
     hTozzTo4leptonsElectronSequence=cms.Sequence(hTozzTo4leptonsElectronSelector)
     
     # Muon ghost cleaning
-    from MuonAnalysis.MuonAssociators.muonCleanerBySegments_cfi import *
-    
+    from HiggsAnalysis.HiggsToZZ4Leptons.muonCleanerBySegments_cfi import *
+
     # Muon relaxed selection
     from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMuonSelector_cfi import *
     hTozzTo4leptonsMuonSelector=HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMuonSelector_cfi.hTozzTo4leptonsMuonSelector.clone()
@@ -354,10 +354,10 @@ vetoElectrons =  cms.EDFilter("GsfElectronRefSelector",
 #eidHZZHyperTight1.src  = "hTozzTo4leptonsElectronSelector"
 
 # MVA Electron ID
-from EgammaAnalysis.ElectronTools.electronIdMVAProducer_CSA14_cfi import *
+from HiggsAnalysis.HiggsToZZ4Leptons.electronIdMVAProducer_CSA14_cfi import *
 #mvaTrigV0.electronTag    = cms.InputTag("hTozzTo4leptonsElectronSelector")
 #mvaNonTrigV0.electronTag = cms.InputTag("hTozzTo4leptonsElectronSelector")
-mvaTrigV025nsCSA14.electronTag    = cms.InputTag("gedGsfElectrons")
+mvaTrigV025nsPHYS14.electronTag    = cms.InputTag("gedGsfElectrons")
 mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("gedGsfElectrons")
 
 ## Electron Regression
@@ -368,20 +368,20 @@ mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("gedGsfElectrons")
 
 # Electron loose isolation
 
-from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronIsolationProducerEgamma_cfi import *
-hTozzTo4leptonsElectronIsolationProducerEgamma.threshold = cms.double(99999.)
+#from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronIsolationProducerEgamma_cfi import *
+#hTozzTo4leptonsElectronIsolationProducerEgamma.threshold = cms.double(99999.)
 
-from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronIsolationEgammaSequences_cff import *
-hTozzTo4leptonsElectronIsolationSequenceEgamma=cms.Sequence(hTozzTo4leptonsElectronIsolationDepositSequence + hTozzTo4leptonsElectronIsolationProducerEgamma)
+#from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronIsolationEgammaSequences_cff import *
+#hTozzTo4leptonsElectronIsolationSequenceEgamma=cms.Sequence(hTozzTo4leptonsElectronIsolationDepositSequence + hTozzTo4leptonsElectronIsolationProducerEgamma)
 
 # Electron PF isolation
 from CommonTools.ParticleFlow.PFBRECO_cff import *
-from CommonTools.ParticleFlow.Isolation.pfElectronIsolation_cff import *
-elPFIsoDepositCharged.src    = cms.InputTag("hTozzTo4leptonsElectronSelector")
-elPFIsoDepositChargedAll.src = cms.InputTag("hTozzTo4leptonsElectronSelector")
-elPFIsoDepositNeutral.src    = cms.InputTag("hTozzTo4leptonsElectronSelector")
-elPFIsoDepositGamma.src      = cms.InputTag("hTozzTo4leptonsElectronSelector")
-elPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsElectronSelector")
+from CommonTools.ParticleFlow.Isolation.pfElectronIsolationPFBRECO_cff import *
+elPFIsoDepositChargedPFBRECO.src    = cms.InputTag("hTozzTo4leptonsElectronSelector")
+elPFIsoDepositChargedAllPFBRECO.src = cms.InputTag("hTozzTo4leptonsElectronSelector")
+elPFIsoDepositNeutralPFBRECO.src    = cms.InputTag("hTozzTo4leptonsElectronSelector")
+elPFIsoDepositGammaPFBRECO.src      = cms.InputTag("hTozzTo4leptonsElectronSelector")
+elPFIsoDepositPUPFBRECO.src         = cms.InputTag("hTozzTo4leptonsElectronSelector")
 
 
 # Muon loose isolation
@@ -391,33 +391,33 @@ elPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsElectronSelector")
 
 # Muon PF isolation
 # from CommonTools.ParticleFlow.PFBRECO_cff import *
-from CommonTools.ParticleFlow.Isolation.pfMuonIsolation_cff import *
-muPFIsoDepositCharged.src    = cms.InputTag("hTozzTo4leptonsMuonSelector")
-muPFIsoDepositChargedAll.src = cms.InputTag("hTozzTo4leptonsMuonSelector")
-muPFIsoDepositNeutral.src    = cms.InputTag("hTozzTo4leptonsMuonSelector")
-muPFIsoDepositGamma.src      = cms.InputTag("hTozzTo4leptonsMuonSelector")
-muPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsMuonSelector")
+from CommonTools.ParticleFlow.Isolation.pfMuonIsolationPFBRECO_cff import *
+muPFIsoDepositChargedPFBRECO.src    = cms.InputTag("hTozzTo4leptonsMuonSelector")
+muPFIsoDepositChargedAllPFBRECO.src = cms.InputTag("hTozzTo4leptonsMuonSelector")
+muPFIsoDepositNeutralPFBRECO.src    = cms.InputTag("hTozzTo4leptonsMuonSelector")
+muPFIsoDepositGammaPFBRECO.src      = cms.InputTag("hTozzTo4leptonsMuonSelector")
+muPFIsoDepositPUPFBRECO.src         = cms.InputTag("hTozzTo4leptonsMuonSelector")
 
 # Photon PF
 # from CommonTools.ParticleFlow.PFBRECO_cff import *
 from CommonTools.ParticleFlow.Isolation.pfPhotonIsolation_cff import *
 
-hTozzTo4leptonsPFfsrPhoton = cms.EDFilter(
-    "GenericPFCandidateSelector",
-    src = cms.InputTag("particleFlow","","RECO"),
-    cut = cms.string("pdgId=22 && pt>2. && abs(eta)<2.4")
-)
-
-
 phPFIsoDepositCharged.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositChargedAll.src = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositNeutral.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositGamma.src      = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositCharged.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedHadronsPFBRECO")
 
+phPFIsoDepositChargedAll.src = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositChargedAll.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedParticlesPFBRECO")
+
+phPFIsoDepositNeutral.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositNeutral.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
+
+phPFIsoDepositGamma.src      = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositGamma.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
+
+phPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositPU.ExtractorPSet.inputCandView = cms.InputTag("pfPileUpAllChargedParticlesPFBRECO")
 
 from RecoParticleFlow.PFProducer.photonPFIsolationValues_cff import *
-
 
 phPFIsoValueCharged03PFId.deposits=cms.VPSet(
             cms.PSet(
@@ -429,7 +429,6 @@ phPFIsoValueCharged03PFId.deposits=cms.VPSet(
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
             ))
-
 
 phPFIsoValueChargedAll03PFId.deposits= cms.VPSet(
             cms.PSet(
@@ -456,7 +455,6 @@ phPFIsoValueNeutral03PFId.deposits = cms.VPSet(
         )
     )
 
-
 phPFIsoValueGamma03PFId.deposits = cms.VPSet(
             cms.PSet(
             src = cms.InputTag("phPFIsoDepositGamma"),
@@ -480,7 +478,6 @@ phPFIsoValuePU03PFId.deposits= cms.VPSet(
             PivotCoordinatesForEBEE = cms.bool(True)
       )
    )
-
 
 # Common preselection 
 # from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsCommonPreselectionSequences_cff import *
@@ -938,7 +935,7 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
 #        hTozzTo4leptonsElectronOrdering             +
 	hTozzTo4leptonsElectronSelector             +
 #        kt4PFJetsNew                                  +
-        mvaTrigV025nsCSA14                          + 
+        mvaTrigV025nsPHYS14                          + 
         mvaNonTrigV025nsPHYS14                      +
         cleanMuonsBySegments                        +
 	hTozzTo4leptonsMuonSelector                 +
@@ -983,9 +980,9 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
 #        hTozzTo4leptonsMuonIsolationSequence        +
 #        hTozzTo4leptonsMuonIsolationProducerMu      +
         # PF isolation for electrons and muons
-        pfParticleSelectionSequence                 +
-        pfElectronIsolationSequence                 +
-        pfMuonIsolationSequence                     +
+        pfParticleSelectionPFBRECOSequence          + 
+        pfElectronIsolationPFBRECOSequence          +      
+        muonPFIsolationPFBRECOSequence              +
         pfPhotonIsolationSequence                   +
         # 
         zToEELooseIsol                              +
