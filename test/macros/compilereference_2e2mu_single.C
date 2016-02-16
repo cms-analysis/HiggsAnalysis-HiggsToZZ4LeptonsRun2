@@ -38,15 +38,8 @@ int main(int argc, char ** argv){
     sprintf(nome,"dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/cmsdas/2013/HZZ4lExercise/sig/roottree_leptons_GluGluToHToZZTo4L_M-1000_8TeV-powheg-pythia6.root");
   }
   else {
-    // sprintf(nome,"/lustre/cms/store/user/ndefilip/Summer12_53X_merged/roottree_leptons_GluGluToHToZZTo4L_M-115_8TeV-powheg-pythia6.root");
-    //sprintf(nome,"/cmshome/nicola/tmp/test/Moriond/CMSSW_5_3_4/src/HiggsAnalysis/HiggsToZZ4Leptons/test/roottree_leptons.root");
-    // sprintf(nome,"/lustre/cms/store/user/defilip/roottree_leptons_vbf.root");  
-    //sprintf(nome,"/lustre/cms/store/user/defilip/roottree_leptons_Fall11.root");
-    // sprintf(nome,"/lustre/cms/store/user/defilip/roottree_leptons_Fall11_MuScleFit.root");
-    // sprintf(nome,"roottree_leptons.root");
-    //sprintf(nome,"/lustre/cms/store/user/defilip/roottree_leptons_gluglu_MuScleFit_EScaleLin.root");
-//   sprintf(nome,"/lustre/cms/store/user/defilip/roottree_leptons_vbf_MuScleFit_EScaleLin_final.root");
-    sprintf(nome,"/localdata/Syncr13TeV/roottree_leptons_sync_Phys14_HiggsToZZ.root");
+    //sprintf(nome,"roottree_leptons.root");
+    sprintf(nome,"/localdata/Syncr13TeV/roottree_leptons_sync_Spring15_HiggsToZZ_74Xv2.root");
   }
 
 
@@ -65,7 +58,7 @@ int main(int argc, char ** argv){
   HZZ4LeptonsAnalysis make3(tree3,1.,dataconf,mcconf);
   //HZZ4LeptonsAnalysis make3(tree3);
 
-  sprintf(nome,"output_Phys14_Higgs.root");
+  sprintf(nome,"output_Spring15_Higgs.root");
   make3.Loop(nome);
 
   cout << "Create file with name: " << nome << endl;

@@ -295,6 +295,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    // Pileup reweighting
    edm::LumiReWeighting LumiWeights_;
    
+   /*
    // initialize 1-D reweighting 2012
    LumiWeights_ = edm::LumiReWeighting(
 				       "puProfile_Summer12_53X.root",
@@ -316,6 +317,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      puMCtrue=boost::shared_ptr<TH1>(  (static_cast<TH1*>(_filePU->Get("nPUvertices")->Clone() )) );
      puMCtrue->Scale(double(1./puMCtrue->Integral(0,-1)));
    }
+
+   */
 
    Char_t PU_MC[500];
    TString datasetBaseNew=basename(datasetChar);
@@ -1596,7 +1599,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        	
  	if( RECOELE_PT[i] > 7. 
 	    && fabs(RECOELE_ETA[i]) < 2.5 
-	    && RECOELE_gsftrack_expected_inner_hits[i]<=1 
+	    // && RECOELE_gsftrack_expected_inner_hits[i]<=1  not used anymore
 	    && fabs(RECOELE_gsftrack_dxy[i]) < .5 
 	    && fabs(RECOELE_gsftrack_dz[i]) < 1. 
 	    ) {	  
@@ -1727,9 +1730,25 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       		  << "\nfabs( RECOELE_gsftrack_dz[i] ) " << fabs( RECOELE_gsftrack_dz[i] )
 		  << endl ;
        	
- 	if( RECOELE_PT[i] > 7. && fabs(RECOELE_ETA[i]) < 2.5  && RECOELE_gsftrack_expected_inner_hits[i]<=1 ) /* ok */ ;
+ 	if( RECOELE_PT[i] > 7. && fabs(RECOELE_ETA[i]) < 2.5 );
+	  // && RECOELE_gsftrack_expected_inner_hits[i]<=1 ) /* ok */ ;
 	else continue ;
 	
+	bool BDT_ok = 0; // Spring15 with CMSSW_7_4_5
+	if( RECOELE_PT[i] > 5. &&  RECOELE_PT[i] <= 10. ){
+	  if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.586 ) BDT_ok = 1 ;
+	  if( ( fabs(RECOELE_scl_Eta[i]) >= .8 && fabs(RECOELE_scl_Eta[i]) < 1.479 )
+	      && RECOELE_mvaNonTrigV0[i] > -0.712 ) BDT_ok = 1 ;
+	  if( fabs(RECOELE_scl_Eta[i]) >= 1.479 && RECOELE_mvaNonTrigV0[i] > -0.662 ) BDT_ok = 1 ;
+        }
+        else {
+	  if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.652 ) BDT_ok = 1 ;
+	  if( ( fabs(RECOELE_scl_Eta[i]) >= .8 && fabs(RECOELE_scl_Eta[i]) <= 1.479 )
+	      && RECOELE_mvaNonTrigV0[i] > -0.701 ) BDT_ok = 1 ;
+	  if( fabs(RECOELE_scl_Eta[i]) > 1.479 && RECOELE_mvaNonTrigV0[i] > -0.350 ) BDT_ok = 1 ;
+        }
+
+	/*
 	bool BDT_ok = 0; // Phys14 with CMSSW_7_2_0
 	if( RECOELE_PT[i] > 5. &&  RECOELE_PT[i] <= 10. ){
 		if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.202 ) BDT_ok = 1 ;
@@ -1743,6 +1762,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 						 && RECOELE_mvaNonTrigV0[i] > -0.284 ) BDT_ok = 1 ;
 		if( fabs(RECOELE_scl_Eta[i]) > 1.479 && RECOELE_mvaNonTrigV0[i] > -0.212 ) BDT_ok = 1 ;
 	}
+	*/
+
 	if( !BDT_ok ) continue ;
 	
 	if( fabs(RECOELE_gsftrack_dxy[i]) < .5 
@@ -2326,7 +2347,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 			      << "\n RECOMU_PFX_dB[ iL[j] ] " << RECOMU_PFX_dB[ iL[j] ]
 			      << endl;
 	    
-	    //if(  RECOMU_PFX_dB[ iL[i] ] >= 0.4 ||  RECOMU_PFX_dB[ iL[j] ] >= 0.4 ) continue;   // cut on isolation
+	    //if(  RECOMU_PFX_dB[ iL[i] ] >= 0.35 ||  RECOMU_PFX_dB[ iL[j] ] >= 0.35 ) continue;   // cut on isolation
 	  }
 	  // ** end association of FSR to Z
 	  
@@ -2723,7 +2744,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 			      << "\n RECOELE_PFX_rho[ iLe[j] ] " << RECOELE_PFX_rho[ iLe[j] ]
 			      << endl;
 	    
-	    //if(  RECOELE_PFX_rho[ iLe[i] ] >= 0.4 ||  RECOELE_PFX_rho[ iLe[j] ] >= 0.4 ) continue;   // cut on isolation
+	    //if(  RECOELE_PFX_rho[ iLe[i] ] >= 0.5 ||  RECOELE_PFX_rho[ iLe[j] ] >= 0.5 ) continue;   // cut on isolation
 	  }
 	  // ** end association of FSR to Z
 	  
@@ -2823,9 +2844,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
             //                               max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept2]+
             //                                   (RECOMU_PFphoton[ Zcandvector.at(index2).ilept2]-Zcandvector.at(index1).ptFSR)-
             //                                   0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept2]))/RECOMU_PT[ Zcandvector.at(index2).ilept2];
-	    
-	    if (Zcandvector.at(index1).isol1 >=0.4 || Zcandvector.at(index1).isol2 >=0.4) continue;
-            if (Zcandvector.at(index2).isol1 >=0.4 || Zcandvector.at(index2).isol2 >=0.4) continue;
+
+	    if (Zcandvector.at(index1).tag==1 && 
+		(Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index1).tag==0 && 
+		(Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index1).isol2 >=0.5)) continue;
+	  
+	    if (Zcandvector.at(index2).tag==1 && 
+		(Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index2).tag==0 && 
+		(Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
 	    cout << "Isolation pass: First Z with FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with no FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
 	    
 	  } 
@@ -2874,9 +2902,17 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      
 	    }
 	    
+	    if (Zcandvector.at(index1).tag==1 
+		&& (Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index1).tag==0 
+		&& (Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index1).isol2 >=0.5)) continue;
 	    
-            if (Zcandvector.at(index1).isol1 >=0.4 || Zcandvector.at(index1).isol2 >=0.4) continue;
-            if (Zcandvector.at(index2).isol1 >=0.4 || Zcandvector.at(index2).isol2 >=0.4) continue;
+            if (Zcandvector.at(index2).tag==1 
+		&& (Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index2).tag==0 
+		&& (Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
+	    
+
 	    cout << "Isolation pass: First Z with no FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
 	    
 	    
@@ -2954,15 +2990,30 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      }
 	    }
 
+	    if (Zcandvector.at(index1).tag==1 && 
+		(Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index1).tag==0 && 
+		(Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
 	    
-            if (Zcandvector.at(index1).isol1 >=0.4 || Zcandvector.at(index1).isol2 >=0.4) continue;
-            if (Zcandvector.at(index2).isol1 >=0.4 || Zcandvector.at(index2).isol2 >=0.4) continue;
+	    if (Zcandvector.at(index2).tag==1 && 
+		(Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index2).tag==0 && 
+		(Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
+
 	    cout << "Isolation pass: First Z with FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
 	    
 	  }
 	  else {  
-	    if (Zcandvector.at(index1).isol1 >=0.4 || Zcandvector.at(index1).isol2 >=0.4) continue;
-	    if (Zcandvector.at(index2).isol1 >=0.4 || Zcandvector.at(index2).isol2 >=0.4) continue;
+	    if (Zcandvector.at(index1).tag==1 && 
+		(Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index1).tag==0 && 
+		(Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
+	    
+	    if (Zcandvector.at(index2).tag==1 && 
+		(Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
+	    if (Zcandvector.at(index2).tag==0 && 
+		(Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
+
 	    cout << "Isolation pass: First Z with no FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with no FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
 	  }
 	  
@@ -3157,7 +3208,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  
 	  for(int mu = 0; mu < N_good; ++mu){
 	    if (RECOMU_SIP[iL[mu]]>=4.) continue;
-	    if (RECOMU_PFX_dB_new[iL[mu]]>=0.4) continue;
+	    if (RECOMU_PFX_dB_new[iL[mu]]>=0.35) continue;
 	    deltaR_3 = sqrt( pow(DELTAPHI(RECO_PFJET_PHI[i],RECOMU_PHI[iL[mu]]),2) + pow(RECO_PFJET_ETA[i] - RECOMU_ETA[iL[mu]],2));
 	    cout << "1st lepton: " <<" deltaR "<< deltaR_3 <<endl;
 	    if (deltaR_3<0.4){
@@ -4280,12 +4331,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      
      for(int i=0;i<RECO_PFJET_N;i++){
        cout<<i<<" Jet with pt= "<<RECO_PFJET_PT[i]<<" ETA "<<RECO_PFJET_ETA[i]<<" PUID "<<RECO_PFJET_PUID[i] << " PUID_MVA "<< RECO_PFJET_PUID_MVA[i]<<endl;
-       if(RECO_PFJET_PUID[i]==1 && RECO_PFJET_PT[i]>30. && fabs(RECO_PFJET_ETA[i])<4.7 ){
+       
+        //if(RECO_PFJET_PUID[i]==1 && RECO_PFJET_PT[i]>30. && fabs(RECO_PFJET_ETA[i])<4.7 ){ // NO PU ID temporary
+       if(RECO_PFJET_PT[i]>30. && fabs(RECO_PFJET_ETA[i])<4.7 ){
        
       	 //Check that jet has deltaR>0.4 away from any tight lepton corrected for FSR
 	 for(int mu = 0; mu < N_good; ++mu){
 	   if (fabs(RECOMU_SIP[iL[mu]])>=4.) continue;
-      	   if (RECOMU_PFX_dB_new[iL[mu]]>=0.4) continue;
+      	   if (RECOMU_PFX_dB_new[iL[mu]]>=0.35) continue;
 	   double deltaR = sqrt( pow(DELTAPHI(RECO_PFJET_PHI[i],RECOMU_PHI[iL[mu]]),2) + pow(RECO_PFJET_ETA[i] - RECOMU_ETA[iL[mu]],2));
 	   cout << "1st lepton muon: " << " pT=" << RECOMU_PT[iL[mu]] <<" deltaR "<< deltaR <<endl;	   
 	   if (deltaR<0.4){
@@ -4307,6 +4360,22 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      	   }
      	 }
 	 
+	 // cleaning w.r.t FSR photons attached to leptons
+	 for(int j=0.;j<Nphotons;j++) {
+           if (iLp_l[j]!=-1 && (iLp_tagEM[j]==0 || iLp_tagEM[j]==1) ) {
+	     if (iLp_tagEM[j]==0) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[j]] << " attached to a muon with pT= " << RECOMU_PT[iLp_l[j]] << endl;
+	     if (iLp_tagEM[j]==1) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[j]] << " attached to a electron with pT= " << RECOELE_PT[iLp_l[j]] << endl;
+	     double deltaR = sqrt( pow(DELTAPHI(RECO_PFJET_PHI[i],RECOPFPHOT_PHI[iLp[j]]),2) + pow(RECO_PFJET_ETA[i] - RECOPFPHOT_ETA[iLp[j]],2));
+	     if (deltaR<0.4){
+	       jetfail[i]=1;
+	       cout << " jetfail " << jetfail[i] <<endl;
+	       break;
+	     }
+	   }
+         }
+	 // 
+
+
 	 if (jetfail[i]==0){
 	   cout<< " PASS jet " <<i<<" PT= "<<RECO_PFJET_PT[i]<<" ETA= "<<RECO_PFJET_ETA[i]<<" PUID= "<<RECO_PFJET_PUID[i]<<endl;
 	   njets_pass++;
@@ -5095,7 +5164,7 @@ double HZZ4LeptonsAnalysis::EAele(int index,bool use2011EA){
 	if (fabs(RECOELE_scl_Eta[index]) >= 2.3   && fabs(RECOELE_scl_Eta[index]) < 2.4 )   EffectiveArea = 0.22;
 	if (fabs(RECOELE_scl_Eta[index]) >= 2.4 )                                       EffectiveArea = 0.29;
       }
-      else {
+      else { // 7_4_X use eta
 	if (fabs(RECOELE_ETA[index]) >= 0.0   && fabs(RECOELE_ETA[index]) < 0.8 )   EffectiveArea = 0.1830;
         if (fabs(RECOELE_ETA[index]) >= 0.8   && fabs(RECOELE_ETA[index]) < 1.3 )   EffectiveArea = 0.1734;
         if (fabs(RECOELE_ETA[index]) >= 1.3   && fabs(RECOELE_ETA[index]) < 2.0 )   EffectiveArea = 0.1077;
