@@ -30,6 +30,7 @@
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsCP.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsMCGenFilter.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsCommonRootTree.h>
+#include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsRootTree.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsConstraintFitProducer.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/ConvValueMapProd.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsCandViewCleaner.h>
@@ -68,6 +69,7 @@ DEFINE_FWK_MODULE(HZZ4LeptonsBestCandidate);
 DEFINE_FWK_MODULE(HZZ4LeptonsCP);
 DEFINE_FWK_MODULE(HZZ4LeptonsMCGenFilter);
 DEFINE_FWK_MODULE(HZZ4LeptonsCommonRootTree);
+DEFINE_FWK_MODULE(HZZ4LeptonsRootTree);
 DEFINE_FWK_MODULE(HZZ4LeptonsConstraintFitProducer);
 DEFINE_FWK_MODULE(HZZ4LeptonsPFJetSelector);
 // DEFINE_FWK_MODULE(HZZ4LeptonsZZMassErrors);

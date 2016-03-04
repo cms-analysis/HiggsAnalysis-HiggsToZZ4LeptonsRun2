@@ -280,8 +280,8 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
+//#include "CMGTools/External/interface/PileupJetIdentifier.h"
 #include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
-
 
 //Full Error
 #include "TrackingTools/AnalyticalJacobians/interface/JacobianCurvilinearToCartesian.h"
@@ -292,7 +292,21 @@
 
 #include <TMatrixD.h>
 
-class TFile;
+
+//class TFile;
+
+class MultiTrajectoryStateMode ;
+class EgammaTowerIsolation ;
+
+
+// Class to create TTree variables
+#include <TFile.h> 
+#include <TTree.h> 
+
+// Namespaces
+using namespace reco;
+using namespace std;
+using namespace pat;
 
 //
 // class declaration
@@ -310,8 +324,8 @@ class HZZ4LeptonsRootTree : public edm::EDAnalyzer {
       //void EventsReWeighting(const edm::Event& evt);
       float delR(float eta1,float phi1,float eta2,float phi2);
       void triggermatching(const edm::Event& iEvent);
-      bool IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<std::string> HLTMuNames,double DR,double DPtRel); 
-      std::string getParticleName(int id) const;
+      bool IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel); 
+      const std::string getParticleName(int id);
       bool match(double mass, double pt, int charge,const reco::CandidateCollection *c1Coll);
       bool matchParticle(double mass, double pt, int charge, const reco::Candidate *c1);
       struct SortCandByDecreasingPt {
@@ -329,6 +343,7 @@ class HZZ4LeptonsRootTree : public edm::EDAnalyzer {
       void fillPhotons(const edm::Event& evt);
       void fillMuons(const edm::Event& iEvent,const edm::EventSetup& iSetup);
       void fillElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+      void EventsMCReWeighting(const edm::Event& iEvent);
       void fillHLTFired(const edm::Event& iEvent);
       void filljets(const edm::Event& iEvent);
       void fillAdditionalRECO(const edm::Event& iEvent);
@@ -577,6 +592,7 @@ private:
       std::vector<float> RECO_PFJET_PHI;
       std::vector<int> RECO_PFJET_PUID;
       std::vector<float> RECO_PFJET_PUID_MVA;
+      
       //=============================================================
       //
       //  Create vectors for Photons Tree
@@ -626,6 +642,7 @@ private:
       std::vector<float> cSV_BTagJet_ETA;
       std::vector<float> cSV_BTagJet_PHI;
       std::vector<float> cSV_BTagJet_DISCR;
+      std::vector<float> cSV_BTagJet_ET;
       //=============================================================
       //
       //           Create Branchs for Muons match HLT variables

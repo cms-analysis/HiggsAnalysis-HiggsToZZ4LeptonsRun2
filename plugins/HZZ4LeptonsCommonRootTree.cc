@@ -238,6 +238,7 @@ void HZZ4LeptonsCommonRootTree::analyze(const edm::Event& iEvent, const edm::Eve
 
   // file PU block
   if (fillPUinfo) fillPU(iEvent);
+  EventsMCReWeighting(iEvent);
 
   // fill HLT block
   //fillHLTFired(iEvent);

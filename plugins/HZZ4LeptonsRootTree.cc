@@ -8,6 +8,7 @@
  *  9/1/2016    
  *  CMSSW_7_4_5     
  */
+
 #include "HZZ4LeptonsRootTree.h"
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -100,6 +101,7 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
+//#include "CMGTools/External/interface/PileupJetIdentifier.h"
 #include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 
 
@@ -961,6 +963,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   mytree->Branch("PFMet_pz",&PFMet_pz,"PFMet_pz/F");
   mytree->Branch("PFMet_sumEt",&PFMet_sumEt,"PFMet_sumEt/F");
   mytree->Branch("METSign",&METSign,"METSign/D");
+
   //=============================================================
   //
   //  Create vectors for BTagging Tree
@@ -981,6 +984,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   mytree->Branch("cSV_BTagJet_ETA",&cSV_BTagJet_ETA);
   mytree->Branch("cSV_BTagJet_PHI",&cSV_BTagJet_PHI);
   mytree->Branch("cSV_BTagJet_DISCR",&cSV_BTagJet_DISCR);
+  mytree->Branch("cSV_BTagJet_ET",&cSV_BTagJet_ET);
   //=============================================================
   //
   //  Create Branches for reco leptons Tree
@@ -1087,6 +1091,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   //=============================================================
   mytree->Branch("num_PU_vertices",&num_PU_vertices,"num_PU_vertices/I");
   mytree->Branch("PU_BunchCrossing",&PU_BunchCrossing,"PU_BunchCrossing/I");
+
   //=============================================================
   //                   
   //           Create Branch for Rho
@@ -1441,6 +1446,7 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
   RECOPHOT_MatchingMCpT.clear();
   RECOPHOT_MatchingMCEta.clear();
   RECOPHOT_MatchingMCPhi.clear();
+ 
   // Photons
   edm::Handle<edm::View<reco::Photon> > photons;
   iEvent.getByLabel(photonsTag_, photons);
@@ -1513,10 +1519,12 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
     double  perr = TMath::Sqrt(C*C*cand->p4().e()*cand->p4().e() + S*S*cand->p4().e() + N*N);
     double pterr = perr*cand->pt()/cand->p(); 
     RECOPFPHOT_PTError.push_back(float(pterr));
-    //cout << "Photon : pT= " << RECOPFPHOT_PT[iphot] << " pTerr= " << RECOPFPHOT_PTError[iphot]<< endl;
+    cout << "Photon : pT= " << RECOPFPHOT_PT[iphot] << " pTerr= " << RECOPFPHOT_PTError[iphot]<< endl;
+    
     RECOPFPHOT_ETA.push_back(cand->eta());
     RECOPFPHOT_PHI.push_back(cand->phi());
     RECOPFPHOT_THETA.push_back(cand->theta());
+
     RECOPFPHOT_PFchAllPart.push_back((*isoPFChargedAllphmap)[phtrackref]); 
     RECOPFPHOT_PFchHad.push_back((*isoPFChargedphmap)[phtrackref]); 
     RECOPFPHOT_PFneuHad.push_back((*isoPFNeutralphmap)[phtrackref]); 
@@ -1557,6 +1565,7 @@ void HZZ4LeptonsRootTree::fillBTagging(const edm::Event& iEvent)
   cSV_BTagJet_ETA.clear();
   cSV_BTagJet_PHI.clear();
   cSV_BTagJet_DISCR.clear();
+  cSV_BTagJet_ET.clear();
   // trackCountingHighEffBJetTags
   edm::Handle<reco::JetTagCollection> bTagHandle;
   iEvent.getByLabel(tCHighEff_bTag_,bTagHandle);
@@ -1606,6 +1615,7 @@ void HZZ4LeptonsRootTree::fillBTagging(const edm::Event& iEvent)
       cSV_BTagJet_ETA.push_back(btagIter->first->eta());
       cSV_BTagJet_PHI.push_back(btagIter->first->phi());
       cSV_BTagJet_DISCR.push_back(btagIter->second);
+      cSV_BTagJet_ET.push_back(btagIter->first->et());
     }
   }
 }
@@ -1625,20 +1635,31 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   RECO_PFJET_PHI.clear();
   RECO_PFJET_PUID.clear();
   RECO_PFJET_PUID_MVA.clear();
-  edm::Handle<reco::PFJetCollection> pfjets;
+  edm::Handle<reco::PFJetCollection> pfjets,pfjetsmva;
   edm::Handle<edm::ValueMap<float> > puJetIdMVAMC;
   edm::Handle<edm::ValueMap<int> > puJetIdFlagMC;
   edm::Handle<edm::ValueMap<float> > puJetIdMVAData;
   edm::Handle<edm::ValueMap<int> > puJetIdFlagData;
+  // if (fillMCTruth == 1){
+  //   iEvent.getByLabel(jetsTag_, pfjets);
+  //   iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
+  //   iEvent.getByLabel(PuJetMvaMCfullId_,puJetIdFlagMC);
+  // }
+  // else{
+  //   iEvent.getByLabel("ak5PFJetsCorrectionData", pfjets);
+  //   iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
+  //   iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
+  // }
   if (fillMCTruth == 1){
     iEvent.getByLabel(jetsTag_, pfjets);
-    iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
-    iEvent.getByLabel(PuJetMvaMCfullId_,puJetIdFlagMC);
+    iEvent.getByLabel("hTozzTo4leptonsPFJetSelector", pfjetsmva);
+    iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);
   }
   else{
-    iEvent.getByLabel("ak5PFJetsCorrectionData", pfjets);
+    iEvent.getByLabel("ak4PFJetsCorrectionData", pfjets);
+    iEvent.getByLabel("hTozzTo4leptonsPFJetSelector", pfjetsmva);
     iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
-    iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
+    
   }
   RECO_PFJET_N=pfjets->size();
   cout << "Number of PFJets in the event= " << RECO_PFJET_N << endl;
@@ -1646,10 +1667,12 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   for ( PFJetCollection::const_iterator i=pfjets->begin(); i!=pfjets->end(); i++) {  
     if (index_jets>99) continue;
     //RECO_PFJET_N.push_back(index_jets);
-    edm::Ref<reco::PFJetCollection> pfjetref(pfjets,index_jets);      
+    edm::Ref<reco::PFJetCollection> pfjetref(pfjets,index_jets);
+      
     float mva = 0.;
     int idflag = -1;
     int pupass = 1;
+
     if (!isVBF_){
       if (fillMCTruth == 1){
 	mva = (*puJetIdMVAMC)[pfjetref];
@@ -1698,15 +1721,23 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
     else {
       cout << "Looking for VBF analysis" << endl;
       edm::Handle<reco::PFJetCollection> pfjets_step2;
+      // if (fillMCTruth == 1){
+      // 	iEvent.getByLabel(edm::InputTag("ak5PFJetsCorrection","","step2"), pfjets_step2);
+      // 	iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
+      // 	iEvent.getByLabel(PuJetMvaMCfullId_,puJetIdFlagMC);
+      // }
+      // else{
+      // 	iEvent.getByLabel(edm::InputTag("ak5PFJetsCorrectionData","","step2"), pfjets_step2);
+      // 	iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
+      // 	iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
+      // }
       if (fillMCTruth == 1){
-	iEvent.getByLabel(edm::InputTag("ak5PFJetsCorrection","","step2"), pfjets_step2);
+	iEvent.getByLabel(edm::InputTag("ak4PFJetsCorrection","","step2"), pfjets_step2);
 	iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
-	iEvent.getByLabel(PuJetMvaMCfullId_,puJetIdFlagMC);
       }
       else{
-	iEvent.getByLabel(edm::InputTag("ak5PFJetsCorrectionData","","step2"), pfjets_step2);
+	iEvent.getByLabel(edm::InputTag("ak4PFJetsCorrectionData","","step2"), pfjets_step2);
 	iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
-	iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
       }
       int index_jets_step2 = 0;
       for ( PFJetCollection::const_iterator j=pfjets_step2->begin(); j!=pfjets_step2->end(); j++) {
@@ -1753,20 +1784,20 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
       RECO_PFJET_PUID.push_back(pupass);
       RECO_PFJET_PUID_MVA.push_back(mva);
     }
-    /* cout 
+    cout 
        << "PF Jet with ET= " << RECO_PFJET_ET[index_jets]   
        << " PT="   << RECO_PFJET_PT[index_jets]   
        << " ETA="  << RECO_PFJET_ETA[index_jets]  
        << " PHI="  << RECO_PFJET_PHI[index_jets]  
        << " PUID=" << RECO_PFJET_PUID[index_jets] 
        << " PUID_MVA=" << RECO_PFJET_PUID_MVA[index_jets] 
-       << endl;*/
+       << endl;
     index_jets++;
   } // for loop on PFJets jets
   
   edm::Handle<double> rhoHandle;
   if (!use2011EA) {
-    rhojetsTag_=edm::InputTag("kt6PFJetsCentralNeutral:rho");      
+    //rhojetsTag_=edm::InputTag("kt6PFJetsCentralNeutral:rho");      
     iEvent.getByLabel(rhojetsTag_,rhoHandle); 
     if (rhoHandle.isValid() ) {
       RHO_mu=*rhoHandle;
@@ -1775,11 +1806,11 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
     else {
       cout << "Not valid RHO collection" << endl;
     }
-    rhojetsTag_=edm::InputTag("kt6PFJets:rho");
+    //rhojetsTag_=edm::InputTag("kt6PFJets:rho");
     iEvent.getByLabel(rhojetsTag_,rhoHandle); 
     if (rhoHandle.isValid() ) {
       RHO_ele=*rhoHandle;
-      //cout << "RHO ele fastjet= " << RHO_ele << endl; 
+      cout << "RHO ele fastjet= " << RHO_ele << endl; 
     }
     else {
       cout << "Not valid RHO collection" << endl;
@@ -1835,6 +1866,7 @@ void HZZ4LeptonsRootTree::fillMET(const edm::Event& evt)
   //edm::Handle<double> metsighandle;
   //evt.getByLabel(theMETSignificance_, metsighandle);
   //METSign=*metsighandle;
+
 }
 //=============================================================
 //
@@ -1851,6 +1883,20 @@ void HZZ4LeptonsRootTree::fillPU(const edm::Event& iEvent)
     PU_BunchCrossing = cand->getBunchCrossing();
   }
 }
+
+void HZZ4LeptonsRootTree::EventsMCReWeighting(const edm::Event& iEvent){
+  MC_weighting.clear();
+  float EventWeight = 1.0;
+  edm::Handle<GenEventInfoProduct> gen_ev_info;
+  iEvent.getByLabel("generator", gen_ev_info);
+  if(!gen_ev_info.isValid()) return;
+  EventWeight = gen_ev_info->weight();
+  //std::cout<<"mc_weight = "<< gen_ev_info->weight() <<std::endl;                                                                                                                                       
+  float mc_weight = ( EventWeight > 0 ) ? 1 : -1;
+  //std::cout<<"mc_weight = "<< mc_weight <<std::endl;                                                                                                                                                   
+  MC_weighting.push_back(mc_weight);
+}
+
 
 void HZZ4LeptonsRootTree::fillHLTFired(const edm::Event& iEvent)
 {
@@ -1946,7 +1992,7 @@ void HZZ4LeptonsRootTree::triggermatching(const edm::Event& iEvent)
   for (edm::View<reco::Muon>::const_iterator iCand = MuCandidates->begin(); iCand != MuCandidates->end(); ++iCand){
     unsigned int i=iCand-MuCandidates->begin();
     cout << "Muon with pt= " << iCand->pt() << ": check trigger matching" << endl;
-    if (IsMuMatchedToHLTMu ( *iCand,  HLTMuMatched , HLTMuMatchedNames, maxDeltaR_, maxDPtRel_ )==true){
+    if (IsMuMatchedToHLTMu(*iCand,  HLTMuMatched , HLTMuMatchedNames, maxDeltaR_, maxDPtRel_)==true){
       nMuHLTMatch++;
       cout << "Muon HLT Matched with pT= " << iCand->pt() << endl;
       RECOMU_PT_MuHLTMatch.push_back(iCand->pt());
@@ -2056,8 +2102,8 @@ void HZZ4LeptonsRootTree::triggermatching(const edm::Event& iEvent)
   RECO_nEleHLTMatchPAT = nEleHLTMatchPat;
 }
 
-bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel) 
-{
+//bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel) 
+bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu ( const reco::Muon &mu, std::vector<reco::Particle> HLTMu , std::vector<string> HLTMuNames, double DR, double DPtRel ) {
   size_t dim =  HLTMu.size();
   size_t nPass=0;
   if (dim==0) return false;
@@ -2076,7 +2122,7 @@ bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<re
 //
 //=============================================================  
 // PDT
-std::string HZZ4LeptonsRootTree::getParticleName(int id) const{
+const std::string HZZ4LeptonsRootTree::getParticleName(int id){
   const ParticleData * pd = pdt_->particle( id );
   if (!pd) {
     std::ostringstream ss;
@@ -2832,7 +2878,8 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
       if (fabs(cand->p4().eta()) >= 2.2 && fabs(cand->p4().eta()) < 2.3 ) EffectiveArea = 0.168;
       if (fabs(cand->p4().eta()) >= 2.3 )                                 EffectiveArea = 0.189;
     }
-    else {       
+
+    else {  // 7_4_X use eta      
       if (fabs(cand->p4().eta()) >= 0.0 && fabs(cand->p4().eta()) < 1.0 ) EffectiveArea = 0.674;
       if (fabs(cand->p4().eta()) >= 1.0 && fabs(cand->p4().eta()) < 1.5 ) EffectiveArea = 0.565;
       if (fabs(cand->p4().eta()) >= 1.5 && fabs(cand->p4().eta()) < 2.0 ) EffectiveArea = 0.442;
@@ -2843,7 +2890,7 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
 
     
     //RECOMU_PFX_rho.push_back(rhoIso);
-    //RECOMU_PFX_rho.push_back((cand->pfIsolationR04().sumChargedHadronPt + max( (cand->pfIsolationR04().sumNeutralHadronEt + cand->pfIsolationR04().sumPhotonEt - max(RHO_mu,0.0)*(EffectiveArea)),0.0))/double(cand->p4().pt()));
+    RECOMU_PFX_rho.push_back((cand->pfIsolationR04().sumChargedHadronPt + max( (cand->pfIsolationR04().sumNeutralHadronEt + cand->pfIsolationR04().sumPhotonEt - max(RHO_mu,0.0)*(EffectiveArea)),0.0))/double(cand->p4().pt()));
 
     
     // Other properties
@@ -3445,7 +3492,8 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
     RECOELE_PFphoton.push_back((*isoPFGammaelemap)[eletrackref]);
     RECOELE_PFPUchAllPart.push_back((*isoPFPUelemap)[eletrackref]);
     RECOELE_PFX_dB.push_back(((*isoPFChargedelemap)[eletrackref] + max((*isoPFGammaelemap)[eletrackref]+(*isoPFNeutralelemap)[eletrackref]-0.5*(*isoPFPUelemap)[eletrackref],0.0))/eletrackref->pt());  
- 
+
+    
     EffectiveArea=0.0;
     if (use2011EA){
       if (fabs(sclRef->eta()) >= 0.0   && fabs(sclRef->eta()) < 1.0 )   EffectiveArea = 0.18;
@@ -3456,14 +3504,14 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
       if (fabs(sclRef->eta()) >= 2.3   && fabs(sclRef->eta()) < 2.4 )   EffectiveArea = 0.22;
       if (fabs(sclRef->eta()) >= 2.4 )                                  EffectiveArea = 0.29;
     }
-    else {
+    else {// 7_4_X use eta 
       if (fabs(cand->p4().eta()) >= 0.0   && fabs(cand->p4().eta()) < 0.8 )   EffectiveArea = 0.1830;
       if (fabs(cand->p4().eta()) >= 0.8   && fabs(cand->p4().eta()) < 1.3 )   EffectiveArea = 0.1734;
       if (fabs(cand->p4().eta()) >= 1.3   && fabs(cand->p4().eta()) < 2.0 )   EffectiveArea = 0.1077;
       if (fabs(cand->p4().eta()) >= 2.0   && fabs(cand->p4().eta()) < 2.2 )   EffectiveArea = 0.1565;
       if (fabs(cand->p4().eta()) >= 2.2 )                                     EffectiveArea = 0.2680;
     }
-    //RECOELE_PFX_rho.push_back(((*isoPFChargedelemap)[eletrackref]+ max( ((*isoPFNeutralelemap)[eletrackref]+(*isoPFGammaelemap)[eletrackref]- max(RHO_ele,0.0)*EffectiveArea),0.0))/cand->p4().pt()); 
+    RECOELE_PFX_rho.push_back(((*isoPFChargedelemap)[eletrackref]+ max( ((*isoPFNeutralelemap)[eletrackref]+(*isoPFGammaelemap)[eletrackref]- max(RHO_ele,0.0)*EffectiveArea),0.0))/cand->p4().pt()); 
        
     // Vertexing DA
     RECOELE_SIP.push_back((*vertexelemap)[eletrackrefv]);
@@ -4315,12 +4363,14 @@ void HZZ4LeptonsRootTree::fillBeamSpot(const edm::Event& iEvent)
   BeamSpot_X=bs.position().x();
   BeamSpot_Y=bs.position().y();
   BeamSpot_Z=bs.position().z();
-  /*cout << "BeamSpot:"
+
+  cout << "BeamSpot:"
     << "  bs_X=" << BeamSpot_X
     << "  bs_Y=" << BeamSpot_Y
     << "  bs_Z=" << BeamSpot_Z
-    << endl;*/
+    << endl;
 }
+
 void HZZ4LeptonsRootTree::fillIsolationByRings(const edm::Event& iEvent,const edm::EventSetup& iSetup)
 {
   edm::Handle<reco::VertexCollection> hVertex;
@@ -5427,7 +5477,7 @@ void HZZ4LeptonsRootTree::fillTracks(const edm::Event& iEvent)
   RECO_TRACK_DZERR.clear();
   edm::Handle<reco::TrackCollection> tracks;
   iEvent.getByLabel(tracksTag_, tracks);
-  //GIORGIA
+  
   RECO_NTRACK=tracks->size();
   //
   cout << "Number of Tracks in the event= " << RECO_NTRACK << endl;
@@ -5450,3 +5500,4 @@ void HZZ4LeptonsRootTree::fillTracks(const edm::Event& iEvent)
     countk++;
   }
 }
+

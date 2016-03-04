@@ -492,6 +492,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     // MC
     Tree_->Branch("num_PU_vertices",&num_PU_vertices,"num_PU_vertices/I");
     Tree_->Branch("PU_BunchCrossing",&PU_BunchCrossing,"PU_BunchCrossing/I");
+    Tree_->Branch("MC_weighting",&MC_weighting,"MC_weighting/F");
 
     // HLT 
     Tree_->Branch("RECO_nMuHLTMatch",&RECO_nMuHLTMatch,"RECO_nMuHLTMatch/I");
@@ -1991,6 +1992,19 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
 	num_PU_vertices=cand->getPU_NumInteractions();
 	PU_BunchCrossing=cand->getBunchCrossing();
       }	
+  }
+
+  void EventsMCReWeighting(const edm::Event& evt){
+   MC_weighting=0.;
+   float EventWeight = 1.0;
+   edm::Handle<GenEventInfoProduct> gen_ev_info;
+   evt.getByLabel("generator", gen_ev_info);
+   if(!gen_ev_info.isValid()) return;
+   EventWeight = gen_ev_info->weight();
+   //std::cout<<"mc_weight = "<< gen_ev_info->weight() <<std::endl;
+   float mc_weight = ( EventWeight > 0 ) ? 1 : -1;
+   //std::cout<<"mc_weight = "<< mc_weight <<std::endl;
+   MC_weighting=mc_weight;
   }
 
 
@@ -5864,6 +5878,9 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
   int num_PU_vertices;
   int PU_BunchCrossing; // bunch crossing for the PU event added
   edm::InputTag PileupSrc_;
+
+  // MC weight
+  float MC_weighting;
 
   // HLT
   bool fillHLTinfo;
