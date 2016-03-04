@@ -18,7 +18,7 @@ hTozzTo4leptonsMCGenParticleListDrawer2e2mu = HiggsAnalysis.HiggsToZZ4Leptons.hT
 # Save MC truth: 
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMCDumper_cfi import *
 import HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMCDumper_cfi
-hTozzTo4leptonsMCDumper.status=cms.vint32(22)
+#hTozzTo4leptonsMCDumper.status=cms.vint32(62)
 
 # CP producer: 
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsCP_cfi import *
@@ -29,7 +29,7 @@ hTozzTo4leptonsMCCP.RECOcollName = cms.InputTag("hTozzTo4leptonsMCDumper")
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsPFtoRECOMuon_cfi import *
 
 # PF photons
-#from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsPFfsrPhoton_cfi import *
+from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsPFfsrPhoton_cfi import *
 
 
 
@@ -149,10 +149,8 @@ else:
     #hTozzTo4leptonsElectronSequence=cms.Sequence(hTozzTo4leptonsElectronIdSequence + hTozzTo4leptonsElectronSelector)
     hTozzTo4leptonsElectronSequence=cms.Sequence(hTozzTo4leptonsElectronSelector)
     
-    
-    # Muon ghost cleaning                                     
-    from MuonAnalysis.MuonAssociators.muonCleanerBySegments_cfi import *
-    cleanMuonsBySegments.src = cms.InputTag("muons")
+    # Muon ghost cleaning
+    from HiggsAnalysis.HiggsToZZ4Leptons.muonCleanerBySegments_cfi import *
 
     # Muon relaxed selection
     from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMuonSelector_cfi import *
@@ -356,22 +354,11 @@ vetoElectrons =  cms.EDFilter("GsfElectronRefSelector",
 #eidHZZHyperTight1.src  = "hTozzTo4leptonsElectronSelector"
 
 # MVA Electron ID
-# from EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi import *
-# mvaTrigV0.electronTag    = cms.InputTag("hTozzTo4leptonsElectronSelector")
-# mvaNonTrigV0.electronTag = cms.InputTag("hTozzTo4leptonsElectronSelector")
-# mvaTrigV025nsCSA14.electronTag    = cms.InputTag("gedGsfElectrons")
-# mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("gedGsfElectrons")
-
-from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronIdMVAProducer_CSA14_cfi import *
-mvaTrigV025nsCSA14.electronTag    = cms.InputTag("gedGsfElectrons")
+from HiggsAnalysis.HiggsToZZ4Leptons.electronIdMVAProducer_CSA14_cfi import *
+#mvaTrigV0.electronTag    = cms.InputTag("hTozzTo4leptonsElectronSelector")
+#mvaNonTrigV0.electronTag = cms.InputTag("hTozzTo4leptonsElectronSelector")
+mvaTrigV025nsPHYS14.electronTag    = cms.InputTag("gedGsfElectrons")
 mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("gedGsfElectrons")
-mvaNonTrigV025nsPHYS14.mvaWeightFile=cms.vstring(
-"EgammaAnalysis/ElectronTools/data/PHYS14FIX/EIDmva_EB1_5_oldscenario2phys14FIX_BDT.weights.xml",
-"EgammaAnalysis/ElectronTools/data/PHYS14FIX/EIDmva_EB2_5_oldscenario2phys14FIX_BDT.weights.xml",
-"EgammaAnalysis/ElectronTools/data/PHYS14FIX/EIDmva_EE_5_oldscenario2phys14FIX_BDT.weights.xml",
-"EgammaAnalysis/ElectronTools/data/PHYS14FIX/EIDmva_EB1_10_oldscenario2phys14FIX_BDT.weights.xml",
-"EgammaAnalysis/ElectronTools/data/PHYS14FIX/EIDmva_EB2_10_oldscenario2phys14FIX_BDT.weights.xml",
-"EgammaAnalysis/ElectronTools/data/PHYS14FIX/EIDmva_EE_10_oldscenario2phys14FIX_BDT.weights.xml",)
 
 ## Electron Regression
 # from EGamma.EGammaAnalysisTools.electronRegressionEnergyProducer_cfi import *
@@ -388,9 +375,7 @@ mvaNonTrigV025nsPHYS14.mvaWeightFile=cms.vstring(
 #hTozzTo4leptonsElectronIsolationSequenceEgamma=cms.Sequence(hTozzTo4leptonsElectronIsolationDepositSequence + hTozzTo4leptonsElectronIsolationProducerEgamma)
 
 # Electron PF isolation
-#from CommonTools.ParticleFlow.pfParticleSelection_cff import *
 from CommonTools.ParticleFlow.PFBRECO_cff import *
-#from CommonTools.ParticleFlow.Isolation.pfElectronIsolation_cff import *
 from CommonTools.ParticleFlow.Isolation.pfElectronIsolationPFBRECO_cff import *
 elPFIsoDepositChargedPFBRECO.src    = cms.InputTag("hTozzTo4leptonsElectronSelector")
 elPFIsoDepositChargedAllPFBRECO.src = cms.InputTag("hTozzTo4leptonsElectronSelector")
@@ -416,12 +401,6 @@ muPFIsoDepositPUPFBRECO.src         = cms.InputTag("hTozzTo4leptonsMuonSelector"
 # Photon PF
 # from CommonTools.ParticleFlow.PFBRECO_cff import *
 from CommonTools.ParticleFlow.Isolation.pfPhotonIsolation_cff import *
-
-hTozzTo4leptonsPFfsrPhoton = cms.EDFilter(
-    "GenericPFCandidateSelector",
-    src = cms.InputTag("particleFlow","","RECO"),
-    cut = cms.string("pdgId=22 && pt>2. && abs(eta)<2.4")
-)
 
 phPFIsoDepositCharged.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
 phPFIsoDepositCharged.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedHadronsPFBRECO")
@@ -456,7 +435,7 @@ phPFIsoValueChargedAll03PFId.deposits= cms.VPSet(
             src = cms.InputTag("phPFIsoDepositChargedAll"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring(),
+            vetos = cms.vstring('Threshold(0.2)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -481,7 +460,7 @@ phPFIsoValueGamma03PFId.deposits = cms.VPSet(
             src = cms.InputTag("phPFIsoDepositGamma"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('0.01','Threshold(0.5)','EcalEndcaps:ConeVeto(0.05)'),
+            vetos = cms.vstring('0.01','Threshold(0.5)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -500,8 +479,6 @@ phPFIsoValuePU03PFId.deposits= cms.VPSet(
       )
    )
 
-#  preselection 
-# from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsPreselectionSequences_cff import *
 
 # zToEE loose isolated
 from HiggsAnalysis.HiggsToZZ4Leptons.zToEE_cfi import *
@@ -650,7 +627,7 @@ hTozzTo4leptonsIpToVtxProducerKinEEEE.VertexLabel = cms.InputTag("hTozzTo4lepton
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMatchingSequence_cff  import *
 
 
-# COMMON ROOT TREE
+# ROOT TREE
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsRootTree_cfi  import *
 hTozzTo4leptonsRootTreePresel=HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsRootTree_cfi.hTozzTo4leptonsRootTree.clone()
 hTozzTo4leptonsRootTreePresel.decaychannel = cms.string('2e2mu')
@@ -675,7 +652,7 @@ else:
 hTozzTo4leptonsRootTreePresel.SkimEarlyDataAnalysisinst = cms.string('hTozzTo4leptonsSkimEarlyDataAnalysis')
 hTozzTo4leptonsRootTreePresel.flagSkimEarlyDatanames=cms.VInputTag(cms.InputTag("flagSkimhighEnergyMuons"),cms.InputTag("flagSkimhighEnergyElectrons"),cms.InputTag("flagSkimrecoWMNfromPf"),cms.InputTag("flagSkimrecoWMNfromTc"),cms.InputTag("flagSkimrecoWENfromPf"),cms.InputTag("flagSkimrecoWENfromTc"),cms.InputTag("flagSkimdiMuonsJPsi"),cms.InputTag("flagSkimdiMuonsZ"),cms.InputTag("flagSkimdiElectronsZ"),cms.InputTag("flagSkimtriLeptonsMuMuMu"),cms.InputTag("flagSkimtriLeptonsMuMuEl"),cms.InputTag("flagSkimtriLeptonsMuElEl"),cms.InputTag("flagSkimtriLeptonsElElEl"),cms.InputTag("flagSkimquadLeptons4Mu"),cms.InputTag("flagSkimquadLeptons2Mu2El"),cms.InputTag("flagSkimquadLeptons4El"))
 # presel
-hTozzTo4leptonsRootTreePresel.flaginst = cms.string('hTozzTo4leptonsPreselection')
+hTozzTo4leptonsRootTreePresel.flaginst = cms.string('hTozzTo4leptonsCommonPreselection')
 hTozzTo4leptonsRootTreePresel.flagtags = cms.vstring('PreselAtleast2Ele','PreselAtleast2Mu','PreselAtleast1ZEE','PreselAtleast1ZMuMu','PreselAtleast1H','PreselLoose2IsolEle','PreselLoose2IsolMu')
 # MC truth
 hTozzTo4leptonsRootTreePresel.fillMCTruth  = cms.untracked.bool(False)
@@ -771,57 +748,59 @@ hTozzTo4leptonsRootTreePresel.CP4e_MELALabel         = cms.InputTag("hTozzTo4lep
 ######Conversion
 from HiggsAnalysis.HiggsToZZ4Leptons.ConvValueMapProd_cfi  import *
 
-## #### FastJet corrections
-from RecoJets.JetProducers.kt4PFJets_cfi import *
-import RecoJets.JetProducers.kt4PFJets_cfi
-kt6PFJets=RecoJets.JetProducers.kt4PFJets_cfi.kt4PFJets.clone()
-kt6PFJets.rParam = cms.double(0.6)
-kt6PFJets.doRhoFastjet = cms.bool(True) 
-kt6PFJets.Rho_EtaMax = cms.double(2.5)
-kt6PFJets.Ghost_EtaMax = cms.double(2.5)
-
-from RecoJets.Configuration.RecoPFJets_cff import *
-kt6PFJetsCentral = kt6PFJets.clone(
-  Ghost_EtaMax = cms.double(2.5),
-  Rho_EtaMax = cms.double(2.5),
-)
-
 #PFJet ID
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsPFJetSelector_cfi import *
+hTozzTo4leptonsPFJetSelector.PFJetCollection = cms.InputTag("ak4PFJetsCHS")
 
 #PFJet Energy Corrections
 from JetMETCorrections.Configuration.DefaultJEC_cff import *
 from JetMETCorrections.Configuration.JetCorrectionServices_cff import *
 from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff import *
 
-ak4PFJetsCorrection = ak4PFL1FastL2L3.clone( 
- src = cms.InputTag('hTozzTo4leptonsPFJetSelector'), 
- correctors  = cms.vstring('ak4PFL1Fastjet')         
+
+ak4PFJetsCorrection   = cms.EDProducer('PFJetCorrectionProducer',
+    src         = cms.InputTag('hTozzTo4leptonsPFJetSelector'),
+    correctors  = cms.vstring('ak4PFCHSL1Fastjet','ak4PFCHSL2Relative','ak4PFCHSL3Absolute')
 )
 
-ak4PFJetsCorrectionData = ak4PFJetsL1FastL2L3Residual.clone()
-ak4PFJetsCorrectionData.src = cms.InputTag('hTozzTo4leptonsPFJetSelector')
+ak4PFJetsCorrectionData   = cms.EDProducer('PFJetCorrectionProducer',
+    src         = cms.InputTag('hTozzTo4leptonsPFJetSelector'),
+    correctors  = cms.vstring('ak4PFCHSL1Fastjet','ak4PFCHSL2Relative','ak4PFCHSL3Absolute')
+)
 
-from CMGTools.External.pujetidsequence_cff import puJetId
-from CMGTools.External.pujetidsequence_cff import puJetMva
 
-recoPuJetIdMC = puJetId.clone(
-  jets = cms.InputTag("ak4PFJetsCorrection"),
-)
-recoPuJetMvaMC = puJetMva.clone(
-  jets = cms.InputTag("ak4PFJetsCorrection"),
-  jetids = cms.InputTag("recoPuJetIdMC"),
-)
-recoPuJetIdMCsequence=cms.Sequence(recoPuJetIdMC * recoPuJetMvaMC) 
+from RecoJets.JetProducers.PileupJetIDParams_cfi import full_5x_chs
 
-recoPuJetIdData = puJetId.clone(
-  jets = cms.InputTag("ak4PFJetsCorrectionData"),
+recoPuJetIdMvaMC = cms.EDProducer('PileupJetIdProducer',
+     produceJetIds = cms.bool(True),
+     jetids = cms.InputTag(""),
+     runMvas = cms.bool(True),
+     jets = cms.InputTag("hTozzTo4leptonsPFJetSelector"),
+     vertexes = cms.InputTag("offlinePrimaryVertices"),
+     algos = cms.VPSet(full_5x_chs),
+     rho     = cms.InputTag("fixedGridRhoFastjetAll"),
+     jec     = cms.string("AK4PFchs"),
+     applyJec = cms.bool(True),
+     inputIsCorrected = cms.bool(False),
+     residualsFromTxt = cms.bool(False),
+     residualsTxt     = cms.FileInPath("RecoJets/JetProducers/data/download.url") # must be an existing file
 )
-recoPuJetMvaData = puJetMva.clone(
-  jets = cms.InputTag("ak4PFJetsCorrectionData"),
-  jetids = cms.InputTag("recoPuJetIdData"),
+
+recoPuJetIdMvaData = cms.EDProducer('PileupJetIdProducer',
+     produceJetIds = cms.bool(True),
+     jetids = cms.InputTag(""),
+     runMvas = cms.bool(True),
+     jets = cms.InputTag("hTozzTo4leptonsPFJetSelector"),
+     vertexes = cms.InputTag("offlinePrimaryVertices"),
+     algos = cms.VPSet(full_5x_chs),
+     rho     = cms.InputTag("fixedGridRhoFastjetAll"),
+     jec     = cms.string("AK4PFchs"),
+     applyJec = cms.bool(True),
+     inputIsCorrected = cms.bool(False),
+     residualsFromTxt = cms.bool(False),
+     residualsTxt     = cms.FileInPath("RecoJets/JetProducers/data/download.url") # must be an existing file                                                                                      
 )
-recoPuJetIdDatasequence=cms.Sequence(recoPuJetIdData * recoPuJetMvaData)
+
 
 # Constrained fit: input 2l
 #from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsConstraintFitProducerLeptons_cfi import *
@@ -953,8 +932,8 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
 #       hTozzTo4leptonsSkimEarlyDataAnalysis        +
 #        hTozzTo4leptonsElectronOrdering             +
 	hTozzTo4leptonsElectronSelector             +
-        kt6PFJets                                +
-        mvaTrigV025nsCSA14                          + 
+#        kt4PFJetsNew                                  +
+        mvaTrigV025nsPHYS14                          + 
         mvaNonTrigV025nsPHYS14                      +
         cleanMuonsBySegments                        +
 	hTozzTo4leptonsMuonSelector                 +
@@ -999,10 +978,11 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
 #        hTozzTo4leptonsMuonIsolationSequence        +
 #        hTozzTo4leptonsMuonIsolationProducerMu      +
         # PF isolation for electrons and muons
-         pfParticleSelectionPFBRECOSequence          + 
-         pfElectronIsolationPFBRECOSequence          +      
-         muonPFIsolationPFBRECOSequence              +
+        pfParticleSelectionPFBRECOSequence          + 
+        pfElectronIsolationPFBRECOSequence          +      
+        muonPFIsolationPFBRECOSequence              +
         pfPhotonIsolationSequence                   +
+        # 
         zToEELooseIsol                              +
         zToMuMuLooseIsol                            +
         hTozzTo4leptonsLooseIsol                    +
@@ -1039,20 +1019,19 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
 #        hTozzTo4leptonsConstraintFitProducerTriLeptonsEEE +
 #        hTozzTo4leptonsConstraintFitProducerTriLeptonsMEE +
         ConvValueMapProd                            +
-#        kt6PFJets                                +
-        kt6PFJetsCentral                            +
+ ##     kt6PFJetsCentralNeutral +
         hTozzTo4leptonsPFJetSelector                +
-#        ak4PFJetsCorrection                         +
-#        ak4PFJetsCorrectionData                     +
-#        recoPuJetIdMCsequence                       +
-#        recoPuJetIdDatasequence                     +
+        ak4PFJetsCorrection                         +
+        ak4PFJetsCorrectionData                     +
+        recoPuJetIdMvaMC                            +
+        recoPuJetIdMvaData                          +
         patTrigger                                  +
         muonTriggerMatchHLT                         +
         muonTriggerMatchHLTasym                     +
         electronTriggerMatchHLT                     
-#        eleRegressionEnergy                         +
-#        hTozzTo4leptonsRegressionElectronProducer
-#        hTozzTo4leptonsRootTreePresel        
+##        eleRegressionEnergy                         +
+##        hTozzTo4leptonsRegressionElectronProducer
+##        hTozzTo4leptonsRootTreePresel        
 	)
                                                  
 

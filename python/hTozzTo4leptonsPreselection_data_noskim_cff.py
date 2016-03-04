@@ -18,7 +18,7 @@ hTozzTo4leptonsMCGenParticleListDrawer2e2mu = HiggsAnalysis.HiggsToZZ4Leptons.hT
 # Save MC truth: 
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMCDumper_cfi import *
 import HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMCDumper_cfi
-# hTozzTo4leptonsMCDumper.status=cms.vint32(62)
+#hTozzTo4leptonsMCDumper.status=cms.vint32(62)
 
 # CP producer: 
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsCP_cfi import *
@@ -435,7 +435,7 @@ phPFIsoValueChargedAll03PFId.deposits= cms.VPSet(
             src = cms.InputTag("phPFIsoDepositChargedAll"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring(),
+            vetos = cms.vstring('Threshold(0.2)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -460,7 +460,7 @@ phPFIsoValueGamma03PFId.deposits = cms.VPSet(
             src = cms.InputTag("phPFIsoDepositGamma"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('0.01','Threshold(0.5)','EcalEndcaps:ConeVeto(0.05)'),
+            vetos = cms.vstring('0.01','Threshold(0.5)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -479,8 +479,6 @@ phPFIsoValuePU03PFId.deposits= cms.VPSet(
       )
    )
 
-# Common preselection 
-# from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsCommonPreselectionSequences_cff import *
 
 # zToEE loose isolated
 from HiggsAnalysis.HiggsToZZ4Leptons.zToEE_cfi import *
