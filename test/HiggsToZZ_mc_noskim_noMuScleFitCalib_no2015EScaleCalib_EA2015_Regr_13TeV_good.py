@@ -24,7 +24,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("VertexSelector",
                                             src = cms.InputTag('offlinePrimaryVertices'),
-                                            cut = cms.string('!isFake && ndof > 4.0 && position.Rho <= 2.0 && abs(z) <= 24'),
+					    cut = cms.string('!isFake && ndof > 4 && abs(z) <= 24 && position.Rho <= 2'),
                                             filter = cms.bool(True)
                                         )
         
