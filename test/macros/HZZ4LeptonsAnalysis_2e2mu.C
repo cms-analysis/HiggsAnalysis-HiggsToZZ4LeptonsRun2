@@ -1815,7 +1815,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 			 << "\n RECOPFPHOT_PFX_rho[i] " << RECOPFPHOT_PFX_rho[i]
 			 << endl ;
 	
-	if ( RECOPFPHOT_PT[i] > 2. && fabs(RECOPFPHOT_ETA[i]) < 2.4 ) {
+	if ( RECOPFPHOT_PT[i] > 2. && fabs(RECOPFPHOT_ETA[i]) < 2.4 && RECOPFPHOT_PFX_rho[i]<1.8) {
 	  
 	  bool is_clean = 1;
 	  
@@ -1869,14 +1869,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       for( int i = 0; i < Nphotons; ++i ){
 	
 	double min_deltaR = 1000;
+	double min_deltaR_ET2=1000;
 	int  l_min_deltaR = -1;
 	int  tag_min_deltaR = -1;   // 0: mu  1: ele
 	
 	for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
 	  if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
-	  
-	  if( deltaR < min_deltaR ) {
+	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
+	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
 	    min_deltaR = deltaR;
 	    l_min_deltaR = l;
 	    tag_min_deltaR = 0;
@@ -1887,8 +1888,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	  if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue;
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[l]],2) );
-	  
-	  if( deltaR < min_deltaR ) {
+	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
+	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
 	    min_deltaR = deltaR;
 	    l_min_deltaR = l;
 	    tag_min_deltaR = 1;
@@ -1897,26 +1898,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	}//end loop on electrons  
 	
 	
-	if( min_deltaR < 0.07 ){
-	  if( RECOPFPHOT_PT[iLp[i]] > 2. ){
-	    //iLp_l[ i ] = iL[l_min_deltaR];
-	    if (tag_min_deltaR==0) iLp_l[ i ] = iL_loose_mu[l_min_deltaR];
-	    if (tag_min_deltaR==1) iLp_l[ i ] = iL_loose_e[l_min_deltaR];
-	    iLp_tagEM[ i ] = tag_min_deltaR;
-	    RECOPFPHOT_DR[iLp[i]]=min_deltaR; 
-	  }
+	if( min_deltaR < 0.5 && min_deltaR_ET2<0.012 ){
+	  //iLp_l[ i ] = iL[l_min_deltaR];
+	  if (tag_min_deltaR==0) iLp_l[ i ] = iL_loose_mu[l_min_deltaR];
+	  if (tag_min_deltaR==1) iLp_l[ i ] = iL_loose_e[l_min_deltaR];
+	  iLp_tagEM[ i ] = tag_min_deltaR;
+	  RECOPFPHOT_DR[iLp[i]]=min_deltaR; 	
 	}
-	else if( min_deltaR < 0.5 ){
-	  if( RECOPFPHOT_PT[iLp[i]] > 4. && RECOPFPHOT_PFX_rho[iLp[i]] < 1. ){
-	    //iLp_l[ i ] = iL[l_min_deltaR];
-	    if (tag_min_deltaR==0) iLp_l[ i ] = iL_loose_mu[l_min_deltaR];
-	    if (tag_min_deltaR==1) iLp_l[ i ] = iL_loose_e[l_min_deltaR];
-	    iLp_tagEM[ i ] = tag_min_deltaR;
-	    RECOPFPHOT_DR[iLp[i]]=min_deltaR;
-	  }
-	}
-	
-	
+
       }
       
       if( debug ) cout << "Indeces of loose leptons associated to photons: "
@@ -1946,9 +1935,52 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	if (iLp_l[i]!=-1 && iLp_tagEM[i]==1) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " attached to an electron with pT= " << RECOELE_PT[iLp_l[i]] << endl;
       };
 
-     // *** end FSR
+       // Exclude that photon from the isolation cone all leptons in the event passing loose ID + SIP cut if it was in the isolation cone and outside the isolation veto (ΔR>0.01 for muons and (ele->supercluster()->eta() < 1.479 || dR > 0.08) for electrons
+      
+      cout << "Rho for electron pileup isolation correction is= " << RHO_ele << endl;
+      double EffectiveArea=-9999.;
 
-
+	    
+      for(int i=0.;i<Nphotons;i++) {
+	
+	for(int e = 0; e < N_loose_e; ++e){
+	  if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;
+	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
+	  
+	  if( deltaR<=0.4 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.4 is the isolation cone for electrons in 74x -> 0.3 in 76x              
+	    if( debug )cout << "Subtracking the photon isolation from the electron isolation value " << endl;
+	    
+	    EffectiveArea=EAele(iL_loose_e[e],tag_2011);
+	    RECOELE_PFX_rho_new[iL_loose_e[e]]=
+              (RECOELE_PFchHad[iL_loose_e[e]]+
+               max(0.,RECOELE_PFneuHad[iL_loose_e[e]]+
+                   (RECOELE_PFphoton[iL_loose_e[e]]-RECOPFPHOT_PT[iLp[i]] )-
+                   max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[iL_loose_e[e]];	    
+	  }
+	} // end loop on ele
+	
+	for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
+          if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;
+          double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
+	  
+	  if( deltaR<=0.3 && deltaR>0.01){ // 0.3 is the isolation cone for muons in 76x
+	    RECOMU_PFX_dB_new[iL_loose_mu[l]]=
+              (RECOMU_PFchHad[iL_loose_mu[l]]+
+               max(0.,RECOMU_PFneuHad[iL_loose_mu[l]]+
+                   (RECOMU_PFphoton[iL_loose_mu[l]]-RECOPFPHOT_PT[iLp[i]] )-
+                   0.5*RECOMU_PFPUchAllPart[iL_loose_mu[l]]))/RECOMU_PT[iL_loose_mu[l]];
+	    
+	  }
+	} // end loop on mu
+	
+	
+	
+      }	
+      
+      
+      // *** end FSR
+      
+      
       // **** Step 3:
       struct candidateZ {
 	float massvalue;
@@ -1994,12 +2026,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       int pj1 = -1;
       
       bool has_FSR_Z1 = 0;
-      
+      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;;
 
       for(int i = 0; i < N_good; ++i){
         for(int j = i + 1; j < N_good; ++j){
-	  if (fabs(RECOMU_SIP[iL[i]])>=4.) continue;
+	  if (fabs(RECOMU_SIP[iL[i]])>=4.) continue; // SIP cut
 	  if (fabs(RECOMU_SIP[iL[j]])>=4.) continue;
+	  if (fabs(RECOMU_PFX_dB_new[iL[i]])>=0.35) continue; // Isolation
+	  if (fabs(RECOMU_PFX_dB_new[iL[j]])>=0.35) continue;
 	  
 	  if(RECOMU_CHARGE[ iL[j] ] == RECOMU_CHARGE[ iL[i] ]) continue; // opposite charge
 	  
@@ -2009,36 +2043,23 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  double massZ;
 	  double massZ_noFSR = 0;
 	  
-	  double ptZ = 0;
-	  double Y_Z = -9;
-	  double sum_ptZ = 0.;
-	  
 	  int tempphotid=-1;
 	  int templepid=-1;
 
 	  float pTphot=-999.;
-	  
-	  EZ = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ];
-	  cout << "\n Looking for a new muon pair"<< endl;
-	  if (debug) cout << "pt,eta,phi,charge= " << RECOMU_PT[ iL[i] ] << " " << RECOMU_ETA[ iL[i] ] << " " << RECOMU_PHI[ iL[i] ] << " " << RECOMU_CHARGE[ iL[i] ]<< endl;
-	  if (debug) cout << "pt,eta,phi,charge= " << RECOMU_PT[ iL[j] ] << " " << RECOMU_ETA[ iL[j] ] << " " << RECOMU_PHI[ iL[j] ] << " " << RECOMU_CHARGE[ iL[j] ]<< endl;
-
-	  pxZ = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] );
-	  pyZ = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] );
-	  pzZ = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] );
-	  //massZ=invmass(RECOMU_MASS[ iL[i] ], RECOMU_PT[ iL[i] ], RECOMU_ETA[ iL[i] ], RECOMU_PHI[ iL[i] ],
-	  //	RECOMU_MASS[ iL[j] ], RECOMU_PT[ iL[j] ], RECOMU_ETA[ iL[j] ], RECOMU_PHI[ iL[j] ]);
-
-	  massZ = sqrt( pow(EZ,2) - pow(pxZ,2) - pow(pyZ,2) - pow(pzZ,2) );	  
+	  Lepton1.SetPtEtaPhiM(RECOMU_PT[iL[i]], RECOMU_ETA[iL[i]], RECOMU_PHI[iL[i]], 0.105);
+	  Lepton2.SetPtEtaPhiM(RECOMU_PT[iL[j]], RECOMU_ETA[iL[j]], RECOMU_PHI[iL[j]], 0.105);
+	  DiLepton=Lepton1+Lepton2;	  
+	  massZ = DiLepton.M();	  
 	  massZ_noFSR = massZ;
-	  
-	  ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-	  Y_Z = 0.5 * log ( (EZ + pzZ)/(EZ - pzZ) );
-	  sum_ptZ = RECOMU_PT[ iL[i] ] + RECOMU_PT[ iL[j] ]; 
+	  if (debug) cout << "Mass Z= " << massZ << endl;
+	  pxZ=DiLepton.Px();
+	  pyZ=DiLepton.Py();
+	  pzZ=DiLepton.Pz();
+	  EZ=DiLepton.E();	  
+	 
 	  Zxx_tag=1;	 
 
-	  if (debug) cout << "Mass Z= " << massZ << " rapidity Z= " << Y_Z << endl;
-	  if (debug) cout << "mass Z= " << sqrt( pow(EZ,2) - pow(pxZ,2) - pow(pyZ,2) - pow(pzZ,2) ) << endl;
 	  // ** Association of FSR to Z
 	  if( debug ) cout  << "Step Z+FSR  " << endl;
 	  
@@ -2053,17 +2074,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  {  // exit a photon asosciated to a lepton mu
 	      
 	      // evaluate the mass
-	      double px, py, pz;
-	      double E;
-	      
-	      E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs( RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ) );	      
-	      px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-	      py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-	      pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		+ fabs( RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ) )*cos( RECOPFPHOT_THETA[iLp[p]] );	      
-	      double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-
-	      if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
+	      LeptonCorrection.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	      Lepton1=Lepton1+LeptonCorrection;
+	      DiLepton=Lepton1+Lepton2;
+	      double mllp=DiLepton.M();
+	      pxZ=DiLepton.Px();
+	      pyZ=DiLepton.Py();
+	      pzZ=DiLepton.Pz();
+	      EZ=DiLepton.E();	      	    
+	      	     
+	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
 		pi = p; 
 		has_FSR_Z = 1;
 		++N_FSR_Z;
@@ -2074,19 +2094,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    if( iLp_l[ p ] == iL[j] && iLp_tagEM[ p ] == 0 )  { 
 	      
 	      // evaluate the mass
-	      double px, py, pz;
-	      double E;
-	      
-	      E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));
-	      
-	      px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-	      py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-	      pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		+ fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-	      
-	      double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-	      
-	      if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
+	      LeptonCorrection.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	      Lepton2=Lepton2+LeptonCorrection;
+	      DiLepton=Lepton1+Lepton2;
+	      double mllp=DiLepton.M();
+	      pxZ=DiLepton.Px();
+	      pyZ=DiLepton.Py();
+	      pzZ=DiLepton.Pz();
+	      EZ=DiLepton.E();
+	      	     
+	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
 		pj = p;
 		has_FSR_Z = 1;
 		++N_FSR_Z; 
@@ -2114,214 +2131,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    
 	    ++N_3_FSR; // fill the counter
 	    N_3_FSR_w=N_3_FSR_w+newweight;
-	    
-	    if( N_FSR_Z == 1 ){
-	      
-	      if( pi > -1 ){
-		// evaluate the mass
-		double px, py, pz;
-		double E;
-		
-		E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[pi]]/sin( RECOPFPHOT_THETA[iLp[pi]] ));		
-		px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[pi]]*cos( RECOPFPHOT_PHI[iLp[pi]] );
-		py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[pi]]*sin( RECOPFPHOT_PHI[iLp[pi]] );
-		pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		  + fabs(RECOPFPHOT_PT[iLp[pi]]/sin( RECOPFPHOT_THETA[iLp[pi]] ))*cos( RECOPFPHOT_THETA[iLp[pi]] );
-		
-		double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		
-		massZ = mllp;
-		
-		pxZ = px;
-		pyZ = py;
-		pzZ = pz;
-		EZ  = E ;
-		
-		ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-
-		tempphotid=iLp[pi];
-		templepid=iLp_l[pi];		
-	      }
-	      else if( pj > -1 ){
-		// evaluate the mass
-		double px, py, pz;
-		double E;
-		
-		E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[pj]]/sin( RECOPFPHOT_THETA[iLp[pj]] ));		
-		px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[pj]]*cos( RECOPFPHOT_PHI[iLp[pj]] );
-		py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[pj]]*sin( RECOPFPHOT_PHI[iLp[pj]] );
-		pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		  + fabs(RECOPFPHOT_PT[iLp[pj]]/sin( RECOPFPHOT_THETA[iLp[pj]] ))*cos( RECOPFPHOT_THETA[iLp[pj]] );
-		
-		double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		
-		massZ = mllp;
-		
-		pxZ = px;
-		pyZ = py;
-		pzZ = pz;
-		EZ  = E ;
-		
-		ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-
-		tempphotid=iLp[pj];
-		templepid=iLp_l[pj];		
-	      }
-	      else { cout << "What the hell?!?!?!" << endl; }
-	      
-	    } // end if N_FSR_Z == 1
-	    else if( N_FSR_Z > 1 ){
-	      if( max_pt_FSR_Z > 4. ){
-		
-		for( int p = 0; p < Nphotons; ++p ){ // internal loop on FSR photons
-		  if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && RECOPFPHOT_PT[iLp[p]] == max_pt_FSR_Z){
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = p;
-		      pj = -1;
-
-		      tempphotid=iLp[p];
-		      templepid=iLp_l[p];
-		      break;
-		    }
-		    
-		  }
-		  if( iLp_l[ p ] == iL[j] && iLp_tagEM[ p ] == 0 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && RECOPFPHOT_PT[iLp[p]] == max_pt_FSR_Z ){
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = -1;
-		      pj = p;
-
-		      tempphotid=iLp[p];
-		      templepid=iLp_l[p];
-		      break;
-		    }
-		  }
-		} // end internal loop on FSR photons
-	      }
-	      else{ // if max_pt < 4
-		
-		double min_deltaR_FSR_Z = 1000;
-		
-		for( int p = 0; p < Nphotons; ++p ){ // internal loop on FSR photons
-		  if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOMU_PHI[iL[i]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOMU_ETA[iL[i]],2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && deltaR < min_deltaR_FSR_Z){
-		      
-		      min_deltaR_FSR_Z = deltaR;
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = p;
-		      pj = -1;
-
-		      tempphotid=iLp[p];
-		      templepid=iLp_l[p];
-		    }
-		    
-		  }
-		  if( iLp_l[ p ] == iL[j] && iLp_tagEM[ p ] == 0 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOMU_PHI[iL[j]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOMU_ETA[iL[j]],2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && deltaR < min_deltaR_FSR_Z){
-		      
-		      min_deltaR_FSR_Z = deltaR;
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = -1;
-		      pj = p;
-
-		      tempphotid=iLp[p];
-		      templepid=iLp[p];
-		    }
-		  }
-		} // end internal loop on FSR photons
-		
-	      }// end choosing best photon
-	    }// end if N_FSR_Z > 1
-
+	    	    
 	    // do not recompute isolation here
 	    if( debug ) cout  << "Z Isolation (not corrected for photon): "
                               << "\n RECOMU_PFX_dB[ iL[i] ] " << RECOMU_PFX_dB[ iL[i] ]
@@ -2368,8 +2178,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  Z->phi2=RECOMU_PHI[iL[j]];
 	  Z->charge1=RECOMU_CHARGE[iL[i]];
 	  Z->charge2=RECOMU_CHARGE[iL[j]];
-	  Z->isol1=RECOMU_PFX_dB[ iL[i] ];
-	  Z->isol2=RECOMU_PFX_dB[ iL[j] ];
+	  Z->isol1=RECOMU_PFX_dB_new[ iL[i] ];
+	  Z->isol2=RECOMU_PFX_dB_new[ iL[j] ];
 	  if( pi != -1 ) Z->ilept1_FSR=true;
 	  if( pj != -1 ) Z->ilept2_FSR=true;
 	  Z->pxZ=pxZ;
@@ -2394,8 +2204,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       // 2mu2e
       for(int i = 0; i < Ne_good; ++i){
         for(int j = i + 1; j < Ne_good; ++j){
-	  if (fabs(RECOELE_SIP[iLe[i]])>=4.) continue;
+	  if (fabs(RECOELE_SIP[iLe[i]])>=4.) continue; // SIP cut
 	  if (fabs(RECOELE_SIP[iLe[j]])>=4.) continue;
+	  if (fabs(RECOELE_PFX_rho[iLe[i]])>=0.5) continue; // Isolation cut
+	  if (fabs(RECOELE_PFX_rho[iLe[j]])>=0.5) continue;
 	  
 	  if(RECOELE_CHARGE[ iLe[j] ] == RECOELE_CHARGE[ iLe[i] ]) continue; // opposite charge
 	  
@@ -2405,37 +2217,24 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  double massZ;
 	  double massZ_noFSR = 0;
 	  
-	  double ptZ = 0;
-	  double Y_Z = -9;
-	  double sum_ptZ = 0.;
-	  
+	 
 	  int tempphotid=-1;
 	  int templepid=-1;
 	  
 	  float pTphot=-999.;
-	  
-	  EZ = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ];
-	  cout << "\n Looking for a new electron pair"<< endl;
-	  if (debug) cout << "pt,eta,phi,charge= " << RECOELE_PT[ iLe[i] ] << " " << RECOELE_ETA[ iLe[i] ] << " " << RECOELE_PHI[ iLe[i] ] << " " << RECOELE_CHARGE[ iLe[i] ]<< endl;
-	  if (debug) cout << "pt,eta,phi,charge= " << RECOELE_PT[ iLe[j] ] << " " << RECOELE_ETA[ iLe[j] ] << " " << RECOELE_PHI[ iLe[j] ] << " " << RECOELE_CHARGE[ iLe[j] ]<< endl;
-	  
-	  pxZ = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] );
-	  pyZ = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] );
-	  pzZ = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] );
-	  //massZ=invmass(RECOELE_MASS[ iLe[i] ], RECOELE_PT[ iLe[i] ], RECOELE_ETA[ iLe[i] ], RECOELE_PHI[ iLe[i] ],
-	  //	RECOELE_MASS[ iLe[j] ], RECOELE_PT[ iLe[j] ], RECOELE_ETA[ iLe[j] ], RECOELE_PHI[ iLe[j] ]);
-	  
-	  massZ = sqrt( pow(EZ,2) - pow(pxZ,2) - pow(pyZ,2) - pow(pzZ,2) );	  
+	  Lepton1.SetPtEtaPhiM(RECOELE_PT[iLe[i]], RECOELE_ETA[iLe[i]], RECOELE_PHI[iLe[i]], 0.000511);
+	  Lepton2.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
+	  DiLepton=Lepton1+Lepton2;	  
+	  massZ = DiLepton.M();	  
 	  massZ_noFSR = massZ;
-	  
-	  ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-	  Y_Z = 0.5 * log ( (EZ + pzZ)/(EZ - pzZ) );
-	  sum_ptZ = RECOELE_PT[ iLe[i] ] + RECOELE_PT[ iLe[j] ]; 
+	  if (debug) cout << "Mass Z= " << massZ << endl;
+	  pxZ=DiLepton.Px();
+	  pyZ=DiLepton.Py();
+	  pzZ=DiLepton.Pz();
+	  EZ=DiLepton.E();
 	  
 	  Zxx_tag=0;
-
-	  if (debug) cout << "Mass Z= " << massZ << " rapidity Z= " << Y_Z << endl;
-	  if (debug) cout << "mass Z= " << sqrt( pow(EZ,2) - pow(pxZ,2) - pow(pyZ,2) - pow(pzZ,2) ) << endl;
+	
 	  // ** Association of FSR to Z
 	  if( debug ) cout  << "Step Z+FSR  " << endl;
 	  
@@ -2450,18 +2249,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    if( iLp_l[ p ] == iLe[i] && iLp_tagEM[ p ] == 1 )  {  // exit a photon associated to a lepton electron
 	      
 	      // evaluate the mass
-	      double px, py, pz;
-	      double E;
+	      LeptonCorrection.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	      Lepton1=Lepton1+LeptonCorrection;
+	      DiLepton=Lepton1+Lepton2;
+	      double mllp=DiLepton.M();
+	      pxZ=DiLepton.Px();
+	      pyZ=DiLepton.Py();
+	      pzZ=DiLepton.Pz();
+	      EZ=DiLepton.E();	      	      	   
 	      
-	      E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs( RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ) );	      
-	      px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-	      py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-	      pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		+ fabs( RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ) )*cos( RECOPFPHOT_THETA[iLp[p]] );	      
-	      double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-	      
-	      
-	      if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
+	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){			     
 		has_FSR_Z = 1; 
 		pi = p; 
 		++N_FSR_Z;
@@ -2472,19 +2269,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    if( iLp_l[ p ] == iLe[j] && iLp_tagEM[ p ] == 1 )  { 
 	      
 	      // evaluate the mass
-	      double px, py, pz;
-	      double E;
-	      
-	      E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));
-	      
-	      px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-	      py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-	      pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		+ fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-	      
-	      double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-	      
-	      if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
+	      LeptonCorrection.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	      Lepton2=Lepton2+LeptonCorrection;
+	      DiLepton=Lepton1+Lepton2;
+	      double mllp=DiLepton.M();
+	      pxZ=DiLepton.Px();
+	      pyZ=DiLepton.Py();
+	      pzZ=DiLepton.Pz();
+	      EZ=DiLepton.E();
+	      	    
+	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){	
 		pj = p;
 		has_FSR_Z = 1;
 		++N_FSR_Z; 
@@ -2512,211 +2306,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  if( has_FSR_Z ){ // if Z has FSR
 	    
 	    ++N_3_FSR; // fill the counter
-	    N_3_FSR_w=N_3_FSR_w+newweight;
-	    
-	    if( N_FSR_Z == 1 ){
-	      
-	      if( pi > -1 ){
-		// evaluate the mass
-		double px, py, pz;
-		double E;
-		
-		E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[pi]]/sin( RECOPFPHOT_THETA[iLp[pi]] ));		
-		px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[pi]]*cos( RECOPFPHOT_PHI[iLp[pi]] );
-		py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[pi]]*sin( RECOPFPHOT_PHI[iLp[pi]] );
-		pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		  + fabs(RECOPFPHOT_PT[iLp[pi]]/sin( RECOPFPHOT_THETA[iLp[pi]] ))*cos( RECOPFPHOT_THETA[iLp[pi]] );
-		
-		double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		
-		massZ = mllp;
-		
-		pxZ = px;
-		pyZ = py;
-		pzZ = pz;
-		EZ  = E ;
-		
-		ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		
-		tempphotid=iLp[pi];
-		templepid=iLp_l[pi];		
-	      }
-	      else if( pj > -1 ){
-		// evaluate the mass
-		double px, py, pz;
-		double E;
-		
-		E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[pj]]/sin( RECOPFPHOT_THETA[iLp[pj]] ));		
-		px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[pj]]*cos( RECOPFPHOT_PHI[iLp[pj]] );
-		py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[pj]]*sin( RECOPFPHOT_PHI[iLp[pj]] );
-		pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		  + fabs(RECOPFPHOT_PT[iLp[pj]]/sin( RECOPFPHOT_THETA[iLp[pj]] ))*cos( RECOPFPHOT_THETA[iLp[pj]] );
-		
-		double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		
-		massZ = mllp;
-		
-		pxZ = px;
-		pyZ = py;
-		pzZ = pz;
-		EZ  = E ;
-		
-		ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		
-		tempphotid=iLp[pj];
-		templepid=iLp_l[pj];		
-	      }
-	      else { cout << "What the hell?!?!?!" << endl; }
-	      
-	    } // end if N_FSR_Z == 1
-	    else if( N_FSR_Z > 1 ){
-	      if( max_pt_FSR_Z > 4. ){
-		
-		for( int p = 0; p < Nphotons; ++p ){ // internal loop on FSR photons
-		  if( iLp_l[ p ] == iLe[i] && iLp_tagEM[ p ] == 1 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && RECOPFPHOT_PT[iLp[p]] == max_pt_FSR_Z){
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = p;
-		      pj = -1;
-		      
-		      tempphotid=iLp[p];
-		      templepid=iLp_l[p];
-		      break;
-		    }
-		    
-		  }
-		  if( iLp_l[ p ] == iLe[j] && iLp_tagEM[ p ] == 1 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && RECOPFPHOT_PT[iLp[p]] == max_pt_FSR_Z ){
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = -1;
-		      pj = p;
-		      tempphotid=iLp[p];
-		      templepid=iLp_l[p];
-		      break;
-		    }
-		  }
-		} // end internal loop on FSR photons
-	      }
-	      else{ // if max_pt < 4
-		
-		double min_deltaR_FSR_Z = 1000;
-		
-		for( int p = 0; p < Nphotons; ++p ){ // internal loop on FSR photons
-		  if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 1 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOELE_PHI[iLe[i]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOELE_ETA[iLe[i]],2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && deltaR < min_deltaR_FSR_Z){
-		      
-		      min_deltaR_FSR_Z = deltaR;
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = p;
-		      pj = -1;
-		      tempphotid=iLp[p];
-		      templepid=iLp_l[p];
-		    }
-		    
-		  }
-		  if( iLp_l[ p ] == iLe[j] && iLp_tagEM[ p ] == 1 )  { 
-		    
-		    // evaluate the mass
-		    double px, py, pz;
-		    double E;
-		    
-		    E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));		    
-		    px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-		    py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-		    pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] ) 
-		      + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );
-		    
-		    double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-		    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOELE_PHI[iLe[j]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOELE_ETA[iLe[j]],2) );
-		    
-		    if( mllp > 4. &&  mllp < 100. && fabs( mllp - Zmass ) < fabs( massZ - Zmass ) && deltaR < min_deltaR_FSR_Z){
-		      
-		      min_deltaR_FSR_Z = deltaR;
-		      massZ = mllp;
-		      
-		      pxZ = px;
-		      pyZ = py;
-		      pzZ = pz;
-		      EZ  = E ;
-		      
-		      ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-		      Y_Z = 0.5 * log ( (EZ + pz)/(EZ - pz) );
-		      pi = -1;
-		      pj = p;
-		      tempphotid=iLp[p];
-		      templepid=iLp[p];
-		    }
-		  }
-		} // end internal loop on FSR photons
-		
-	      }// end choosing best photon
-	    }// end if N_FSR_Z > 1
+	    N_3_FSR_w=N_3_FSR_w+newweight;	    
 	    
 	    // do not recompute isolation here
 	    if( debug ) cout  << "Z Isolation (not corrected for photon): "
@@ -2765,8 +2355,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  Z->phi2=RECOELE_PHI[iLe[j]];
 	  Z->charge1=RECOELE_CHARGE[iLe[i]];
 	  Z->charge2=RECOELE_CHARGE[iLe[j]];
-	  Z->isol1=RECOELE_PFX_rho[ iLe[i] ];
-	  Z->isol2=RECOELE_PFX_rho[ iLe[j] ];
+	  Z->isol1=RECOELE_PFX_rho_new[ iLe[i] ];
+	  Z->isol2=RECOELE_PFX_rho_new[ iLe[j] ];
 	  if( pi != -1 ) Z->ilept1_FSR=true;
 	  if( pj != -1 ) Z->ilept2_FSR=true;
 	  Z->pxZ=pxZ;
@@ -2789,277 +2379,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       } // end loop on couples
       
       
-      
-      // Isolation cut on electorn and muons  
-      double EffectiveArea=-9999.;
-      cout << "Rho for electron pileup isolation correction is= " << RHO_ele << endl;     
-    
-      for (int index1=0; index1<Zcandvector.size();index1++){
-	for (int index2=index1+1; index2<Zcandvector.size();index2++){
-	  if (Zcandvector.at(index1).tag==Zcandvector.at(index2).tag) continue;
-	  
-	  if (Zcandvector.at(index1).withFSR==1 && Zcandvector.at(index2).withFSR==0 ) {  // correct the muon isol. of all the 4 leptons for the photon pT asosciated to first Z
-	    
-	    if (Zcandvector.at(index1).tag==1){
-	      if(Zcandvector.at(index1).ilept1_FSR==true){
-		Zcandvector.at(index1).isol1=(RECOMU_PFchHad[Zcandvector.at(index1).ilept1]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index1).ilept1]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index1).ilept1]-Zcandvector.at(index1).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index1).ilept1]))/RECOMU_PT[ Zcandvector.at(index1).ilept1];
-	      }
-	      
-	      if(Zcandvector.at(index1).ilept2_FSR==true){
-		Zcandvector.at(index1).isol2=(RECOMU_PFchHad[Zcandvector.at(index1).ilept2]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index1).ilept2]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index1).ilept2]-Zcandvector.at(index1).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index1).ilept2]))/RECOMU_PT[ Zcandvector.at(index1).ilept2];
-	      
-	      }
-	    }
-	    if (Zcandvector.at(index1).tag==0){
-	      if(Zcandvector.at(index1).ilept1_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index1).ilept1,tag_2011);
-		Zcandvector.at(index1).isol1=(RECOELE_PFchHad[Zcandvector.at(index1).ilept1]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index1).ilept1]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index1).ilept1]-Zcandvector.at(index1).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index1).ilept1];					 
-	      }
-	      
-	      if(Zcandvector.at(index1).ilept2_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index1).ilept2,tag_2011);				  
-		Zcandvector.at(index1).isol2=(RECOELE_PFchHad[Zcandvector.at(index1).ilept2]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index1).ilept2]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index1).ilept2]-Zcandvector.at(index1).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index1).ilept2];
-	      }
-	      
-	    }
-	    
-	    // Zcandvector.at(index2).isol1=(RECOMU_PFchHad[Zcandvector.at(index2).ilept1]+
-            //                               max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept1]+
-            //                                   (RECOMU_PFphoton[ Zcandvector.at(index2).ilept1]-Zcandvector.at(index1).ptFSR)-
-            //                                   0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept1]))/RECOMU_PT[ Zcandvector.at(index2).ilept1];
-	    
-            // Zcandvector.at(index2).isol2=(RECOMU_PFchHad[Zcandvector.at(index2).ilept2]+
-            //                               max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept2]+
-            //                                   (RECOMU_PFphoton[ Zcandvector.at(index2).ilept2]-Zcandvector.at(index1).ptFSR)-
-            //                                   0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept2]))/RECOMU_PT[ Zcandvector.at(index2).ilept2];
-
-	    if (Zcandvector.at(index1).tag==1 && 
-		(Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index1).tag==0 && 
-		(Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index1).isol2 >=0.5)) continue;
-	  
-	    if (Zcandvector.at(index2).tag==1 && 
-		(Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index2).tag==0 && 
-		(Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
-	    cout << "Isolation pass: First Z with FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with no FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
-	    
-	  } 
-	  else if (Zcandvector.at(index1).withFSR==0 && Zcandvector.at(index2).withFSR==1 ) { // correct the muon isol. of all the 4 leptons for the photon pT asosciated to second Z  
-	    
-	    // Zcandvector.at(index1).isol1=(RECOMU_PFchHad[Zcandvector.at(index1).ilept1]+
-            //                               max(0.,RECOMU_PFneuHad[ Zcandvector.at(index1).ilept1]+
-            //                                   (RECOMU_PFphoton[ Zcandvector.at(index1).ilept1]-Zcandvector.at(index2).ptFSR)-
-            //                                   0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index1).ilept1]))/RECOMU_PT[ Zcandvector.at(index1).ilept1];
-	    
-            // Zcandvector.at(index1).isol2=(RECOMU_PFchHad[Zcandvector.at(index1).ilept2]+
-            //                               max(0.,RECOMU_PFneuHad[ Zcandvector.at(index1).ilept2]+
-            //                                   (RECOMU_PFphoton[ Zcandvector.at(index1).ilept2]-Zcandvector.at(index2).ptFSR)-
-            //                                   0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index1).ilept2]))/RECOMU_PT[ Zcandvector.at(index1).ilept2];
-
-	    if (Zcandvector.at(index2).tag==1){ 
-	      if(Zcandvector.at(index2).ilept1_FSR==true){
-		Zcandvector.at(index2).isol1=(RECOMU_PFchHad[Zcandvector.at(index2).ilept1]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept1]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index2).ilept1]-Zcandvector.at(index2).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept1]))/RECOMU_PT[ Zcandvector.at(index2).ilept1];
-	      }
-	      if(Zcandvector.at(index2).ilept2_FSR==true){
-		Zcandvector.at(index2).isol2=(RECOMU_PFchHad[Zcandvector.at(index2).ilept2]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept2]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index2).ilept2]-Zcandvector.at(index2).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept2]))/RECOMU_PT[ Zcandvector.at(index2).ilept2];
-	      }
-	    }
-	    else if (Zcandvector.at(index2).tag==0){ 
-	      if(Zcandvector.at(index2).ilept1_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index2).ilept1,tag_2011);				  
-		Zcandvector.at(index2).isol1=(RECOELE_PFchHad[Zcandvector.at(index2).ilept1]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index2).ilept1]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index2).ilept1]-Zcandvector.at(index2).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index2).ilept1];
-	      }
-	      
-	      if(Zcandvector.at(index2).ilept2_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index2).ilept2,tag_2011);				  
-		Zcandvector.at(index2).isol2=(RECOELE_PFchHad[Zcandvector.at(index2).ilept2]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index2).ilept2]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index2).ilept2]-Zcandvector.at(index2).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index2).ilept2];
-	      }
-	      
-	    }
-	    
-	    if (Zcandvector.at(index1).tag==1 
-		&& (Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index1).tag==0 
-		&& (Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index1).isol2 >=0.5)) continue;
-	    
-            if (Zcandvector.at(index2).tag==1 
-		&& (Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index2).tag==0 
-		&& (Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
-	    
-
-	    cout << "Isolation pass: First Z with no FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
-	    
-	    
-	  }
-	  else if (Zcandvector.at(index1).withFSR==1 && Zcandvector.at(index2).withFSR==1 ) { // correct the muon isol. of all the 4 leptons for the photon pT asosciated to Z1 and Z2
-	    //float ptFSRsum=Zcandvector.at(index1).ptFSR+Zcandvector.at(index2).ptFSR;
-	    
-	    if (Zcandvector.at(index1).tag==1){ 
-	      if(Zcandvector.at(index1).ilept1_FSR==true){
-		Zcandvector.at(index1).isol1=(RECOMU_PFchHad[Zcandvector.at(index1).ilept1]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index1).ilept1]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index1).ilept1]-Zcandvector.at(index1).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index1).ilept1]))/RECOMU_PT[ Zcandvector.at(index1).ilept1];
-		
-	      }
-	      
-	      if(Zcandvector.at(index1).ilept2_FSR==true){
-		Zcandvector.at(index1).isol2=(RECOMU_PFchHad[Zcandvector.at(index1).ilept2]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index1).ilept2]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index1).ilept2]-Zcandvector.at(index1).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index1).ilept2]))/RECOMU_PT[ Zcandvector.at(index1).ilept2];	  
-		
-	      }
-	    }
-	    else if (Zcandvector.at(index1).tag==0){
-	      if(Zcandvector.at(index1).ilept1_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index1).ilept1,tag_2011);
-		Zcandvector.at(index1).isol1=(RECOELE_PFchHad[Zcandvector.at(index1).ilept1]+
-					      max(0.,RECOELE_PFneuHad[Zcandvector.at(index1).ilept1]+
-						  (RECOELE_PFphoton[Zcandvector.at(index1).ilept1]-Zcandvector.at(index1).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[Zcandvector.at(index1).ilept1];
-	      }
-	      
-	      if(Zcandvector.at(index1).ilept2_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index1).ilept2,tag_2011);				  
-		Zcandvector.at(index1).isol2=(RECOELE_PFchHad[Zcandvector.at(index1).ilept2]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index1).ilept2]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index1).ilept2]-Zcandvector.at(index1).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index1).ilept2];	  
-	      }
-	    } 
-	    
-	    //
-
-	    if (Zcandvector.at(index2).tag==1){ 
-	      if(Zcandvector.at(index2).ilept1_FSR==true){
-		Zcandvector.at(index2).isol1=(RECOMU_PFchHad[Zcandvector.at(index2).ilept1]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept1]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index2).ilept1]-Zcandvector.at(index2).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept1]))/RECOMU_PT[ Zcandvector.at(index2).ilept1];	  
-	      }
-	      
-	      if(Zcandvector.at(index2).ilept2_FSR==true){
-		Zcandvector.at(index2).isol2=(RECOMU_PFchHad[Zcandvector.at(index2).ilept2]+
-					      max(0.,RECOMU_PFneuHad[ Zcandvector.at(index2).ilept2]+
-						  (RECOMU_PFphoton[ Zcandvector.at(index2).ilept2]-Zcandvector.at(index2).ptFSR)-
-						  0.5*RECOMU_PFPUchAllPart[ Zcandvector.at(index2).ilept2]))/RECOMU_PT[ Zcandvector.at(index2).ilept2];	  
-	      }
-	    }
-	    else if (Zcandvector.at(index2).tag==0){ 
-	      if(Zcandvector.at(index2).ilept1_FSR==true){
-		EffectiveArea=EAele(Zcandvector.at(index2).ilept1,tag_2011);				  
-		Zcandvector.at(index2).isol1=(RECOELE_PFchHad[Zcandvector.at(index2).ilept1]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index2).ilept1]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index2).ilept1]-Zcandvector.at(index2).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index2).ilept1];	  
-	      }
-	      
-	      if(Zcandvector.at(index2).ilept2_FSR==true){  
-		EffectiveArea=EAele(Zcandvector.at(index2).ilept2,tag_2011);				  
-		Zcandvector.at(index2).isol2=(RECOELE_PFchHad[Zcandvector.at(index2).ilept2]+
-					      max(0.,RECOELE_PFneuHad[ Zcandvector.at(index2).ilept2]+
-						  (RECOELE_PFphoton[ Zcandvector.at(index2).ilept2]-Zcandvector.at(index2).ptFSR)-
-						  max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[ Zcandvector.at(index2).ilept2];	  
-	      }
-	    }
-
-	    if (Zcandvector.at(index1).tag==1 && 
-		(Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index1).tag==0 && 
-		(Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
-	    
-	    if (Zcandvector.at(index2).tag==1 && 
-		(Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index2).tag==0 && 
-		(Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
-
-	    cout << "Isolation pass: First Z with FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
-	    
-	  }
-	  else {  
-	    if (Zcandvector.at(index1).tag==1 && 
-		(Zcandvector.at(index1).isol1 >=0.35 || Zcandvector.at(index1).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index1).tag==0 && 
-		(Zcandvector.at(index1).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
-	    
-	    if (Zcandvector.at(index2).tag==1 && 
-		(Zcandvector.at(index2).isol1 >=0.35 || Zcandvector.at(index2).isol2 >=0.35)) continue;
-	    if (Zcandvector.at(index2).tag==0 && 
-		(Zcandvector.at(index2).isol1 >=0.5 || Zcandvector.at(index2).isol2 >=0.5)) continue;
-
-	    cout << "Isolation pass: First Z with no FSR and mass= " << Zcandvector.at(index1).massvalue << "  Second Z with no FSR and mass=" << Zcandvector.at(index2).massvalue << endl;
-	  }
-	  
-	  //cout << " Surviving Zs with index= " << index1 << index2 << endl;
-	  Zcandisolvector.push_back(Zcandvector.at(index1));
-	  Zcandisolvector.push_back(Zcandvector.at(index2));
-	}	
-      }
-      
-  
-
-
-      // clean duplicate
-      vector<candidateZ> Zcandisolvector_nodup;
-      Zcandisolvector_nodup.clear();
-
-      for (int i=0;i<Zcandisolvector.size();i++){
-        bool duplicate=false;
-        for (int j=i+1;j<Zcandisolvector.size();++j){
-          if (Zcandisolvector.at(i).massvalue == Zcandisolvector.at(j).massvalue){
-            duplicate=true;
-            continue;
-          }
-        }
-        if (!duplicate) {
-          cout << "Filling the cleaned vector with mass= " << Zcandisolvector.at(i).massvalue<< endl;
-          Zcandisolvector_nodup.push_back(Zcandisolvector.at(i));
-        }
-      }
-
-
-      cout << "\n How many candidate Zs? " << Zcandvector.size() 
-	   << " whose those with isolated leptons are " << Zcandisolvector_nodup.size() << endl;
-
-      for (int i=0;i<Zcandisolvector_nodup.size();i++){
-	cout 
-	  << " and mass is " << Zcandisolvector_nodup.at(i).massvalue 
-	  << " lepton = " << Zcandisolvector_nodup.at(i).ilept1 << " isol.= " << Zcandisolvector_nodup.at(i).isol1
-	   << " lepton = " << Zcandisolvector_nodup.at(i).ilept2 << " isol.= " << Zcandisolvector_nodup.at(i).isol2
-	  << endl; 
-      }
-
-      if (Zcandisolvector_nodup.size()<2) {
+      if (Zcandvector.size()<2) {
 	cout << "Less than two Z pairs with isolated leptons...exiting" << endl;
 	continue; 
       }
+      
 
       ++N_3a ;  // fill counter
       N_3a_w=N_3a_w+newweight;
@@ -3069,9 +2393,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       vector<candidateZ> Zcandisolmassvector;
       Zcandisolmassvector.clear();
 
-      for (int index=0; index<Zcandisolvector_nodup.size();index++){
-	if (!(Zcandisolvector_nodup.at(index).massvalue > 12 && Zcandisolvector_nodup.at(index).massvalue < 120)) continue;
-	Zcandisolmassvector.push_back(Zcandisolvector_nodup.at(index));
+      for (int index=0; index<Zcandvector.size();index++){
+	if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
+	Zcandisolmassvector.push_back(Zcandvector.at(index));
       };
       
       if (Zcandisolmassvector.size()<2) {
@@ -3350,7 +2674,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       cout << "Set of 4-leptons is " << ileptonsv.size() << " and size of vector of ZZ is " << iZsv.size() << endl;
       //cout << iZsv.at(0).at(0) << " " << iZsv.at(0).at(1)<< endl;
 
-      // ghost removal delta R > 0.02 wrt Z1 leptons
+      // ghost removal delta R > 0.02 wrt Z1 leptons   /// PROBLEMA
       vector<candidateZ> goodZ;
       for (int vl=0;vl<ileptonsv.size();vl++){
 	int counter=0;
@@ -3430,27 +2754,26 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       // QCD suppression: mll>4 GeV cut on all OS-SF pairs (4/4)
       
       double min_mass_2L = 10000.;
-      
+      TLorentzVector Lepton1qcd,Lepton2qcd,DiLeptonQCD;
+	    
       for(int i = 0; i < N_good; ++i){
 	if (RECOMU_SIP[iL[i]]>=4.) continue;
-	
+	if (fabs(RECOMU_PFX_dB[iL[i]])>=0.35) continue; // Isolation cut - NO FSR
+
         for(int j = i + 1; j < N_good; ++j){
 	  if (RECOMU_SIP[iL[j]]>=4.) continue;
-	  
+	  if (fabs(RECOMU_PFX_dB[iL[j]])>=0.35) continue; // Isolation cut - NO FSR
+		
 	  if ( RECOMU_CHARGE[iL[i]] == RECOMU_CHARGE[iL[j]]) continue; // shoud be OS
 	  
 	  // evaluate the mass
-	  double px, py, pz;
-	  double E;
 	  double mass;
-	  
-	  E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ];		
-	  px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] );
-	  py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] );
-	  pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] );
-	  
-	  mass = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-	  
+
+	  Lepton1qcd.SetPtEtaPhiM(RECOMU_PT[iL[i]], RECOMU_ETA[iL[i]], RECOMU_PHI[iL[i]], 0.105);
+          Lepton2qcd.SetPtEtaPhiM(RECOMU_PT[iL[j]], RECOMU_ETA[iL[j]], RECOMU_PHI[iL[j]], 0.105);
+          DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
+          mass = DiLeptonQCD.M();
+	  	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
         }
@@ -3459,23 +2782,22 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       for(int i = 0; i < Ne_good; ++i){
 	if (RECOELE_SIP[iLe[i]]>=4.) continue;
+	if (RECOELE_PFX_rho[iLe[i]]>=0.5) continue; // Isolation no-FSR
+
 	
         for(int j = i + 1; j < Ne_good; ++j){
 	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
+	  if (RECOELE_PFX_rho[iLe[j]]>=0.5) continue; // Isolation no-FSR
 	  
 	  if ( RECOELE_CHARGE[iLe[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
 	  
 	  // evaluate the mass
-	  double px, py, pz;
-	  double E;
 	  double mass;
-	  
-	  E = RECOELE_E[ iLe[i] ] + RECOELE_E[ iLe[j] ];		
-	  px = RECOELE_PT[ iLe[i] ]*cos( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*cos( RECOELE_PHI[ iLe[j] ] );
-	  py = RECOELE_PT[ iLe[i] ]*sin( RECOELE_PHI[ iLe[i] ] ) + RECOELE_PT[ iLe[j] ]*sin( RECOELE_PHI[ iLe[j] ] );
-	  pz = RECOELE_P[ iLe[i] ]*cos( RECOELE_THETA[ iLe[i] ] ) + RECOELE_P[ iLe[j] ]*cos( RECOELE_THETA[ iLe[j] ] );
-	  
-	  mass = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
+
+	  Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[iL[i]], RECOELE_ETA[iL[i]], RECOELE_PHI[iL[i]], 0.000511);
+          Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iL[j]], RECOELE_ETA[iL[j]], RECOELE_PHI[iL[j]], 0.000511);
+          DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
+          mass = DiLeptonQCD.M();
 	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
@@ -3532,6 +2854,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 indexlep2Z1=pTcleanedgoodZ.at(i).ilept2;
 	 Z1tag=pTcleanedgoodZ.at(i).tag;
        }
+     }
+
+     if (massZ1 < 40.) {
+       cout << "The mass of Z1 is < 40 GeV...exiting" << endl;
+       continue;
      } 
      
      if( debug ) cout  << "\n Final Z1 properties: "
