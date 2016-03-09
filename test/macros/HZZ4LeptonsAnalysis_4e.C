@@ -987,10 +987,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-        
-      //if (!(Run==1 && Event==93771 && LumiSection==961)) continue; 
-      //if (!(Event==1888)) continue;
-      //if (!(Run==1 && Event==109809 && LumiSection==1099)) continue;
+
+      //if (!(Run==1 && LumiSection==41 && Event==7655)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -1923,6 +1921,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		pi = p; 
 		++N_FSR_Z;
 		if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
+		massZ=mllp;
 	      }
 	      
 	    }
@@ -1943,6 +1942,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		has_FSR_Z = 1;
 		++N_FSR_Z; 
 		if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
+		massZ=mllp;
 	      }
 	    }
 	  } // end loop on FSR photons
@@ -2853,11 +2853,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  cout << "Index of lepton with photon ISR= " << iLp_l[ p ] << " and final lepton index= " << iLe[i] << endl;
 	  if( iLp_l[ p ] == iLe[i] && iLp_tagEM[ p ] == 1 )  {
 	    cout << "Electron with pT= " << RECOELE_PT[iLe[i]] << " has associated a photon with pT= " << RECOPFPHOT_PT[iLp[p]] <<  endl;
-	    RECOELE_PFX_rho_new[iLe[i]]=
-	      (RECOELE_PFchHad[iLe[i]]+
-	       max(0.,RECOELE_PFneuHad[iLe[i]]+
-		   (RECOELE_PFphoton[iLe[i]]-RECOPFPHOT_PT[iLp[p]] )-
-		   max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[iLe[i]];
+	    // RECOELE_PFX_rho_new[iLe[i]]=
+	    //   (RECOELE_PFchHad[iLe[i]]+
+	    //    max(0.,RECOELE_PFneuHad[iLe[i]]+
+	    // 	   (RECOELE_PFphoton[iLe[i]]-RECOPFPHOT_PT[iLp[p]] )-
+	    // 	   max(RHO_ele,0.0)*(EffectiveArea)))/RECOELE_PT[iLe[i]];
 	   
 	    flagFSR=1;
 	    pfsr=p;

@@ -988,12 +988,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
         
-      //if (!(Run==1 && Event==183724 && LumiSection==981)) continue;
-      //if (!(Event==1888)) continue;
-      //if (!(Run==1 && Event==109809 && LumiSection==1099)) continue;
-
-      if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
-      
+      //if (!(Run==1 && LumiSection==41 && Event==7655)) continue;
+  
+      if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;   
 
       if( RECO_NMU > 100 ) RECO_NMU = 100;
       if( RECO_NELE > 100 ) RECO_NELE = 100;
@@ -1921,6 +1918,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		pi = p; 
 		++N_FSR_Z;
 		if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
+		massZ=mllp;
 	      }
 	      
 	    }
@@ -1940,6 +1938,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		has_FSR_Z = 1;
 		++N_FSR_Z; 
 		if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
+		massZ=mllp;
 	      }
 	    }
 	  } // end loop on FSR photons
@@ -1947,7 +1946,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  //if( has_FSR_Z ) debug = 1;
 	  
 	  if( debug && has_FSR_Z) {
-	    cout  << " Z has FSR! " << endl;
+	    cout  << " Z has FSR! and mass " << massZ << endl;
 	    cout  << "  N_FSR_Z " << N_FSR_Z << endl;
 	    cout  << "  max_pt of photon FSR_Z " << max_pt_FSR_Z << endl;
 	    if( pi > -1 ) cout  << "  pi " << pi << " --> index photon: " << iLp[pi] << " associated lepton: " << iLp_l[pi] << " (= "<< iL[i]<<" ? )  tag: " << iLp_tagEM[pi] << endl;
@@ -2849,11 +2848,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  cout << "Index of lepton with photon ISR= " << iLp_l[ p ] << " and final lepton index= " << iL[i] << endl;
 	  if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  {
 	    cout << "Muon with pT= " << RECOMU_PT[iL[i]] << " has associated a photon with pT= " << RECOPFPHOT_PT[iLp[p]] <<  endl;
-	    RECOMU_PFX_dB_new[iL[i]]=
-	      (RECOMU_PFchHad[iL[i]]+
-	       max(0.,RECOMU_PFneuHad[iL[i]]+
-		   (RECOMU_PFphoton[iL[i]]-RECOPFPHOT_PT[iLp[p]] )-
-		   0.5*RECOMU_PFPUchAllPart[iL[i]]))/RECOMU_PT[iL[i]];
+	    // RECOMU_PFX_dB_new[iL[i]]=
+	    //   (RECOMU_PFchHad[iL[i]]+
+	    //    max(0.,RECOMU_PFneuHad[iL[i]]+
+	    // 	   (RECOMU_PFphoton[iL[i]]-RECOPFPHOT_PT[iLp[p]] )-
+	    // 	   0.5*RECOMU_PFPUchAllPart[iL[i]]))/RECOMU_PT[iL[i]];
 	   
 	    flagFSR=1;
 	    pfsr=p;
