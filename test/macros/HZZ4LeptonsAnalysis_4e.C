@@ -2306,53 +2306,34 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       // ++N_4a ;  // fill counter
       // N_4a_w=N_4a_w+newweight;
 
-      // Building a vector of the indices of the leptons from the Zs
-      array<int,4> ileptons;
-      vector<std::array<int, 4> > ileptonsv;
-      array<int,2> iZs;
-      vector<std::array<int, 2> > iZsv;
-      
-      for (int i=0;i<Zcandisolmassvector.size();i++){
-	cout << i << endl;
-	for (int j=i+1;j<Zcandisolmassvector.size();j++){
-	  cout << i << " " << j << endl;
-	  ileptons={Zcandisolmassvector.at(i).ilept1,Zcandisolmassvector.at(i).ilept2,Zcandisolmassvector.at(j).ilept1,Zcandisolmassvector.at(j).ilept2}; 
-	  cout << "Lept " << ileptons.at(0) << " " << ileptons.at(1) << " " << ileptons.at(2) << " " << ileptons.at(3)<< endl;
-	  ileptonsv.push_back(ileptons);
-	  iZs={i,j};
-	  cout << "Zindex " << iZs.at(0) << " " << iZs.at(1) << endl;
-	  iZsv.push_back(iZs);
-	  //cout << " Z index= " << iZsv.at(0).at(0) << " " << iZsv.at(0).at(1)<< endl;
-	}	  
-      }
-      
-      //cout << iZs.at(0) << " " << iZs.at(1)<< endl;
-      cout << "Set of 4-leptons is " << ileptonsv.size() << " and size of vector of ZZ is " << iZsv.size() << endl;
-      //cout << iZsv.at(0).at(0) << " " << iZsv.at(0).at(1)<< endl;
-
-      // ghost removal delta R > 0.02 wrt Z1 leptons
+      // Ghost removal delta R > 0.02 
       vector<candidateZ> goodZ;
-      for (int vl=0;vl<ileptonsv.size();vl++){
-	int counter=0;
-	cout << "Each set of 4-leptons has " << ileptonsv.at(vl).size() << " leptons" << endl;
-	for (int i=0;i<ileptonsv.at(vl).size();i++){
-	  for (int j=i+1;j<ileptonsv.at(vl).size();j++){
-	    if( sqrt( pow( DELTAPHI( RECOELE_PHI[i],RECOELE_PHI[j] ),2) 
-		      + pow(RECOELE_ETA[i] - RECOELE_ETA[j],2) ) <= 0.02) continue;
-	    
-	    ++counter;
-	  }
+
+      for (int i=0;i<Zcandisolmassvector.size();i++){
+	if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(i).phi2 ),2) 
+		  + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(i).eta2,2) ) <= 0.02) continue;
+	for (int j=i+1;j<Zcandisolmassvector.size();j++){
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(j).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(j).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
+
+	  cout << "There is a set of 4 leptons passing the ghost removal" << endl;
+	  goodZ.push_back(Zcandisolmassvector.at(i));
+	  goodZ.push_back(Zcandisolmassvector.at(j));
 	}
-	if (counter<6) {
-	  cout << "There is no set of 4 leptons passing the ghost removal + pT cuts" << endl;
-	  continue;
-	}
-	cout << iZsv.at(vl).at(0) << " " << iZsv.at(vl).at(1)<< endl;
-	goodZ.push_back(Zcandisolmassvector.at(iZsv.at(vl).at(0)));
-	goodZ.push_back(Zcandisolmassvector.at(iZsv.at(vl).at(1)));
       }
-      
-      
+         
       if (goodZ.size()==0) {
 	cout << "No ZZ combination passing the cuts  ...exiting " << endl;
 	continue;

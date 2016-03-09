@@ -1877,10 +1877,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  double massZ;
 	  double massZ_noFSR = 0;
 	  
-	  // double ptZ = 0;
-	  // double Y_Z = -9;
-	  // double sum_ptZ = 0.;
-	  
 	  int tempphotid=-1;
 	  int templepid=-1;
 
@@ -1895,27 +1891,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  pyZ=DiLepton.Py();
 	  pzZ=DiLepton.Pz();
 	  EZ=DiLepton.E();
-
-	  // EZ = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ];
-	  // cout << "\n Looking for a new pair"<< endl;
-	  // if (debug) cout << "pt,eta,phi,charge= " << RECOMU_PT[ iL[i] ] << " " << RECOMU_ETA[ iL[i] ] << " " << RECOMU_PHI[ iL[i] ] << " " << RECOMU_CHARGE[ iL[i] ]<< endl;
-	  // if (debug) cout << "pt,eta,phi,charge= " << RECOMU_PT[ iL[j] ] << " " << RECOMU_ETA[ iL[j] ] << " " << RECOMU_PHI[ iL[j] ] << " " << RECOMU_CHARGE[ iL[j] ]<< endl;
-
-	  // pxZ = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] );
-	  // pyZ = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] );
-	  // pzZ = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] );
-	  // //massZ=invmass(RECOMU_MASS[ iL[i] ], RECOMU_PT[ iL[i] ], RECOMU_ETA[ iL[i] ], RECOMU_PHI[ iL[i] ],
-	  // //	RECOMU_MASS[ iL[j] ], RECOMU_PT[ iL[j] ], RECOMU_ETA[ iL[j] ], RECOMU_PHI[ iL[j] ]);
-
-	  // massZ = sqrt( pow(EZ,2) - pow(pxZ,2) - pow(pyZ,2) - pow(pzZ,2) );	  
-	  // massZ_noFSR = massZ;
-	  
-	  // ptZ = sqrt( pxZ*pxZ + pyZ*pyZ );
-	  // Y_Z = 0.5 * log ( (EZ + pzZ)/(EZ - pzZ) );
-	  // sum_ptZ = RECOMU_PT[ iL[i] ] + RECOMU_PT[ iL[j] ]; 
-	  
-	  // if (debug) cout << "Mass Z= " << massZ << " rapidity Z= " << Y_Z << endl;
-	  // if (debug) cout << "mass Z= " << sqrt( pow(EZ,2) - pow(pxZ,2) - pow(pyZ,2) - pow(pzZ,2) ) << endl;
+	 
 	  // ** Association of FSR to Z
 	  if( debug ) cout  << "Step Z+FSR  " << endl;
 	  
@@ -1938,18 +1914,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      pxZ=DiLepton.Px();
 	      pyZ=DiLepton.Py();
 	      pzZ=DiLepton.Pz();
-	      EZ=DiLepton.E();
-	      
-	      // double px, py, pz;
-	      // double E;
-	      
-	      // E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs( RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ) );	      
-	      // px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-	      // py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-	      // pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-	      // 	+ fabs( RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ) )*cos( RECOPFPHOT_THETA[iLp[p]] );	      
-	      // double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
-
+	      EZ=DiLepton.E();	      	   
 	      
 	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
 		has_FSR_Z = 1; 
@@ -1969,18 +1934,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      pyZ=DiLepton.Py();
 	      pzZ=DiLepton.Pz();
 	      EZ=DiLepton.E();
-
-	      // evaluate the mass
-	      // double px, py, pz;
-	      // double E;
-	      
-	      // E = RECOMU_E[ iL[i] ] + RECOMU_E[ iL[j] ] + fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ));
-	      
-	      // px = RECOMU_PT[ iL[i] ]*cos( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*cos( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*cos( RECOPFPHOT_PHI[iLp[p]] );
-	      // py = RECOMU_PT[ iL[i] ]*sin( RECOMU_PHI[ iL[i] ] ) + RECOMU_PT[ iL[j] ]*sin( RECOMU_PHI[ iL[j] ] ) + RECOPFPHOT_PT[iLp[p]]*sin( RECOPFPHOT_PHI[iLp[p]] );
-	      // pz = RECOMU_P[ iL[i] ]*cos( RECOMU_THETA[ iL[i] ] ) + RECOMU_P[ iL[j] ]*cos( RECOMU_THETA[ iL[j] ] ) 
-	      // 	+ fabs(RECOPFPHOT_PT[iLp[p]]/sin( RECOPFPHOT_THETA[iLp[p]] ))*cos( RECOPFPHOT_THETA[iLp[p]] );	      
-	      //double mllp = sqrt( pow(E,2) - pow(px,2) - pow(py,2) - pow(pz,2) );
 	      
 	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
 		pj = p;
@@ -2349,53 +2302,34 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       // ++N_4a ;  // fill counter
       // N_4a_w=N_4a_w+newweight;
 
-      // Building a vector of the indices of the leptons from the Zs
-      array<int,4> ileptons;
-      vector<std::array<int, 4> > ileptonsv;
-      array<int,2> iZs;
-      vector<std::array<int, 2> > iZsv;
-      
-      for (int i=0;i<Zcandisolmassvector.size();i++){
-	cout << i << endl;
-	for (int j=i+1;j<Zcandisolmassvector.size();j++){
-	  cout << i << " " << j << endl;
-	  ileptons={Zcandisolmassvector.at(i).ilept1,Zcandisolmassvector.at(i).ilept2,Zcandisolmassvector.at(j).ilept1,Zcandisolmassvector.at(j).ilept2}; 
-	  cout << "Lept " << ileptons.at(0) << " " << ileptons.at(1) << " " << ileptons.at(2) << " " << ileptons.at(3)<< endl;
-	  ileptonsv.push_back(ileptons);
-	  iZs={i,j};
-	  cout << "Zindex " << iZs.at(0) << " " << iZs.at(1) << endl;
-	  iZsv.push_back(iZs);
-	  //cout << " Z index= " << iZsv.at(0).at(0) << " " << iZsv.at(0).at(1)<< endl;
-	}	  
-      }
-      
-      //cout << iZs.at(0) << " " << iZs.at(1)<< endl;
-      cout << "Set of 4-leptons is " << ileptonsv.size() << " and size of vector of ZZ is " << iZsv.size() << endl;
-      //cout << iZsv.at(0).at(0) << " " << iZsv.at(0).at(1)<< endl;
-
-      // ghost removal delta R > 0.02 wrt Z1 leptons
+      // Ghost removal delta R > 0.02 
       vector<candidateZ> goodZ;
-      for (int vl=0;vl<ileptonsv.size();vl++){
-	int counter=0;
-	cout << "Each set of 4-leptons has " << ileptonsv.at(vl).size() << " leptons" << endl;
-	for (int i=0;i<ileptonsv.at(vl).size();i++){
-	  for (int j=i+1;j<ileptonsv.at(vl).size();j++){
-	    if( sqrt( pow( DELTAPHI( RECOMU_PHI[i],RECOMU_PHI[j] ),2) 
-		      + pow(RECOMU_ETA[i] - RECOMU_ETA[j],2) ) <= 0.02) continue;
-	    
-	    ++counter;
-	  }
+
+      for (int i=0;i<Zcandisolmassvector.size();i++){
+	if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(i).phi2 ),2) 
+		  + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(i).eta2,2) ) <= 0.02) continue;
+	for (int j=i+1;j<Zcandisolmassvector.size();j++){
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(j).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(j).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
+
+	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
+
+	  cout << "There is a set of 4 leptons passing the ghost removal" << endl;
+	  goodZ.push_back(Zcandisolmassvector.at(i));
+	  goodZ.push_back(Zcandisolmassvector.at(j));
 	}
-	if (counter<6) {
-	  cout << "There is no set of 4 leptons passing the ghost removal + pT cuts" << endl;
-	  continue;
-	}
-	cout << iZsv.at(vl).at(0) << " " << iZsv.at(vl).at(1)<< endl;
-	goodZ.push_back(Zcandisolmassvector.at(iZsv.at(vl).at(0)));
-	goodZ.push_back(Zcandisolmassvector.at(iZsv.at(vl).at(1)));
       }
-      
-      
+
       if (goodZ.size()==0) {
 	cout << "No ZZ combination passing the cuts  ...exiting " << endl;
 	continue;
