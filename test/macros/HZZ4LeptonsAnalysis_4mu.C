@@ -3206,8 +3206,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      int index_bjets[2]={-999,-999};
      
      for (int i=0;i<50;i++){
-       if (cSV_BTagJet_DISCR[i] > 0.814){ // 72x
-	 //if (cSV_BTagJet_DISCR[i] > 0.89){ // 74x
+	 if (cSV_BTagJet_DISCR[i] > 0.89){ // 74x
 	 if(cSV_BTagJet_PT[i]>30. && fabs(cSV_BTagJet_ETA[i])<4.7 ) cout << "Found a bjet (pT>30 and |eta|<2.4) with pT= " << cSV_BTagJet_PT[i] << endl;	 
 	 n_bjets++;
 	 if (n_bjets==1) index_bjets[0]=i; 
@@ -3258,8 +3257,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      for(int i=0;i<RECO_PFJET_N;i++){
        if (jetfail[i]!=0) continue;
        for (int j=0;j<50;j++){
-	 if (cSV_BTagJet_PT[j]==RECO_PFJET_PT[i] && cSV_BTagJet_DISCR[j]>0.814 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
-	   //if (cSV_BTagJet_DISCR[j]>0.814 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
+	 if (cSV_BTagJet_PT[j]==RECO_PFJET_PT[i] && cSV_BTagJet_DISCR[j]>0.89 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
+	   //if (cSV_BTagJet_DISCR[j]>0.89 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
 	   n_match_bjets++;
 	   //if (n_match_bjets==1) jet1=i;
 	   //if (n_match_bjets==2) jet2=i;
