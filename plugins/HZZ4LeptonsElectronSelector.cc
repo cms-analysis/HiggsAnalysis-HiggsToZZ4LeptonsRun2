@@ -32,7 +32,7 @@ using namespace reco;
 // constructor
 HZZ4LeptonsElectronSelector::HZZ4LeptonsElectronSelector(const edm::ParameterSet& pset) {
 
-  elecLabel   = pset.getParameter<edm::InputTag>("electronCollection");
+  elecLabel   = consumes<edm::View<reco::GsfElectron> >(pset.getParameter<edm::InputTag>("electronCollection"));
   elecPtMin   = pset.getParameter<double>("electronPtMin");
   elecEtaMax  = pset.getParameter<double>("electronEtaMax");
    
@@ -55,7 +55,7 @@ void HZZ4LeptonsElectronSelector::produce(edm::Event& iEvent, const edm::EventSe
 
   // Get all pixel match GSF electron candidates
   edm::Handle<edm::View<GsfElectron> > electrons;
-  iEvent.getByLabel(elecLabel, electrons);
+  iEvent.getByToken(elecLabel, electrons);
 
   if (electrons.isValid()){
     // Loop over GsfElectrons

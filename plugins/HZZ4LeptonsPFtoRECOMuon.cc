@@ -26,7 +26,7 @@ using namespace reco;
 
 // constructor
 HZZ4LeptonsPFtoRECOMuon::HZZ4LeptonsPFtoRECOMuon(const edm::ParameterSet& pset) {
-  pfLabel        = pset.getParameter<edm::InputTag>("pfCollection");
+  pfLabel        = consumes<edm::View<reco::PFCandidate> >(pset.getParameter<edm::InputTag>("pfCollection"));
   string alias;
   produces<reco::MuonCollection>(); 
 }
@@ -48,7 +48,7 @@ void HZZ4LeptonsPFtoRECOMuon::produce(edm::Event& iEvent, const edm::EventSetup&
   auto_ptr<reco::MuonCollection> muon( new reco::MuonCollection );
 
   edm::Handle<edm::View<PFCandidate> > particles;    
-  iEvent.getByLabel(pfLabel.label(), particles);
+  iEvent.getByToken(pfLabel, particles);
 
   // Loop over PF candidates
   for (edm::View<reco::PFCandidate>::const_iterator mIter = particles->begin(); mIter != particles->end(); ++mIter ) {

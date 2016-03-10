@@ -16,8 +16,7 @@ using namespace std;
 // Constructor
 HZZ4LeptonsHLTAnalysisFilter::HZZ4LeptonsHLTAnalysisFilter(const edm::ParameterSet& pset) {
 
-  HLTInfoFired              = pset.getParameter<edm::InputTag>("HLTInfoFired");
-  
+  HLTInfoFired = consumes<std::vector<std::string> >(pset.getParameter<edm::InputTag>("HLTInfoFired"));
 }
 
 
@@ -31,7 +30,7 @@ HZZ4LeptonsHLTAnalysisFilter::~HZZ4LeptonsHLTAnalysisFilter() {
 bool HZZ4LeptonsHLTAnalysisFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup ) {
 
   edm::Handle<vector<std::string> > HLTfired_;
-  iEvent.getByLabel(HLTInfoFired,HLTfired_);
+  iEvent.getByToken(HLTInfoFired,HLTfired_);
   
   vector<string> HLTimported;
   string tmpstring="";

@@ -38,8 +38,8 @@ struct SortCandByDecreasingPt {
 // constructor
 HZZ4LeptonsElectronOrdering::HZZ4LeptonsElectronOrdering(const edm::ParameterSet& pset) {
 
-  elecLabel   = pset.getParameter<edm::InputTag>("electronCollection");
-   
+  elecLabel   = consumes<reco::GsfElectronCollection>(pset.getParameter<edm::InputTag>("electronCollection"));
+ 
   produces<reco::GsfElectronCollection>(); 
 
   counterelectron=0;	
@@ -57,13 +57,13 @@ void HZZ4LeptonsElectronOrdering::produce(edm::Event& iEvent, const edm::EventSe
   auto_ptr<reco::GsfElectronCollection> Gelec( new reco::GsfElectronCollection );
 
   // Get all pixel match GSF electron candidates
-  edm::Handle<edm::View<GsfElectron> > electrons;
-  iEvent.getByLabel(elecLabel, electrons);
+  edm::Handle<reco::GsfElectronCollection> electrons;
+  iEvent.getByToken(elecLabel, electrons);
 
   if (electrons.isValid()){
     // Loop over GsfElectrons
     for (unsigned int i = 0; i < electrons->size(); ++i) {
-      Ref<edm::View<reco::GsfElectron> > electronRef(electrons,i);
+      Ref<reco::GsfElectronCollection> electronRef(electrons,i);
       Gelec->push_back( *electronRef );      
     } 
   }

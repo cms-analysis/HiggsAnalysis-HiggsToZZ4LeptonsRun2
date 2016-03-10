@@ -1,6 +1,6 @@
 
-/* Original author:  Nicola De Filippis - LLR -Ecole Polytechnique 
- *                   modifed by Nhan Tran
+/* Original author:  Nicola De Filippis - Politecnico and INFN - Bari
+ *                   
  *
  */
 
@@ -24,46 +24,11 @@
 #include "CommonTools/CandUtils/interface/cloneDecayTree.h"
 
 
-// #include "JHU/MELA/src/scripts/MELA.h"
 
 // namespaces
 using namespace edm;
 using namespace std;
 using namespace reco;
-
-
-// template <typename U>
-// void checkZorder(U& z1mass, U& z2mass,
-//                  U& costhetastar, U& costheta1,
-//                  U& costheta2, U& phi,
-//                  U& phistar1){
-
-//   U tempZ1mass=z1mass;
-//   U tempZ2mass=z2mass;
-//   U tempH1=costheta1;
-//   U tempH2=costheta2;
-//   U tempHs=costhetastar;
-//   U tempPhi1=phistar1;
-//   U tempPhi=phi;
-
-//   if(z2mass>z1mass){
-
-//     z1mass=tempZ2mass;
-//     z2mass=tempZ1mass;
-//     costhetastar=-tempHs;
-//     costheta1=tempH2;
-//     costheta2=tempH1;
-//     phi=tempPhi;
-//     phistar1=-tempPhi1-tempPhi;
-//     if(phistar1>3.1415)
-//       phistar1=phistar1-2*3.1415;
-//     if(phistar1<-3.1415)
-//       phistar1=phistar1+2*3.1415;
-
-//   }else
-//     return;
-
-// }
 
 
 double HZZ4LeptonsCP::Distance( const reco::Candidate & c1, const reco::Candidate & c2 ) {
@@ -79,8 +44,7 @@ HZZ4LeptonsCP::HZZ4LeptonsCP(const edm::ParameterSet& pset) {
 	
 	// Get the various input parameters
 	typedef std::vector<edm::InputTag> vtag;
-
-	RECOcollName  = pset.getParameter<edm::InputTag>("RECOcollName");
+	RECOcollName  = consumes<edm::View<reco::Candidate> >(pset.getParameter<edm::InputTag>("RECOcollName"));
 	decayChain_   = pset.getParameter<std::string>("decayChain");
 	debug	      =	pset.getUntrackedParameter<bool> ("debug");
 
@@ -128,9 +92,9 @@ void HZZ4LeptonsCP::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 	
 	// ZZ candidates
 	Handle<edm::View<Candidate> > CandidateH;
-	iEvent.getByLabel(RECOcollName,CandidateH);
+	iEvent.getByToken(RECOcollName,CandidateH);
 	
-	if(debug) cout << "Candidate H " << CandidateH->size() << " of type=" << RECOcollName.label().c_str() << endl;
+	//if(debug) cout << "Candidate H " << CandidateH->size() << " of type=" << RECOcollName.label().c_str() << endl;
 	
 	// extract the 4 vectors
 	// higgs

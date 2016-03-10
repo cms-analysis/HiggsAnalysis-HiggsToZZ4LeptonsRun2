@@ -9,9 +9,9 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 
 // Muons:
-#include <DataFormats/MuonReco/interface/Muon.h>
-#include <DataFormats/MuonReco/interface/MuonFwd.h>
-#include <DataFormats/TrackReco/interface/Track.h>
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
 
 // Candidate handling
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -35,7 +35,7 @@ using namespace reco;
 HZZ4LeptonsMuonSelector::HZZ4LeptonsMuonSelector(const edm::ParameterSet& pset) {
   isGlobalMuon     = pset.getParameter<bool>("isGlobalMuon");
   isTrackerMuon    = pset.getParameter<bool>("isTrackerMuon");
-  muonLabel        = pset.getParameter<edm::InputTag>("muonCollection");
+  muonLabel        = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("muonCollection"));
   muonPtMin        = pset.getParameter<double>("muonPtMin");
   muonEtaMax       = pset.getParameter<double>("muonEtaMax");
 
@@ -62,7 +62,7 @@ void HZZ4LeptonsMuonSelector::produce(edm::Event& iEvent, const edm::EventSetup&
   edm::Handle<edm::View<Muon> > muons;
   edm::View<reco::Muon>::const_iterator mIter;
     
-  iEvent.getByLabel(muonLabel.label(), muons);
+  iEvent.getByToken(muonLabel, muons);
 
   // Loop over muons
   for (mIter = muons->begin(); mIter != muons->end(); ++mIter ) {
