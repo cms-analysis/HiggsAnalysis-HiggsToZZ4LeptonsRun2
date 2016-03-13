@@ -1668,6 +1668,7 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
     if (index_jets>99) continue;
     //RECO_PFJET_N.push_back(index_jets);
     edm::Ref<reco::PFJetCollection> pfjetref(pfjets,index_jets);
+    edm::Ref<reco::PFJetCollection> pfjetrefmva(pfjetsmva,index_jets);
       
     float mva = 0.;
     int idflag = -1;
@@ -1675,12 +1676,10 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
 
     if (!isVBF_){
       if (fillMCTruth == 1){
-	mva = (*puJetIdMVAMC)[pfjetref];
-	idflag = (*puJetIdFlagMC)[pfjetref];
+	mva = (*puJetIdMVAMC)[pfjetrefmva];
       }
       else{
-	mva = (*puJetIdMVAData)[pfjetref];
-	idflag = (*puJetIdFlagData)[pfjetref];
+	mva = (*puJetIdMVAData)[pfjetrefmva];
       }
       
       /* 	if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )){ */
