@@ -10,7 +10,10 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     # PU
     fillPUinfo = cms.untracked.bool(True),
     PileupSrc  = cms.InputTag("addPileupInfo"),
-                                               
+      
+    # Generator
+    Generator  = cms.InputTag("generator"),                                           
+
     # HLT
     fillHLTinfo  = cms.untracked.bool(False),
     HLTInfoFired = cms.InputTag("hTozzTo4leptonsHLTInfo"),                                           
@@ -21,11 +24,7 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     triggerEvent  = cms.InputTag("hltTriggerSummaryAOD","","HLT"),
     triggerFilter = cms.string('hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40Q'),
     triggerMatchObject   =  cms.InputTag("muonTriggerMatchHLT"),
-    # triggerFilterAsym   =  cms.vstring('hltDiMuonL3PreFiltered8','hltDiMuonL3p5PreFiltered8'),
-    # triggerFilterAsym   =  cms.vstring('hltMu40eta2p1CentralPFJet200MuCleaned','hltMu40eta2p1DiCentralPFJet50MuCleaned'
-    triggerFilterAsym   =  cms.vstring('hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40Q'),
-    triggerMatchObject_asym =  cms.InputTag("muonTriggerMatchHLTasym"),
-                                               
+    triggerEleFilter = cms.string('hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40Q'),                                               
     triggerHLTcollection =  cms.string("hltL3MuonCandidates"),                                              
     triggerMatchObjectEle =  cms.InputTag("electronTriggerMatchHLT"),                                           
 
@@ -35,9 +34,12 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     flagSkimEarlyDatanames=cms.VInputTag(cms.InputTag("Flag_spikes"), cms.InputTag("Skim_highEnergyMuons"),cms.InputTag("Skim_highEnergyElectrons"),cms.InputTag("Skim_recoWMNfromPf"),cms.InputTag("Skim_recoWMNfromTc"),cms.InputTag("Skim_recoWENfromPf"),cms.InputTag("Skim_recoWENfromTc"),cms.InputTag("Skim_diMuonsJPsi"),cms.InputTag("Skim_diMuonsZ"),cms.InputTag("Skim_diElectronsZ"),cms.InputTag("Skim_triLeptonsMuMuMu"),cms.InputTag("Skim_triLeptonsMuMuEl"),cms.InputTag("Skim_triLeptonsMuElEl"),cms.InputTag("Skim_triLeptonsElElEl"),cms.InputTag("Skim_quadLeptons4Mu"),cms.InputTag("Skim_quadLeptons2Mu2El"),cms.InputTag("Skim_quadLeptons4El")),                                               
 
     # MC truth
-    fillMCTruth = cms.untracked.bool(False),
-    MCcollName = cms.InputTag("hTozzTo4leptonsMCDumper"),
-
+    fillMCTruth    = cms.untracked.bool(False),
+    MCcollName     = cms.InputTag("hTozzTo4leptonsMCDumper"),
+    genParticles   = cms.InputTag("genParticles"),
+    fourgenleptons = cms.InputTag("fourgenleptons"),
+    digenZ         = cms.InputTag("digenZ"),
+                                             
     # RECO                                               
     RECOcollNameBest2e2mu = cms.VInputTag(cms.InputTag("hToZZTo4LeptonsBestCandidateOffselMother"), cms.InputTag("hToZZTo4LeptonsBestCandidateOffselBoson0"), cms.InputTag("hToZZTo4LeptonsBestCandidateOffselBoson1")),
     RECOcollNameBest4mu = cms.VInputTag(cms.InputTag("hToZZTo4LeptonsBestCandidateOffselMother"), cms.InputTag("hToZZTo4LeptonsBestCandidateOffselBoson0"), cms.InputTag("hToZZTo4LeptonsBestCandidateOffselBoson1")),
@@ -61,12 +63,7 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     # isolation Tk, Ecal and Hcal
     SuperClustersLabel       = cms.InputTag("hTozzTo4leptonsMergedSuperClusters"),
     GsfTracksElectronsLabel  = cms.InputTag("electronGsfTracks"),
-    ElectronsLabel           = cms.InputTag("hTozzTo4leptonsElectronIsolationProducer"),
-    ElectronsMapLabel        = cms.InputTag("hTozzTo4leptonsHadIsolationProducer"),
-    ElectronsTkMapLabel      = cms.InputTag("hTozzTo4leptonsHadIsolationProducer:Tk"),
-    ElectronsEcalMapLabel    = cms.InputTag("hTozzTo4leptonsHadIsolationProducer:Ecal"),                                              
-    ElectronsHcalMapLabel    = cms.InputTag("hTozzTo4leptonsHadIsolationProducer:Hcal"),
-    ElectronsEgmLabel        = cms.InputTag("hTozzTo4leptonsElectronIsolationProducerEgamma"),
+    ElectronsEgmLabel        = cms.InputTag("hTozzTo4leptonsElectronIsolationProducerEgamma"),                                               
     ElectronsEgmTkMapLabel   = cms.InputTag("eleIsoFromDepsTkOptimized"),
     ElectronsEgmEcalMapLabel = cms.InputTag("eleIsoFromDepsEcalFromHitsByCrystalOptimized"),
     ElectronsEgmHcalMapLabel = cms.InputTag("eleIsoFromDepsHcalFromTowersOptimized"),
@@ -88,11 +85,11 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     MuonPFIsoValuePU            = cms.InputTag("muPFIsoValuePU03PFBRECO"),
 
 
-    ElectronPFIsoValueChargedAll = cms.InputTag("elPFIsoValueChargedAll04PFIdPFBRECO"),
-    ElectronPFIsoValueCharged    = cms.InputTag("elPFIsoValueCharged04PFIdPFBRECO"),
-    ElectronPFIsoValueNeutral    = cms.InputTag("elPFIsoValueNeutral04PFIdPFBRECO"),
-    ElectronPFIsoValueGamma      = cms.InputTag("elPFIsoValueGamma04PFIdPFBRECO"),
-    ElectronPFIsoValuePU         = cms.InputTag("elPFIsoValuePU04PFIdPFBRECO"),
+    ElectronPFIsoValueChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFBRECO"),
+    ElectronPFIsoValueCharged    = cms.InputTag("elPFIsoValueCharged03PFIdPFBRECO"),
+    ElectronPFIsoValueNeutral    = cms.InputTag("elPFIsoValueNeutral03PFIdPFBRECO"),
+    ElectronPFIsoValueGamma      = cms.InputTag("elPFIsoValueGamma03PFIdPFBRECO"),
+    ElectronPFIsoValuePU         = cms.InputTag("elPFIsoValuePU03PFIdPFBRECO"),
 
     PFPhotonsLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton"),                                           
     PFpterrorLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton:ErrorMap"),
@@ -103,7 +100,6 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     PhotonPFIsoValueGamma      = cms.InputTag("phPFIsoValueGamma03PFId"),
     PhotonPFIsoValuePU         = cms.InputTag("phPFIsoValuePU03PFId"),
                                            
-
     
     # vertexing w.r.t primary vertex DA
     MuonsLabelVert           = cms.InputTag("hTozzTo4leptonsMuonSelector"),    
@@ -153,12 +149,12 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     MuonsSTIPMapLabelVertError     = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipErrorMuMap"),
     MuonsSLIPMapLabelVertError     = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipErrorMuMap"),
     	
-    ElectronsSTIPMapLabelVert  = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipEleMap"),
-    ElectronsSLIPMapLabelVert  = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipEleMap"),   	
-    ElectronsSTIPMapLabelVertValue     = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipValueEleMap"),
-    ElectronsSLIPMapLabelVertValue     = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipValueEleMap"),
-    ElectronsSTIPMapLabelVertError     = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipErrorEleMap"),
-    ElectronsSLIPMapLabelVertError     = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipErrorEleMap"),
+    ElectronsSTIPMapLabelVert      = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipEleMap"),
+    ElectronsSLIPMapLabelVert      = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipEleMap"),   	
+    ElectronsSTIPMapLabelVertValue = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipValueEleMap"),
+    ElectronsSLIPMapLabelVertValue = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipValueEleMap"),
+    ElectronsSTIPMapLabelVertError = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:TipErrorEleMap"),
+    ElectronsSLIPMapLabelVertError = cms.InputTag("hTozzTo4leptonsTipLipToVtxProducer:LipErrorEleMap"),
 
     # electron ID
     eleIDLabel                = cms.VInputTag(cms.InputTag("IsoleidClassLoose"),cms.InputTag("IsoleidClassMedium")),
@@ -167,21 +163,10 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     eleRegressionEnergyErrorLabel  = cms.InputTag("eleRegressionEnergy:eneErrorRegForGsfEle"),
     eleRegressionEnergyLabel       = cms.InputTag("eleRegressionEnergy:eneRegForGsfEle"),          
 
-    # CiC                                           
-    eleID_VeryLooseTag        = cms.InputTag("eidVeryLoose"),
-    eleID_LooseTag            = cms.InputTag("eidLoose"),
-    eleID_MediumTag           = cms.InputTag("eidMedium"),
-    eleID_TightTag            = cms.InputTag("eidTight"),                                           
-
-    # Cic HZZ                                           
-    eleID_HZZVeryLooseTag     = cms.InputTag("eidHZZVeryLoose"),
-    eleID_HZZLooseTag         = cms.InputTag("eidHZZLoose"),
-    eleID_HZZMediumTag        = cms.InputTag("eidHZZMedium"),
-    eleID_HZZTightTag         = cms.InputTag("eidHZZHyperTight1"),
-
     # MVA ele ID BDT
-    mvaTrigV0MapTag           = cms.InputTag("mvaTrigV025nsPHYS14"),
-    mvaNonTrigV0MapTag        = cms.InputTag("mvaNonTrigV025nsPHYS14"),
+    mvaElectronTag            = cms.InputTag("gedGsfElectrons"),
+    mvaTrigV0MapTag           = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15Trig25nsV1Values"),
+    mvaNonTrigV0MapTag        = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
                                         
     # GD                                          
     ftsigmaVert               = cms.InputTag("hTozzTo4leptonsGeomDiscrimProducer:ftsigma"),
@@ -234,54 +219,14 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     StandardFitVertexMME       = cms.InputTag("hTozzTo4leptonsConstraintFitProducerTriLeptonsMME:StandardFitVertex"),                                     
     StandardFitVertexEEE       = cms.InputTag("hTozzTo4leptonsConstraintFitProducerTriLeptonsEEE:StandardFitVertex"),
     StandardFitVertexMEE       = cms.InputTag("hTozzTo4leptonsConstraintFitProducerTriLeptonsMEE:StandardFitVertex"),                                              
-                                               
-                                               
-    # CP
-    MCCP_PhiLabel             = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPPhi"),
-    MCCP_Phi1Label            = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPPhi1"),
-    MCCP_Phi2Label            = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPPhi2"),
-    MCCP_phi1RFLabel          = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPphi1RF"),
-    MCCP_phi2RFLabel          = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPphi2RF"),
-    MCCP_cosThetaStarLabel    = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPcosThetaStar"),
-    MCCP_cosTheta1Label       = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPcosTheta1"),
-    MCCP_cosTheta2Label       = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPcosTheta2"),
-    MCCP_MELALabel            = cms.InputTag("hTozzTo4leptonsMCCP:hToZZTo4LeptonsMCBestCandidateCPMELA"),
- 
-    CP2e2mu_PhiLabel          = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPPhi"),
-    CP2e2mu_Phi1Label         = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPPhi1"),
-    CP2e2mu_Phi2Label         = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPPhi2"),
-    CP2e2mu_phi1RFLabel       = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPphi1RF"),
-    CP2e2mu_phi2RFLabel       = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPphi2RF"),
-    CP2e2mu_cosThetaStarLabel = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPcosThetaStar"),
-    CP2e2mu_cosTheta1Label    = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPcosTheta1"),
-    CP2e2mu_cosTheta2Label    = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPcosTheta2"),
-    CP2e2mu_MELALabel         = cms.InputTag("hTozzTo4leptonsCP:hToZZTo4LeptonsBestCandidateCPMELA"),
-                                               
-    CP4mu_PhiLabel            = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPPhi"),
-    CP4mu_Phi1Label           = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPPhi1"),
-    CP4mu_Phi2Label           = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPPhi2"),
-    CP4mu_phi1RFLabel         = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPphi1RF"),
-    CP4mu_phi2RFLabel         = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPphi2RF"),
-    CP4mu_cosThetaStarLabel   = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPcosThetaStar"),
-    CP4mu_cosTheta1Label      = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPcosTheta1"),
-    CP4mu_cosTheta2Label      = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPcosTheta2"),
-    CP4mu_MELALabel           = cms.InputTag("hTozzTo4leptonsCPMMMM:hToZZTo4LeptonsBestCandidateCPMELA"),
-                                               
-    CP4e_PhiLabel             = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPPhi"),
-    CP4e_Phi1Label            = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPPhi1"),
-    CP4e_Phi2Label            = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPPhi2"),
-    CP4e_phi1RFLabel          = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPphi1RF"),
-    CP4e_phi2RFLabel          = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPphi2RF"),
-    CP4e_cosThetaStarLabel    = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPcosThetaStar"),
-    CP4e_cosTheta1Label       = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPcosTheta1"),
-    CP4e_cosTheta2Label       = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPcosTheta2"), 
-    CP4e_MELALabel            = cms.InputTag("hTozzTo4leptonsCPEEEE:hToZZTo4LeptonsBestCandidateCPMELA"),
-
+                                                                                                                              
 
     # Other Objetcs
     PhotonsLabel       = cms.InputTag("photons"),
     TracksLabel        = cms.InputTag("generalTracks"),
     JetsLabel          = cms.InputTag("ak4PFJetsCorrection"),
+    JetsDataLabel      = cms.InputTag("ak4PFJetsCorrectionData"),
+    JetsMVALabel       = cms.InputTag("hTozzTo4leptonsPFJetSelector"),
     PuJetMvaMCfullDiscrLabel   = cms.InputTag("recoPuJetIdMvaMC:fullDiscriminant"),
     PuJetMvaMCfullIdLabel      = cms.InputTag("recoPuJetIdMvaMC:full53xId"),                                              
     PuJetMvaDatafullDiscrLabel = cms.InputTag("recoPuJetIdMvaData:fullDiscriminant"),
@@ -328,25 +273,32 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     CorMETGlobalMuLabel       = cms.InputTag("corMetGlobalMuons"),
 
     # btagging                                           
-    tCHighEff_bTagLabel  = cms.InputTag("trackCountingHighEffBJetTags"),
-    tCHighPur_bTagLabel  = cms.InputTag("trackCountingHighPurBJetTags"),
-    jPHighEff_bTagLabel  = cms.InputTag("jetProbabilityBJetTags"),
-    jBP_bTagLabel        = cms.InputTag("jetBProbabilityBJetTags"),
-    sSVHighEff_bTagLabel = cms.InputTag("simpleSecondaryVertexHighEffBJetTags"),
-    sSVHighPur_bTagLabel = cms.InputTag("simpleSecondaryVertexHighPurBJetTags"),
-    cSV_bTagLabel        = cms.InputTag("combinedInclusiveSecondaryVertexV2BJetTags"),
-    cSVMVA_bTagLabel     = cms.InputTag("combinedSecondaryVertexMVABJetTags"),
+    tCHighEff_bTagLabel  = cms.InputTag("pfTrackCountingHighEffBJetTags"),
+    tCHighPur_bTagLabel  = cms.InputTag("pfTrackCountingHighPurBJetTags"),
+    jPHighEff_bTagLabel  = cms.InputTag("pfjetProbabilityBJetTags"),
+    jBP_bTagLabel        = cms.InputTag("pfjetBProbabilityBJetTags"),
+    sSVHighEff_bTagLabel = cms.InputTag("pfSimpleSecondaryVertexHighEffBJetTags"),
+    sSVHighPur_bTagLabel = cms.InputTag("pfSimpleSecondaryVertexHighPurBJetTags"),
+    cSV_bTagLabel        = cms.InputTag("pfCombinedInclusiveSecondaryVertexV2BJetTags"),
+    cSVMVA_bTagLabel     = cms.InputTag("pfCombinedSecondaryVertexMVABJetTags"),
     sEByIP3d_bTagLabel   = cms.InputTag("softElectronByIP3dBJetTags"),
-    sEByPt_bTagLabel     = cms.InputTag("softElectronByPtBJetTags"),
-    sM_bTagLabel         = cms.InputTag("softMuonBJetTags"),
+    sEByPt_bTagLabel     = cms.InputTag("softPFElectronByPtBJetTags"),
+    sM_bTagLabel         = cms.InputTag("softPFMuonBJetTags"),
     sMByIP3d_bTagLabel   = cms.InputTag("softMuonByIP3dBJetTags"),
     sMByPt_bTagLabel     = cms.InputTag("softMuonByPtBJetTags"),
                                                 
-
     # Conversion finder
     ConvMapDist          = cms.InputTag("ConvValueMapProd:dist"),                          
     ConvMapDcot          = cms.InputTag("ConvValueMapProd:dcot"),
 
-    # VBF
-    isVBF                = cms.bool(False)                               
+    # Matching
+    goodElectronMCMatch  = cms.InputTag("goodElectronMCMatch"),
+    myElectrons          = cms.InputTag("myElectrons"),
+    goodMuonMCMatch      = cms.InputTag("goodMuonMCMatch"),
+    myMuons              = cms.InputTag("myMuons"),
+    goodGammaMCMatch      = cms.InputTag("goodGammaMCMatch"),
+    myGammas              = cms.InputTag("myGammas"),
+
+    # Beam Spot
+    offlineBeamSpot       = cms.InputTag("offlineBeamSpot"),
 )

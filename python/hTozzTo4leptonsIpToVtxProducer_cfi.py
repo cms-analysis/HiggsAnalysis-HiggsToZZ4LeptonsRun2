@@ -9,6 +9,7 @@ hTozzTo4leptonsIpToVtxProducer = cms.EDProducer("HZZ4LeptonsIpToVtxProducer",
 #    MuonsLabel = cms.InputTag("hTozzTo4leptonsMuonIsolationProducer"),
     MuonsLabel = cms.InputTag("hTozzTo4leptonsMuonSelector"),
     VertexLabel = cms.InputTag("offlinePrimaryVertices"),
+    BeamSpotLabel  = cms.InputTag("offlineBeamSpot"),
     useBeamSpot = cms.bool(False),
     decaychannel = cms.string('2e2mu')
 )
