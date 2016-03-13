@@ -1547,9 +1547,7 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   RECO_PFJET_PUID_MVA.clear();
   edm::Handle<reco::PFJetCollection> pfjets,pfjetsmva;
   edm::Handle<edm::ValueMap<float> > puJetIdMVAMC;
-  edm::Handle<edm::ValueMap<int> > puJetIdFlagMC;
   edm::Handle<edm::ValueMap<float> > puJetIdMVAData;
-  edm::Handle<edm::ValueMap<int> > puJetIdFlagData;
  
   if (fillMCTruth == 1){
     iEvent.getByToken(jetsTag_, pfjets);
@@ -1564,21 +1562,23 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   }
   RECO_PFJET_N=pfjets->size();
   cout << "Number of PFJets in the event= " << RECO_PFJET_N << endl;
+
   int index_jets = 0;
-  for ( PFJetCollection::const_iterator i=pfjets->begin(); i!=pfjets->end(); i++) {  
+
+  for ( PFJetCollection::const_iterator i=pfjets->begin(); i!=pfjets->end(); i++) {
+    
     edm::Ref<reco::PFJetCollection> pfjetref(pfjets,index_jets);
-      
+    edm::Ref<reco::PFJetCollection> pfjetrefmva(pfjetsmva,index_jets);
+	    
     float mva = 0.;
     int pupass = 1;
-
     
     if (fillMCTruth == 1){
-      mva = (*puJetIdMVAMC)[pfjetref];
+      mva = (*puJetIdMVAMC)[pfjetrefmva];
     }
     else{
-      mva = (*puJetIdMVAData)[pfjetref];
+      mva = (*puJetIdMVAData)[pfjetrefmva];
     }
-    
       
     //      New Selection
     if(i->pt()>20.){
@@ -1621,7 +1621,6 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   
   edm::Handle<double> rhoHandle;
   
-  //rhojetsTag_=edm::InputTag("kt6PFJetsCentralNeutral:rho");      
   iEvent.getByToken(rhojetsTag_,rhoHandle); 
   if (rhoHandle.isValid() ) {
     RHO_mu=*rhoHandle;
@@ -1630,7 +1629,7 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   else {
     cout << "Not valid RHO collection" << endl;
   }
-  //rhojetsTag_=edm::InputTag("kt6PFJets:rho");
+
   iEvent.getByToken(rhojetsTag_,rhoHandle); 
   if (rhoHandle.isValid() ) {
     RHO_ele=*rhoHandle;
