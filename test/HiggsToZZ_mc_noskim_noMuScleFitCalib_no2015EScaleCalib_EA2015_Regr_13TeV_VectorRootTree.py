@@ -45,7 +45,6 @@ process.load('HiggsAnalysis/HiggsToZZ4Leptons/hTozzTo4leptonsPreselection_data_n
 process.hTozzTo4leptonsElectronSelector.electronCollection = cms.InputTag("gedGsfElectrons")
 # process.vetoElectrons.src = cms.InputTag("calibratedElectrons")  
 process.hTozzTo4leptonsHLTInfo.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
-process.patTrigger.processName=cms.string("HLT")
 process.hTozzTo4leptonsRootTreePresel.use2011EA = cms.untracked.bool(False)
 process.hTozzTo4leptonsRootTreePresel.triggerEvent  = cms.InputTag("hltTriggerSummaryAOD","","HLT")
 process.hTozzTo4leptonsRootTreePresel.fillPUinfo = True
