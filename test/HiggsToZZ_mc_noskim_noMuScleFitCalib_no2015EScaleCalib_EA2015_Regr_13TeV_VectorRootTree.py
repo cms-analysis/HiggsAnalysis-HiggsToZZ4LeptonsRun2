@@ -38,7 +38,7 @@ process.hTozzTo4leptonsElectronOrdering = cms.EDProducer("HZZ4LeptonsElectronOrd
                                                            )
 
   
-process.load('MuonAnalysis/MuonAssociators/muonCleanerBySegments_cfi')
+process.load('HiggsAnalysis/HiggsToZZ4Leptons/muonCleanerBySegments_cfi')
 process.cleanMuonsBySegments.src = cms.InputTag("muons")
     
 process.load('HiggsAnalysis/HiggsToZZ4Leptons/hTozzTo4leptonsPreselection_data_noskim_vector_cff') 
