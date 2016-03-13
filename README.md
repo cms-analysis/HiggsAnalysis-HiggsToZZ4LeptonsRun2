@@ -10,3 +10,15 @@ git clone https://github.com/tocheng/KinZfitter.git
 
 Try download: 
 EgammaAnalysis/ElectronTools
+Try:
+cd RecoEgamma/ElectronIdentification/data/Spring15
+
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB1_5_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB2_5_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EE_5_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB1_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB2_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EE_10_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB1_10_oldTrigSpring15_25ns_data_1_VarD_TMVA412_Sig6BkgAll_MG_noSpec_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB2_10_oldTrigSpring15_25ns_data_1_VarD_TMVA412_Sig6BkgAll_MG_noSpec_BDT.weights.xml .
+cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EE_10_oldTrigSpring15_25ns_data_1_VarD_TMVA412_Sig6BkgAll_MG_noSpec_BDT.weights.xml .
