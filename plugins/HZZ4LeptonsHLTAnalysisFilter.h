@@ -38,7 +38,7 @@ class HZZ4LeptonsHLTAnalysisFilter : public edm::EDFilter {
 
  private:
   std::string inputfileName;
-  edm::InputTag HLTInfoFired;
+  edm::EDGetTokenT<std::vector<std::string> > HLTInfoFired;
 
 
 };

@@ -4,9 +4,9 @@
  *
  *  Author: N. De Filippis - Politecnico and INFN Bari
  *
- *  Modified (from array to vector format) by Sherif Elgammal 
- *  9/1/2016    
- *  CMSSW_7_4_5     
+ *  Modified (from array to vector format) by Sherif Elgammal / Nicola De Filippis / Giorgia Miniello
+ *  11/3/2016    
+ *  CMSSW_7_6_X     
  */
 
 #ifndef MyCodeArea_Analyzer_HZZ4LeptonsRootTree_h
@@ -158,6 +158,7 @@
 #include "DataFormats/METReco/interface/PFMETFwd.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+
 //====================== end a part for photons ==========================
 #include <vector>
 #include <set>
@@ -280,7 +281,6 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
-//#include "CMGTools/External/interface/PileupJetIdentifier.h"
 #include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 
 //Full Error
@@ -321,10 +321,11 @@ class HZZ4LeptonsRootTree : public edm::EDAnalyzer {
       virtual void beginJob();
       virtual void endJob();
       void IntialValues();
-      //void EventsReWeighting(const edm::Event& evt);
+      void EventsReWeighting(const edm::Event& evt);
       float delR(float eta1,float phi1,float eta2,float phi2);
       void triggermatching(const edm::Event& iEvent);
-      bool IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel); 
+      bool IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel);
+      bool IsEleMatchedToHLTEle(const reco::GsfElectron &ele,std::vector<reco::Particle> HLTEle,std::vector<string> HLTEleNames,double DR,double DPtRel);
       const std::string getParticleName(int id);
       bool match(double mass, double pt, int charge,const reco::CandidateCollection *c1Coll);
       bool matchParticle(double mass, double pt, int charge, const reco::Candidate *c1);
@@ -347,8 +348,6 @@ class HZZ4LeptonsRootTree : public edm::EDAnalyzer {
       void fillHLTFired(const edm::Event& iEvent);
       void filljets(const edm::Event& iEvent);
       void fillAdditionalRECO(const edm::Event& iEvent);
-      void fillBeamSpot(const edm::Event& iEvent);
-      void fillIsolationByRings(const edm::Event& iEvent,const edm::EventSetup& iSetup);
       void fillP3Covariance(const reco::PFCandidate &c, TMatrixDSym &bigCov, int offset) const;
       void fillConstraintVtx2e2mu(const edm::Event& iEvent);
       void fillConstraintVtx4e(const edm::Event& iEvent);
@@ -358,10 +357,6 @@ class HZZ4LeptonsRootTree : public edm::EDAnalyzer {
       void fillGD2e2mu(const edm::Event& iEvent);
       void fillGD4e(const edm::Event& iEvent);
       void fillGD4mu(const edm::Event& iEvent);
-      void fillCP2e2mu(const edm::Event& iEvent);
-      void fillCP4e(const edm::Event& iEvent);
-      void fillCP4mu(const edm::Event& iEvent);
-      void fillMCCP(const edm::Event& iEvent);
       void fillVertices(const edm::Event& iEvent);
       void fillTracks(const edm::Event& iEvent);
 private:
@@ -649,8 +644,10 @@ private:
       //
       //=============================================================
       char HLTPathsFired[20000];
-      int RECO_nMuHLTMatch,RECO_nMuHLTMatchPAT,RECO_nMuHLTMatch_asym_PAT,RECO_nEleHLTMatchPAT;
-      std::vector<float> RECOMU_PT_MuHLTMatch,RECOMU_PT_MuHLTMatchPAT,RECOMU_PT_MuHLTMatch_asym_PAT,RECOELE_PT_EleHLTMatchPAT;
+      int RECO_nMuHLTMatch,RECO_nEleHLTMatch;
+      std::vector<float> RECOMU_PT_MuHLTMatch,RECOMU_ETA_MuHLTMatch,RECOMU_PHI_MuHLTMatch;
+      std::vector<float> RECOELE_PT_EleHLTMatch,RECOELE_ETA_EleHLTMatch,RECOELE_PHI_EleHLTMatch;
+
       //=============================================================
       //                   
       //           Create Branchs for PF MET
@@ -888,6 +885,7 @@ private:
       //int num_PU_vertices;
       //int PU_BunchCrossing;
       // Beam Spot
+      BeamSpot bs;
       double BeamSpot_X,BeamSpot_Y,BeamSpot_Z;
       //=============================================================
       //                   
@@ -1091,18 +1089,21 @@ private:
       bool fillPUinfo;
       int num_PU_vertices;
       int PU_BunchCrossing; // bunch crossing for the PU event added
-      edm::InputTag PileupSrc_;
+      edm::EDGetTokenT<std::vector<PileupSummaryInfo> > PileupSrc_;
       
-      // HLT
+      // Generator
+      edm::EDGetTokenT<GenEventInfoProduct> generator_;
+
+      // HTL
       bool fillHLTinfo;
       edm::InputTag HLTInfoFired;
       std::string HLTAnalysisinst;
       std::vector<edm::InputTag> flagHLTnames; 
       
-      edm::InputTag triggerEvent,triggerMatchObject,triggerMatchObject_asym,triggerMatchObjectEle;
-      std::string triggerFilter,triggerHLTcollection;
-      std::vector<std::string> triggerFilter_asym;
-      
+      edm::EDGetTokenT<trigger::TriggerEvent> triggerEvent;
+      edm::EDGetTokenT<edm::Association<std::vector<pat::TriggerObjectStandAlone> > > triggerMatchObject;
+      edm::InputTag triggerMatchObjectEle;
+      std::string triggerFilter,triggerEleFilter,triggerHLTcollection;
       
       // SkimEarlyData
       std::string SkimEarlyDataAnalysisinst;
@@ -1110,8 +1111,11 @@ private:
       
       // MC truth
       bool fillMCTruth;
-      edm::InputTag MCcollName;
-      
+      edm::EDGetTokenT<edm::View<reco::Candidate> > MCcollName;
+      edm::EDGetTokenT<vector<reco::GenParticle> > genParticles_;
+      edm::EDGetTokenT<edm::View<reco::Candidate> > fourgenleptons_;
+      edm::EDGetTokenT<edm::View<reco::Candidate> > digenZ_;
+	  
       // RECO
       bool useAdditionalRECO;
       bool use2011EA;
@@ -1125,14 +1129,18 @@ private:
       // electron and muon tags
       bool useBestCandidate;
       edm::InputTag BestCandidatesLeptonsTag_;
-      edm::InputTag electronTag_,electronEgmTag_,muonTag_,muonPFTag_,clusterCollectionTag_,gsftrackCollection_;
+      edm::InputTag clusterCollectionTag_,gsftrackCollection_;
+      edm::EDGetTokenT<edm::View<reco::Muon> > muonPFTag_;
+      edm::EDGetTokenT<edm::View<reco::Muon> > muonTag_;
+      edm::EDGetTokenT<edm::View<reco::GsfElectron> > electronEgmTag_;
       edm::InputTag electronMapTag_,muonMapTag_;
-      edm::InputTag electronTkMapTag_,electronEgmTkMapTag_,muonTkMapTag_;
-      edm::InputTag electronEcalMapTag_,electronEgmEcalMapTag_,muonEcalMapTag_;
-      edm::InputTag electronHcalMapTag_,electronEgmHcalMapTag_,muonHcalMapTag_;
-      edm::InputTag mvaTrigV0MapTag_,mvaNonTrigV0MapTag_;
+      edm::InputTag electronEgmTkMapTag_,muonTkMapTag_;
+      edm::InputTag electronEgmEcalMapTag_,muonEcalMapTag_;
+      edm::InputTag electronEgmHcalMapTag_,muonHcalMapTag_;
+      edm::EDGetTokenT<edm::View<reco::GsfElectron> > mvaElectronTag_;
+      edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigV0MapTag_,mvaNonTrigV0MapTag_;
       
-      edm::InputTag 
+      edm::EDGetTokenT<edm::ValueMap<double> >
 	electronPFIsoValueChargedAllTag_,
 	electronPFIsoValueChargedTag_,
 	electronPFIsoValueNeutralTag_,
@@ -1142,7 +1150,7 @@ private:
       
       edm::InputTag eleRegressionEnergyErrorTag_,eleRegressionEnergyTag_;
       
-      edm::InputTag 
+      edm::EDGetTokenT<edm::ValueMap<double> >
 	muonPFIsoValueChargedAllTag_,
 	muonPFIsoValueChargedTag_,
 	muonPFIsoValueNeutralTag_,
@@ -1150,7 +1158,7 @@ private:
 	muonPFIsoValuePUTag_;   
 
 
-      edm::InputTag 
+      edm::EDGetTokenT<edm::ValueMap<double> >
 	photonPFIsoValueChargedAllTag_,
 	photonPFIsoValueChargedTag_,
 	photonPFIsoValueNeutralTag_,
@@ -1159,10 +1167,10 @@ private:
 
       // vertexing 3D 
       edm::InputTag electronTag_Vert,muonTag_Vert;
-      edm::InputTag electronMapTag_Vert,electronMapTag_VertKF,muonMapTag_Vert,muonMapTag_VertKF;
-      edm::InputTag electronMapTag_VertValue,electronMapTag_VertValueKF,muonMapTag_VertValue,muonMapTag_VertValueKF;
-      edm::InputTag electronMapTag_VertError,electronMapTag_VertErrorKF,muonMapTag_VertError,muonMapTag_VertErrorKF;
-      
+      edm::EDGetTokenT<edm::ValueMap<float> > electronMapTag_Vert,electronMapTag_VertKF,muonMapTag_Vert,muonMapTag_VertKF,
+	electronMapTag_VertValue,electronMapTag_VertValueKF,muonMapTag_VertValue,muonMapTag_VertValueKF,
+	electronMapTag_VertError,electronMapTag_VertErrorKF,muonMapTag_VertError,muonMapTag_VertErrorKF;
+   
       edm::InputTag electronMapTag_VertGD,muonMapTag_VertGD;
       edm::InputTag electronMapTag_VertGDEEEE,muonMapTag_VertGDMMMM;
       edm::InputTag electronMapTag_VertStd,muonMapTag_VertStd;
@@ -1171,12 +1179,13 @@ private:
       edm::InputTag electronMapTag_VertKinEEEE,muonMapTag_VertKinMMMM;
 
       // vertexing STIP / SLIP
-      edm::InputTag electronSTIPMapTag_Vert,muonSTIPMapTag_Vert;
-      edm::InputTag electronSLIPMapTag_Vert,muonSLIPMapTag_Vert;
-      edm::InputTag electronSTIPMapTag_VertValue,muonSTIPMapTag_VertValue;
-      edm::InputTag electronSLIPMapTag_VertValue,muonSLIPMapTag_VertValue;
-      edm::InputTag electronSTIPMapTag_VertError,muonSTIPMapTag_VertError;
-      edm::InputTag electronSLIPMapTag_VertError,muonSLIPMapTag_VertError;
+      edm::EDGetTokenT<edm::ValueMap<float> >  electronSTIPMapTag_Vert,muonSTIPMapTag_Vert,
+	electronSLIPMapTag_Vert,muonSLIPMapTag_Vert,
+	electronSTIPMapTag_VertValue,muonSTIPMapTag_VertValue,
+	electronSLIPMapTag_VertValue,muonSLIPMapTag_VertValue,
+	electronSTIPMapTag_VertError,muonSTIPMapTag_VertError,
+	electronSLIPMapTag_VertError,muonSLIPMapTag_VertError;
+      
       // vertexing GD
       edm::InputTag ftsigma_Vert,ftsigmalag_Vert,
 	ftsigma_VertMMMM,ftsigmalag_VertMMMM,
@@ -1223,32 +1232,44 @@ private:
       edm::InputTag theTrackerIsoDepositLabel; //Tracker Isolation deposit label 
       
       // Photon, Tracks, Jets, Vertices
-      edm::InputTag pfphotonsTag_,photonsTag_,tracksTag_,jetsTag_,rhojetsTag_,verticesTag_;
-      edm::InputTag PuJetMvaMCfullDiscr_,PuJetMvaMCfullId_;
-      edm::InputTag PuJetMvaDatafullDiscr_,PuJetMvaDatafullId_;
+      edm::EDGetTokenT<vector<reco::Track> > tracksTag_;
+      edm::EDGetTokenT<edm::View<reco::PFCandidate> > pfphotonsTag_;
+      edm::EDGetTokenT<edm::View<reco::Photon> > photonsTag_;
+      vector<reco::Vertex> PV;
+      edm::EDGetTokenT<std::vector<reco::Vertex> >verticesTag_;
+      edm::EDGetTokenT<double> rhojetsTag_;
+      edm::EDGetTokenT<std::vector<reco::PFJet> > jetsTag_, jetsDataTag_, jetsMVATag_;
+      edm::EDGetTokenT<edm::ValueMap<float> >  PuJetMvaMCfullDiscr_,PuJetMvaMCfullId_;
+      edm::EDGetTokenT<edm::ValueMap<float> >  PuJetMvaDatafullDiscr_,PuJetMvaDatafullId_;
       // MET
-      edm::InputTag genmetTag_,trackermetTag_,pfmetTag_;
+      edm::InputTag trackermetTag_;
+      edm::EDGetTokenT<vector<reco::PFMET> >  pfmetTag_;
+      edm::EDGetTokenT<vector<reco::GenMET> > genmetTag_;
       edm::InputTag calometTag_,calometoptTag_,calometoptnohfTag_,calometoptnohfhoTag_;
       edm::InputTag calometopthoTag_,calometnohfTag_,calometnohfhoTag_,calomethoTag_;
       bool useAdditionalMET_;
       edm::InputTag htmetic5Tag_,htmetkt4Tag_,htmetkt6Tag_,htmetsc5Tag_,htmetsc7Tag_;
       edm::InputTag jescormetic5Tag_,jescormetkt4Tag_,jescormetkt6Tag_,jescormetsc5Tag_,jescormetsc7Tag_;
       edm::InputTag cormetMuTag_;
-      
-      // CP variables tag
-      edm::InputTag MCCP_cosTheta1Tag_,MCCP_cosTheta2Tag_,MCCP_cosThetaStarTag_,
-	MCCP_PhiTag_,MCCP_Phi1Tag_,MCCP_Phi2Tag_,MCCP_phi1RFTag_,MCCP_phi2RFTag_,MCCP_MELATag_;
-      
-      edm::InputTag 
-	CP2e2mu_cosTheta1Tag_,CP2e2mu_cosTheta2Tag_,CP2e2mu_cosThetaStarTag_,CP2e2mu_PhiTag_,CP2e2mu_Phi1Tag_,CP2e2mu_Phi2Tag_,CP2e2mu_phi1RFTag_,CP2e2mu_phi2RFTag_,CP2e2mu_MELATag_;
-      edm::InputTag CP4mu_cosTheta1Tag_,CP4mu_cosTheta2Tag_,CP4mu_cosThetaStarTag_,CP4mu_PhiTag_,CP4mu_Phi1Tag_,CP4mu_Phi2Tag_,CP4mu_phi1RFTag_,CP4mu_phi2RFTag_,CP4mu_MELATag_;
-      edm::InputTag CP4e_cosTheta1Tag_,CP4e_cosTheta2Tag_,CP4e_cosThetaStarTag_,CP4e_PhiTag_,CP4e_Phi1Tag_,CP4e_Phi2Tag_,CP4e_phi1RFTag_,CP4e_phi2RFTag_,CP4e_MELATag_;
-      
+        
       // Conversion
-      edm::InputTag ConvMapDistTag_,ConvMapDcotTag_;
+      edm::EDGetTokenT<edm::ValueMap<float> > ConvMapDistTag_,ConvMapDcotTag_;
+
+      // Matching
+      edm::EDGetTokenT<edm::Association<std::vector<reco::GenParticle> > > goodElectronMCMatch_;
+      edm::EDGetTokenT<reco::CandidateCollection> myElectrons_;
+      edm::EDGetTokenT<edm::Association<std::vector<reco::GenParticle> > > goodMuonMCMatch_;
+      edm::EDGetTokenT<reco::CandidateCollection> myMuons_;
+      edm::EDGetTokenT<edm::Association<std::vector<reco::GenParticle> > > goodGammaMCMatch_;
+      edm::EDGetTokenT<reco::CandidateCollection> myGammas_;
+
+      // Beam Spot
+      edm::EDGetTokenT<reco::BeamSpot> offlineBeamSpot_;
       
-      // VBF
-      bool isVBF_;
+      // bTagging
+      edm::EDGetTokenT<edm::AssociationVector<edm::RefToBaseProd<reco::Jet>,std::vector<float>,edm::RefToBase<reco::Jet>,unsigned int,edm::helper::AssociationIdenticalKeyReference> >  
+	tCHighEff_bTag_, tCHighPur_bTag_,cSV_bTag_;
+
       
       // counters
       int irun, ievt,ils,nevt;
@@ -1257,48 +1278,10 @@ private:
       
       // MC info
       edm::ESHandle<ParticleDataTable>  pdt_;
-      
-      // bTagging
-      edm::InputTag    
-	tCHighEff_bTag_, tCHighPur_bTag_,
-	/*     jPHighEff_bTag_,jBP_bTag_, */
-	/*     sSVHighEff_bTag_,sSVHighPur_bTag_, */
-	cSV_bTag_;
-      /*     cSVMVA_bTag_,  */
-      /*     sEByIP3d_bTag_,sEByPt_bTag_,      */
-      /*     sM_bTag_,sMByIP3d_bTag_,sMByPt_bTag_; */
-  
-
 
       std::string outputFile_; // output file
   
-      /*edm::InputTag vertexSrc;
-      edm::InputTag pfMuons_;
-      edm::InputTag pfMuonToken_;
-      edm::InputTag srcSelectedMuons_;  
-      edm::InputTag srcPFCandidates_; 
-      edm::InputTag theRecoLabel_;
-      edm::InputTag PatElectronsrc_;
-      edm::InputTag genParticlesColl_;
-      edm::InputTag tokentracks_;
-      edm::InputTag globalMuons_;
-      edm::InputTag token_globalMuons;
-      edm::InputTag thePFMETCollectionToken_;
-      edm::InputTag theMETSignificance_;
-      edm::InputTag thejetsTag_;
-
-      edm::InputTag rhoIsoInputTag;
-      edm::InputTag genEventInfo_;
-      edm::InputTag reducedBarrelRecHitCollection_;
-      edm::InputTag reducedEndcapRecHitCollection_;
-      std::string GsfElectronProducer_;
-      std::string GsfElectronCollection_;
-      
-
-      /// HLT TriggerResults EDProduct
-      edm::InputTag inputTag_;
-      /// HLT trigger names
-      edm::TriggerNames triggerNames_;*/
+    
       
       /// number of HLT trigger paths requested in configuration
       unsigned int n_;

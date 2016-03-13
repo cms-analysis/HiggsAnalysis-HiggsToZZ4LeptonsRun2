@@ -16,8 +16,16 @@
 #include "FWCore/Utilities/interface/InputTag.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "FWCore/Framework/interface/ESHandle.h"
-
-// using namespace edm;
+// Beam Spot                                                                                                                                                                      
+#include "DataFormats/BeamSpot/interface/BeamSpot.h"
+// Vertex utilities                                                                                                                                                               
+#include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/VertexReco/interface/VertexFwd.h"
+// Muons
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include <DataFormats/MuonReco/interface/MuonFwd.h>
+// Electrons
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 
 class HZZ4LeptonsIpToVtxProducer : public edm::EDProducer {
 
@@ -30,11 +38,12 @@ class HZZ4LeptonsIpToVtxProducer : public edm::EDProducer {
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   std::string decaychannel;
-  edm::InputTag muonTag_, electronTag_,vertexTag_;
+  edm::EDGetTokenT<edm::View<reco::Muon> >muonTag_;
+  edm::EDGetTokenT<edm::View<reco::GsfElectron> >electronTag_;
+  edm::EDGetTokenT<std::vector<reco::Vertex> > vertexTag_;
+  edm::EDGetTokenT<reco::BeamSpot> offlineBeamSpot_;
   bool useBeamSpot_;
-
-  // PG and FRC 06-07-11 try to reduce printout!
-	bool debug;
+  bool debug;
   //
 };
 

@@ -9,7 +9,7 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 
 // PFJets:
-#include <DataFormats/JetReco/interface/PFJet.h>
+#include "DataFormats/JetReco/interface/PFJet.h"
 
 // Candidate handling
 #include "DataFormats/Candidate/interface/Candidate.h"
@@ -34,7 +34,7 @@ HZZ4LeptonsPFJetSelector::HZZ4LeptonsPFJetSelector(const edm::ParameterSet& pset
   isLoosePFJetID     = pset.getParameter<bool>("isLoosePFJetID");
   //isMediumPFJetID     = pset.getParameter<bool>("isMediumPFJetID");
   //isTightPFJetID     = pset.getParameter<bool>("isTightPFJetID");
-  pfjetsLabel        = pset.getParameter<edm::InputTag>("PFJetCollection");
+  pfjetsLabel        = consumes<edm::View<reco::PFJet> >(pset.getParameter<edm::InputTag>("PFJetCollection"));
 
   string alias;
   produces<reco::PFJetCollection>(); 
@@ -59,7 +59,7 @@ void HZZ4LeptonsPFJetSelector::produce(edm::Event& iEvent, const edm::EventSetup
   edm::Handle<edm::View<PFJet> > pfjets;
   edm::View<reco::PFJet>::const_iterator mIter;
     
-  iEvent.getByLabel(pfjetsLabel.label(), pfjets);
+  iEvent.getByToken(pfjetsLabel, pfjets);
 
   // Loop over PFJets
   for (mIter = pfjets->begin(); mIter != pfjets->end(); ++mIter ) {

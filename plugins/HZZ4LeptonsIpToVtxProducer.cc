@@ -100,9 +100,10 @@ HZZ4LeptonsIpToVtxProducer::HZZ4LeptonsIpToVtxProducer(const edm::ParameterSet& 
 
   // Decay Channel
   decaychannel                                                    = pset.getParameter<std::string>("decaychannel");
-  if (decaychannel=="2e2mu" || decaychannel=="4mu")  muonTag_     = pset.getParameter<edm::InputTag>("MuonsLabel");
-  if (decaychannel=="2e2mu" || decaychannel=="4e")   electronTag_ = pset.getParameter<edm::InputTag>("ElectronsLabel");
-  vertexTag_                                                      = pset.getParameter<edm::InputTag>("VertexLabel");
+  if (decaychannel=="2e2mu" || decaychannel=="4mu")  muonTag_     = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("MuonsLabel"));
+  if (decaychannel=="2e2mu" || decaychannel=="4e")   electronTag_ = consumes<edm::View<reco::GsfElectron> >(pset.getParameter<edm::InputTag>("ElectronsLabel"));
+  vertexTag_                                                      = consumes<std::vector<reco::Vertex> >(pset.getParameter<edm::InputTag>("VertexLabel"));
+  offlineBeamSpot_                                                = consumes<reco::BeamSpot>(pset.getParameter<edm::InputTag>("BeamSpotLabel"));  
   useBeamSpot_                                                    = pset.getParameter<bool>("useBeamSpot");
 
 	// PG and FRC 06-07-11
@@ -162,7 +163,7 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
 
   // Beamspot 
   Handle<reco::BeamSpot> recoBeamSpotHandle;
-  iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),recoBeamSpotHandle);
+  iEvent.getByToken(offlineBeamSpot_,recoBeamSpotHandle);
   const BeamSpot bs = *recoBeamSpotHandle;
 
   if(debug) cout << "BeamSpot position: X,Y,Z=" << bs.position().x() << " " << bs.position().y() << " " << bs.position().z() << " " << bs.x0() << " " << bs.y0() << " " << bs.z0() << endl;
@@ -180,7 +181,7 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
 
   // Get primary vertex collection
   Handle<reco::VertexCollection> recoPVCollection;
-  iEvent.getByLabel(vertexTag_,recoPVCollection);
+  iEvent.getByToken(vertexTag_,recoPVCollection);
   //
   reco::Vertex primVertex;
   bool pvfound = (recoPVCollection->size() != 0);
@@ -226,7 +227,7 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
  
   if (decaychannel=="2e2mu" || decaychannel=="4mu"){
     edm::Handle<edm::View<Muon> > muCandidates;
-    iEvent.getByLabel(muonTag_.label(),muCandidates);
+    iEvent.getByToken(muonTag_,muCandidates);
 
     size_t nmu = muCandidates->size();
     std::vector<float> sigmu(nmu),valuemu(nmu),errormu(nmu);
@@ -306,7 +307,7 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
   if (decaychannel=="2e2mu" || decaychannel=="4e"){    
     
     Handle<edm::View<GsfElectron> > eleCandidates; 
-    iEvent.getByLabel(electronTag_.label(),eleCandidates);
+    iEvent.getByToken(electronTag_,eleCandidates);
 
     size_t nele = eleCandidates->size();
     std::vector<float> sigele(nele),valueele(nele),errorele(nele);

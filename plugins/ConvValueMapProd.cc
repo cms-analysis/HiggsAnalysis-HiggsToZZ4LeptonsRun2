@@ -11,9 +11,9 @@
 #include "DataFormats/Common/interface/ValueMap.h"
 
 
-ConvValueMapProd::ConvValueMapProd(const edm::ParameterSet& iConfig) :
-    gsfLabel_(iConfig.getUntrackedParameter<edm::InputTag>("gsfLabel")),
-    tkLabel_(iConfig.getUntrackedParameter<edm::InputTag>("tkLabel")) {
+ConvValueMapProd::ConvValueMapProd(const edm::ParameterSet& iConfig){ 
+    gsfLabel_= consumes<std::vector<reco::GsfElectron> >(iConfig.getUntrackedParameter<edm::InputTag>("gsfLabel"));
+    tkLabel_ = consumes<std::vector<reco::Track> >(iConfig.getUntrackedParameter<edm::InputTag>("tkLabel"));
 
     produces<edm::ValueMap<float> >("dist").setBranchAlias("dist");
     produces<edm::ValueMap<float> >("dcot").setBranchAlias("dcot");
@@ -23,10 +23,10 @@ ConvValueMapProd::ConvValueMapProd(const edm::ParameterSet& iConfig) :
 void ConvValueMapProd::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     edm::Handle<reco::GsfElectronCollection> gsfH;
-    iEvent.getByLabel(gsfLabel_,gsfH);
+    iEvent.getByToken(gsfLabel_,gsfH);
 
     edm::Handle<reco::TrackCollection> tkH;
-    iEvent.getByLabel(tkLabel_,tkH);
+    iEvent.getByToken(tkLabel_,tkH);
 
     edm::ESHandle<MagneticField> magneticField;
     iSetup.get<IdealMagneticFieldRecord>().get(magneticField);

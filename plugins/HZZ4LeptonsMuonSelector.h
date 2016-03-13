@@ -20,6 +20,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 
 class HZZ4LeptonsMuonSelector : public edm::EDProducer {
  public:
@@ -30,7 +32,7 @@ class HZZ4LeptonsMuonSelector : public edm::EDProducer {
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   bool isGlobalMuon,isTrackerMuon;
-  edm::InputTag muonLabel;
+  edm::EDGetTokenT<edm::View<reco::Muon> > muonLabel;
   float muonPtMin;
   float muonEtaMax;
 

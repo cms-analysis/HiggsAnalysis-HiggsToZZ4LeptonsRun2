@@ -20,6 +20,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
 class HZZ4LeptonsPFtoRECOMuon : public edm::EDProducer {
  public:
@@ -30,7 +31,7 @@ class HZZ4LeptonsPFtoRECOMuon : public edm::EDProducer {
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   bool isMuon;
-  edm::InputTag pfLabel;
+  edm::EDGetTokenT<edm::View<reco::PFCandidate> > pfLabel;     
 
 };
 

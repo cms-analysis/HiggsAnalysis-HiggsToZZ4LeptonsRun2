@@ -59,55 +59,6 @@ HZZ4LeptonsCommonRootTree::HZZ4LeptonsCommonRootTree(const edm::ParameterSet& ps
   nevt=0;
 
   
-  /*
-  // Muon PF Ring Isolation
-  fMuonIsoMVA = new MuonMVAEstimator();
-  vector<string> muoniso_weightfiles,muoniso_weightfiles_path;
-  
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-BarrelPt5To10_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-EndcapPt5To10_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-BarrelPt10ToInf_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-EndcapPt10ToInf_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-Tracker_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-Global_V0_BDTG.weights.xml");
-  
-  for(unsigned ifile=0 ; ifile < muoniso_weightfiles.size() ; ++ifile) {
-    string path_mvaWeightFileMuonIsoMVA;
-    path_mvaWeightFileMuonIsoMVA = edm::FileInPath (muoniso_weightfiles[ifile].c_str() ).fullPath();
-    muoniso_weightfiles_path.push_back(path_mvaWeightFileMuonIsoMVA);
-  }
-  
-  fMuonIsoMVA->initialize("MuonIso_BDTG_IsoRings",
-			  MuonMVAEstimator::kIsoRings,
-			  kTRUE,
-			  muoniso_weightfiles_path);
-  
-  fMuonIsoMVA->SetPrintMVADebug(kTRUE);
-
-  */
-  
-  // Electron PF Ring Isolation
-  //fElectronIsoMVA = new EGammaMvaEleEstimator();
-  //vector<string> eleiso_weightfiles,eleiso_weightfiles_path;
-  
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_BarrelPt5To10.weights.xml");
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_EndcapPt5To10.weights.xml");
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_BarrelPt10ToInf.weights.xml");
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_EndcapPt10ToInf.weights.xml");
-  
-  //  for(unsigned ifile=0 ; ifile < eleiso_weightfiles.size() ; ++ifile) {
-    //string path_mvaWeightFileElectronIsoMVA;
-    //path_mvaWeightFileElectronIsoMVA = edm::FileInPath (eleiso_weightfiles[ifile].c_str() ).fullPath();
-    //eleiso_weightfiles_path.push_back(path_mvaWeightFileElectronIsoMVA);
-    //}
-  
-  
-  //fElectronIsoMVA->initialize("EleIso_BDTG_IsoRings",
-  //			      EGammaMvaEleEstimator::kIsoRings,
-  //		      kTRUE,
-  //		      eleiso_weightfiles_path);
-  // fElectronIsoMVA->SetPrintMVADebug(kTRUE);
-  
 }
 
 // Destructor
@@ -252,96 +203,12 @@ void HZZ4LeptonsCommonRootTree::analyze(const edm::Event& iEvent, const edm::Eve
     fillgenparticles(iEvent,iSetup);
     fillmc(iEvent);
   }
-   
 
-  // Fill RECO block in the rootple
-  // PF Jets
-  filljets(iEvent);
-
-
-  if (useAdditionalRECO==true) {
-    fillAdditionalRECO(iEvent);
-  }
-
-
-  // Fill RECO rest frame block in the rootple
-  if (useAdditionalRECO==false){    
-    if ( decaychannel=="2e2mu")  fillCP2e2mu(iEvent);
-    if ( decaychannel=="4mu" )   fillCP4mu(iEvent);
-    if ( decaychannel=="4e")     fillCP4e(iEvent);
-  }
-
-
-  if (useAdditionalRECO==true) {
-    fillCP2e2mu(iEvent);
-    fillCP4mu(iEvent);
-    fillCP4e(iEvent);
-  }
-
-  // Filling electron and muons vectors
-  fillElectrons(iEvent,iSetup);
-  fillMuons(iEvent,iSetup);
-  fillIsolationByRings(iEvent,iSetup);
-  fillPhotons(iEvent);
-
-  // Geometrical discriminant 
-  // if (useAdditionalRECO==false){
-  //  if (decaychannel=="2e2mu" ) fillGD2e2mu(iEvent);
-  //  if (decaychannel=="4mu" )   fillGD4mu(iEvent);
-  //  if (decaychannel=="4e" )    fillGD4e(iEvent);
-  // }
-  // else if (useAdditionalRECO==true) {
-  //  fillGD2e2mu(iEvent);
-  //  fillGD4mu(iEvent);
-  //  fillGD4e(iEvent);
-  // }
-
-
-  // ConstraintVertexFit
-  //if (useAdditionalRECO==false){
-  //  if (decaychannel=="2e2mu" ) fillConstraintVtx2e2mu(iEvent);
-  //  if (decaychannel=="4mu" )   fillConstraintVtx4mu(iEvent);
-  //  if (decaychannel=="4e" )    fillConstraintVtx4e(iEvent);
-  //}
-  //else if (useAdditionalRECO==true) {
-  //  fillConstraintVtx2e2mu(iEvent);
-  //  fillConstraintVtx4mu(iEvent);
-  //  fillConstraintVtx4e(iEvent);
-  //}
-  // fillConstraintVtxTriLeptons(iEvent);
-  // fillConstraintVtxDiLeptons(iEvent);
-
-  
-  //Tracks
-  edm::Handle<reco::TrackCollection> tracks;
-  iEvent.getByLabel(tracksTag_, tracks);
-  RECO_NTRACK=tracks->size();
-  cout << "Number of Tracks in the event= " << RECO_NTRACK << endl;
-
-  int countk=0;
-  for ( TrackCollection::const_iterator i=tracks->begin(); i!=tracks->end(); i++) { 
-    if (countk>199) break;
-    RECO_TRACK_PT[countk]=i->pt();
-    RECO_TRACK_ETA[countk]=i->eta();
-    RECO_TRACK_PHI[countk]=i->phi();
-    RECO_TRACK_CHI2[countk]=i->chi2();
-    RECO_TRACK_CHI2RED[countk]=i->normalizedChi2();
-    //RECO_TRACK_CHI2PROB=TMath::Prob(i->chi2(),i->ndof());
-    RECO_TRACK_CHI2PROB[countk]=ChiSquaredProbability(i->chi2(),i->ndof());
-    RECO_TRACK_NHITS[countk]=i->numberOfValidHits();
-    RECO_TRACK_DXY[countk]=i->dxy();
-    RECO_TRACK_DXYERR[countk]=i->dxyError();
-    RECO_TRACK_DZ[countk]=i->dz();
-    RECO_TRACK_DZERR[countk]=i->dzError();
-    countk++;
-  }
-
- 
-
-  
   //Vertices
   edm::Handle<reco::VertexCollection> recoPrimaryVertexCollection;
-  iEvent.getByLabel(verticesTag_,recoPrimaryVertexCollection);
+  iEvent.getByToken(verticesTag_,recoPrimaryVertexCollection);
+  PV = *recoPrimaryVertexCollection;
+  
   RECO_NVTX=recoPrimaryVertexCollection->size();
   cout << "Number of Vertices in the event= " << RECO_NVTX << endl;
 
@@ -370,12 +237,74 @@ void HZZ4LeptonsCommonRootTree::analyze(const edm::Event& iEvent, const edm::Eve
     index_vertex++;
   } // loop on vertices
   
+  
+
+  // Fill RECO block in the rootple
+  // PF Jets
+  filljets(iEvent);
+
+
+  if (useAdditionalRECO==true) {
+    fillAdditionalRECO(iEvent);
+  }
+
+
+  // Filling electron and muons vectors
+  fillElectrons(iEvent,iSetup);
+  fillMuons(iEvent,iSetup);
+  fillPhotons(iEvent);
+
+
+
+  // ConstraintVertexFit
+  //if (useAdditionalRECO==false){
+  //  if (decaychannel=="2e2mu" ) fillConstraintVtx2e2mu(iEvent);
+  //  if (decaychannel=="4mu" )   fillConstraintVtx4mu(iEvent);
+  //  if (decaychannel=="4e" )    fillConstraintVtx4e(iEvent);
+  //}
+  //else if (useAdditionalRECO==true) {
+  //  fillConstraintVtx2e2mu(iEvent);
+  //  fillConstraintVtx4mu(iEvent);
+  //  fillConstraintVtx4e(iEvent);
+  //}
+  // fillConstraintVtxTriLeptons(iEvent);
+  // fillConstraintVtxDiLeptons(iEvent);
+
+  
+  //Tracks
+  edm::Handle<reco::TrackCollection> tracks;
+  iEvent.getByToken(tracksTag_, tracks);
+  RECO_NTRACK=tracks->size();
+  cout << "Number of Tracks in the event= " << RECO_NTRACK << endl;
+
+  int countk=0;
+  for ( TrackCollection::const_iterator i=tracks->begin(); i!=tracks->end(); i++) { 
+    if (countk>199) break;
+    RECO_TRACK_PT[countk]=i->pt();
+    RECO_TRACK_ETA[countk]=i->eta();
+    RECO_TRACK_PHI[countk]=i->phi();
+    RECO_TRACK_CHI2[countk]=i->chi2();
+    RECO_TRACK_CHI2RED[countk]=i->normalizedChi2();
+    //RECO_TRACK_CHI2PROB=TMath::Prob(i->chi2(),i->ndof());
+    RECO_TRACK_CHI2PROB[countk]=ChiSquaredProbability(i->chi2(),i->ndof());
+    RECO_TRACK_NHITS[countk]=i->numberOfValidHits();
+    RECO_TRACK_DXY[countk]=i->dxy();
+    RECO_TRACK_DXYERR[countk]=i->dxyError();
+    RECO_TRACK_DZ[countk]=i->dz();
+    RECO_TRACK_DZERR[countk]=i->dzError();
+    countk++;
+  }
+
+ 
+
+  
+  
 
 
   //GENMET
   if (fillMCTruth) {
     edm::Handle<reco::GenMETCollection> genmetHandle;
-    iEvent.getByLabel(genmetTag_,genmetHandle);
+    iEvent.getByToken(genmetTag_,genmetHandle);
     for ( GenMETCollection::const_iterator i=genmetHandle->begin(); i!=genmetHandle->end(); i++) {
       genmet = i->pt();
     }
@@ -385,7 +314,19 @@ void HZZ4LeptonsCommonRootTree::analyze(const edm::Event& iEvent, const edm::Eve
   fillMET(iEvent);
 
   // Beam Spot
-  fillBeamSpot(iEvent);
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  iEvent.getByToken(offlineBeamSpot_,recoBeamSpotHandle) ;
+  bs = *recoBeamSpotHandle;
+  
+  BeamSpot_X=bs.position().x();
+  BeamSpot_Y=bs.position().y();
+  BeamSpot_Z=bs.position().z();
+  
+  cout << "BeamSpot:"
+       << "  bs_X=" << BeamSpot_X
+       << "  bs_Y=" << BeamSpot_Y
+       << "  bs_Z=" << BeamSpot_Z
+       << endl;
 
   // btagging
   fillBTagging(iEvent);
@@ -404,159 +345,4 @@ void HZZ4LeptonsCommonRootTree::beginJob() {
 void HZZ4LeptonsCommonRootTree::endJob() {
 }
 
-/*
-// ====================================================================================
-const EcalRecHit& HZZ4LeptonsCommonRootTree::getRecHit(DetId id, const EcalRecHitCollection *recHits)
-// ====================================================================================
-{
-  if ( id == DetId(0) ) {
-    return EcalRecHit();
-  } else {
-    EcalRecHitCollection::const_iterator it = recHits->find( id );
-    if ( it != recHits->end() ) {
-      return (*it);
-    } else {
-      //throw cms::Exception("EcalRecHitNotFound") << "The recHit corresponding to the DetId" << id.rawId() << " not found in the EcalRecHitCollection";
-      // the recHit is not in the collection (hopefully zero suppressed)
-      return EcalRecHit();
-    }
-  }
-  return EcalRecHit();
-}
-*/
-// ====================================================================================
-float HZZ4LeptonsCommonRootTree::E2overE9( const DetId id, const EcalRecHitCollection & recHits, 
-					   float recHitEtThreshold, float recHitEtThreshold2 , 
-					   bool avoidIeta85, bool KillSecondHit)
-// ====================================================================================
-// taken from CMSSW/RecoLocalCalo/EcalRecAlgos/src/EcalSeverityLevelAlgo.cc CMSSW_3_9_0_pre5
-{
-  if ( id.subdetId() == EcalBarrel ) {
-    
-    EBDetId ebId( id );
-    
-    // avoid recHits at |eta|=85 where one side of the neighbours is missing
-    if ( abs(ebId.ieta())==85 && avoidIeta85){  return 0;}
-    float e1 = recHitE( id, recHits );
-    float ete1=recHitApproxEt( id, recHits );
-    // check that rechit E_t is above threshold
-    if (ete1 < std::min(recHitEtThreshold,recHitEtThreshold2) ) { return 0;}
-    if (ete1 < recHitEtThreshold && !KillSecondHit ) {return 0;}
-    
-    float e2=-1;
-    float ete2=0;
-    float s9 = 0;
-    // coordinates of 2nd hit relative to central hit
-    int e2eta=0;
-    int e2phi=0;
-    // LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 1
-    for ( int deta = -1; deta <= +1; ++deta ) {
-      for ( int dphi = -1; dphi <= +1; ++dphi ) {
-	// compute 3x3 energy
-	float etmp=recHitE( id, recHits, deta, dphi );
-	s9 += etmp;
-	EBDetId idtmp=EBDetId::offsetBy(id,deta,dphi);
-	float eapproxet=recHitApproxEt( idtmp, recHits );
-	// remember 2nd highest energy deposit (above threshold) in 3x3 array 
-	if (etmp>e2 && eapproxet>recHitEtThreshold2 && !(deta==0 && dphi==0)) {
-	  e2=etmp;
-	  ete2=eapproxet;
-	  e2eta=deta;
-	  e2phi=dphi;
-	}
-      }
-    }
-    
-    if ( e1 == 0 )  { return 0;}
-    // return 0 if 2nd hit is below threshold
-    if ( e2 == -1 ) {return 0;}
-    // compute e2/e9 centered around 1st hit
-    float e2nd=e1+e2;
-    float e2e9=0;
-    if (s9!=0) e2e9=e2nd/s9;
-    // if central hit has higher energy than 2nd hit
-    // return e2/e9 if 1st hit is above E_t threshold
-    if (e1 > e2 && ete1>recHitEtThreshold) return e2e9;
-    // if second hit has higher energy than 1st hit
-    if ( e2 > e1 ) { 
-      // return 0 if user does not want to flag 2nd hit, or
-      // hits are below E_t thresholds - note here we
-      // now assume the 2nd hit to be the leading hit.
-      if (!KillSecondHit || ete2<recHitEtThreshold || ete1<recHitEtThreshold2) {
-	return 0;
-      }
-      else {
-	// LOOP OVER 3x3 ARRAY CENTERED AROUND HIT 2
-	float s92nd=0;
-	float e2nd_prime=0;
-	int e2prime_eta=0;
-	int e2prime_phi=0;
-	EBDetId secondid=EBDetId::offsetBy(id,e2eta,e2phi);
-	for ( int deta = -1; deta <= +1; ++deta ) {
-	  for ( int dphi = -1; dphi <= +1; ++dphi ) {
-	    // compute 3x3 energy
-	    float etmp=recHitE( secondid, recHits, deta, dphi );
-	    s92nd += etmp;
-	    if (etmp>e2nd_prime && !(deta==0 && dphi==0)) {
-	      e2nd_prime=etmp;
-	      e2prime_eta=deta;
-	      e2prime_phi=dphi;
-	    }
-	  }
-	}
-	// if highest energy hit around E2 is not the same as the input hit, return 0;
-	if (!(e2prime_eta==-e2eta && e2prime_phi==-e2phi)) 
-	  { 
-	    return 0;
-	  }
-	// compute E2/E9 around second hit 
-	float e2e9_2=0;
-	if (s92nd!=0) e2e9_2=e2nd/s92nd;
-	//   return the value of E2/E9 calculated around 2nd hit
-	return e2e9_2;
-      }
-    }
-  } else if ( id.subdetId() == EcalEndcap ) {
-    // only used for EB at the moment
-    return 0;
-  }
-  return 0;
-}
-
-// ====================================================================================
-float HZZ4LeptonsCommonRootTree::recHitE( const DetId id, const EcalRecHitCollection &recHits )
-// ====================================================================================
-{
-  if ( id == DetId(0) ) {
-    return 0;
-  } else {
-    EcalRecHitCollection::const_iterator it = recHits.find( id );
-    if ( it != recHits.end() ) return (*it).energy();
-  }
-  return 0;
-}
-
-// ====================================================================================
-float HZZ4LeptonsCommonRootTree::recHitE( const DetId id, const EcalRecHitCollection & recHits,
-					  int di, int dj )
-// ====================================================================================
-{
-  // in the barrel:   di = dEta   dj = dPhi
-  // in the endcap:   di = dX     dj = dY
-  DetId nid;
-  if( id.subdetId() == EcalBarrel) nid = EBDetId::offsetBy( id, di, dj );
-  else if( id.subdetId() == EcalEndcap) nid = EEDetId::offsetBy( id, di, dj );
-  return ( nid == DetId(0) ? 0 : recHitE( nid, recHits ) );
-}
-
-// ====================================================================================
-float HZZ4LeptonsCommonRootTree::recHitApproxEt( const DetId id, const EcalRecHitCollection &recHits )
-// ====================================================================================
-{
-  // for the time being works only for the barrel
-  if ( id.subdetId() == EcalBarrel ) {
-    return recHitE( id, recHits ) / cosh( EBDetId::approxEta( id ) );
-  }
-  return 0;
-}
 

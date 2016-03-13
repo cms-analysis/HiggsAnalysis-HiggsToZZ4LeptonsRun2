@@ -4,9 +4,9 @@
  *
  *  Author: N. De Filippis - Politecnico and INFN Bari
  *
- *  Modified (from array to vector format) by Sherif Elgammal 
- *  9/1/2016    
- *  CMSSW_7_4_5     
+ *  Modified (from array to vector format) by Sherif Elgammal / Nicol De Filippis / Giorgia Miniello
+ *  11/3/2016    
+ *  CMSSW_7_6_X    
  */
 
 #include "HZZ4LeptonsRootTree.h"
@@ -101,7 +101,6 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 
 //PU Jet ID
-//#include "CMGTools/External/interface/PileupJetIdentifier.h"
 #include "DataFormats/JetReco/interface/PileupJetIdentifier.h"
 
 
@@ -168,403 +167,313 @@ using namespace pat;
 #include <string>
 
 //========================================================================
-HZZ4LeptonsRootTree::HZZ4LeptonsRootTree( const edm::ParameterSet& ps )
+HZZ4LeptonsRootTree::HZZ4LeptonsRootTree( const edm::ParameterSet& pset )
 //========================================================================
 {
   typedef std::vector<edm::InputTag> vtag;
   // Get the various input parameters
-  decaychannel              = ps.getParameter<std::string>("decaychannel");
-  rootFileName              = ps.getUntrackedParameter<std::string>("rootFileName");
-  useRECOformat             = ps.getUntrackedParameter<bool>("useRECOformat");
+  decaychannel              = pset.getParameter<std::string>("decaychannel");
+  rootFileName              = pset.getUntrackedParameter<std::string>("rootFileName");
+  useRECOformat             = pset.getUntrackedParameter<bool>("useRECOformat");
 
   // search param in cfg
-  module_to_search=ps.getUntrackedParameter<vector<std::string> >("module_to_search");
-  par_to_search= ps.getUntrackedParameter<std::string>("par_to_search");
+  module_to_search=pset.getUntrackedParameter<vector<std::string> >("module_to_search");
+  par_to_search= pset.getUntrackedParameter<std::string>("par_to_search");
     
 
   // Get PU simulation info
-  fillPUinfo                = ps.getUntrackedParameter<bool>("fillPUinfo");
-  PileupSrc_                = ps.getParameter<edm::InputTag>("PileupSrc");
+  fillPUinfo                = pset.getUntrackedParameter<bool>("fillPUinfo");
+  PileupSrc_                = consumes<std::vector<PileupSummaryInfo> >(pset.getParameter<edm::InputTag>("PileupSrc"));
+
+  // Generator
+  generator_                = consumes<GenEventInfoProduct >(pset.getParameter<edm::InputTag>("Generator"));
 
   // Get HLT flags
-  fillHLTinfo               = ps.getUntrackedParameter<bool>("fillHLTinfo");
-  HLTInfoFired              = ps.getParameter<edm::InputTag>("HLTInfoFired");
-  HLTAnalysisinst           = ps.getParameter<string>("HLTAnalysisinst");
-  flagHLTnames              = ps.getParameter<vtag>("flagHLTnames");
+  fillHLTinfo               = pset.getUntrackedParameter<bool>("fillHLTinfo");
+  HLTInfoFired              = pset.getParameter<edm::InputTag>("HLTInfoFired");
+  HLTAnalysisinst           = pset.getParameter<string>("HLTAnalysisinst");
+  flagHLTnames              = pset.getParameter<vtag>("flagHLTnames");
   // Get HLT matching
-  triggerEvent              = ps.getParameter<edm::InputTag>("triggerEvent");
-  triggerFilter             = ps.getParameter<std::string>("triggerFilter");
-  triggerMatchObject        = ps.getParameter<edm::InputTag>("triggerMatchObject");
-  triggerFilter_asym        = ps.getParameter<std::vector<std::string> >("triggerFilterAsym");
-  triggerMatchObject_asym   = ps.getParameter<edm::InputTag>("triggerMatchObject_asym");
-  triggerMatchObjectEle     = ps.getParameter<edm::InputTag>("triggerMatchObjectEle");
-  triggerHLTcollection      = ps.getParameter<std::string>("triggerHLTcollection");
+  triggerEvent              = consumes<trigger::TriggerEvent >(pset.getParameter<edm::InputTag>("triggerEvent"));
+  triggerFilter             = pset.getParameter<std::string>("triggerFilter");
+  triggerEleFilter          = pset.getParameter<std::string>("triggerEleFilter");
+  triggerMatchObjectEle     = pset.getParameter<edm::InputTag>("triggerMatchObjectEle");
+  triggerHLTcollection      = pset.getParameter<std::string>("triggerHLTcollection");
 
   // Get flags
-  flaginst                  = ps.getParameter<std::string>("flaginst");
-  flagtags                  = ps.getParameter<std::vector<std::string> >("flagtags");
+  flaginst                  = pset.getParameter<std::string>("flaginst");
+  flagtags                  = pset.getParameter<std::vector<std::string> >("flagtags");
   // MCtruth tags
-  fillMCTruth               = ps.getUntrackedParameter<bool>("fillMCTruth");
-  MCcollName                = ps.getParameter<edm::InputTag>("MCcollName");
-
+  fillMCTruth               = pset.getUntrackedParameter<bool>("fillMCTruth");
+  MCcollName                = consumes<edm::View<reco::Candidate> >(pset.getParameter<edm::InputTag>("MCcollName"));
+  genParticles_             = consumes<vector<reco::GenParticle> >(pset.getParameter<edm::InputTag>("genParticles"));
+  fourgenleptons_           = consumes<edm::View<reco::Candidate> >(pset.getParameter<edm::InputTag>("fourgenleptons"));
+  digenZ_                   = consumes<edm::View<reco::Candidate> >(pset.getParameter<edm::InputTag>("digenZ"));
+      
   // RECO tags
-  RECOcollNameBest2e2mu     = ps.getParameter<vtag>("RECOcollNameBest2e2mu");
-  RECOcollNameBest4mu       = ps.getParameter<vtag>("RECOcollNameBest4mu");
-  RECOcollNameBest4e        = ps.getParameter<vtag>("RECOcollNameBest4e");
+  RECOcollNameBest2e2mu     = pset.getParameter<vtag>("RECOcollNameBest2e2mu");
+  RECOcollNameBest4mu       = pset.getParameter<vtag>("RECOcollNameBest4mu");
+  RECOcollNameBest4e        = pset.getParameter<vtag>("RECOcollNameBest4e");
  
   // RECO additional tags
-  useAdditionalRECO         = ps.getUntrackedParameter<bool>("useAdditionalRECO");
-  RECOcollNameZ             = ps.getParameter<vtag>("RECOcollNameZ");
-  RECOcollNameZss           = ps.getParameter<vtag>("RECOcollNameZss");
-  RECOcollNameDiLep         = ps.getParameter<edm::InputTag>("RECOcollNameDiLep");
-  RECOcollNameMMMM          = ps.getParameter<vtag>("RECOcollNameMMMM");
-  RECOcollNameEEEE          = ps.getParameter<vtag>("RECOcollNameEEEE");
-  RECOcollNameEEMM          = ps.getParameter<vtag>("RECOcollNameEEMM");
-  RECOcollNameLLLLss        = ps.getParameter<vtag>("RECOcollNameLLLLss");
-  RECOcollNameLLLLssos      = ps.getParameter<vtag>("RECOcollNameLLLLssos");
-  RECOcollNameLLL           = ps.getParameter<vtag>("RECOcollNameLLL");
-  RECOcollNameLLLl          = ps.getParameter<vtag>("RECOcollNameLLLl");
-  RECOcollNameLLLL          = ps.getParameter<edm::InputTag>("RECOcollNameLLLL");
+  useAdditionalRECO         = pset.getUntrackedParameter<bool>("useAdditionalRECO");
+  RECOcollNameZ             = pset.getParameter<vtag>("RECOcollNameZ");
+  RECOcollNameZss           = pset.getParameter<vtag>("RECOcollNameZss");
+  RECOcollNameDiLep         = pset.getParameter<edm::InputTag>("RECOcollNameDiLep");
+  RECOcollNameMMMM          = pset.getParameter<vtag>("RECOcollNameMMMM");
+  RECOcollNameEEEE          = pset.getParameter<vtag>("RECOcollNameEEEE");
+  RECOcollNameEEMM          = pset.getParameter<vtag>("RECOcollNameEEMM");
+  RECOcollNameLLLLss        = pset.getParameter<vtag>("RECOcollNameLLLLss");
+  RECOcollNameLLLLssos      = pset.getParameter<vtag>("RECOcollNameLLLLssos");
+  RECOcollNameLLL           = pset.getParameter<vtag>("RECOcollNameLLL");
+  RECOcollNameLLLl          = pset.getParameter<vtag>("RECOcollNameLLLl");
+  RECOcollNameLLLL          = pset.getParameter<edm::InputTag>("RECOcollNameLLLL");
 
   // electrons and muons tags
-  use2011EA               = ps.getUntrackedParameter<bool>("use2011EA");
-  muonTag_              = ps.getParameter<edm::InputTag>("MuonsLabel");
-  muonMapTag_           = ps.getParameter<edm::InputTag>("MuonsMapLabel");
-  muonTkMapTag_         = ps.getParameter<edm::InputTag>("MuonsTkMapLabel");
-  muonEcalMapTag_       = ps.getParameter<edm::InputTag>("MuonsEcalMapLabel");
-  muonHcalMapTag_       = ps.getParameter<edm::InputTag>("MuonsHcalMapLabel");
-  muonPFTag_                  = ps.getParameter<edm::InputTag>("PFMuonsLabel");
-  muonPFIsoValueChargedAllTag_= ps.getParameter<edm::InputTag>("MuonPFIsoValueChargedAll");
-  muonPFIsoValueChargedTag_   = ps.getParameter<edm::InputTag>("MuonPFIsoValueCharged");
-  muonPFIsoValueNeutralTag_   = ps.getParameter<edm::InputTag>("MuonPFIsoValueNeutral");
-  muonPFIsoValueGammaTag_     = ps.getParameter<edm::InputTag>("MuonPFIsoValueGamma");
-  muonPFIsoValuePUTag_        = ps.getParameter<edm::InputTag>("MuonPFIsoValuePU");
+  use2011EA               = pset.getUntrackedParameter<bool>("use2011EA");
+  muonTag_                = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("MuonsLabel"));
+  muonMapTag_             = pset.getParameter<edm::InputTag>("MuonsMapLabel");
+  muonTkMapTag_           = pset.getParameter<edm::InputTag>("MuonsTkMapLabel");
+  muonEcalMapTag_         = pset.getParameter<edm::InputTag>("MuonsEcalMapLabel");
+  muonHcalMapTag_         = pset.getParameter<edm::InputTag>("MuonsHcalMapLabel");
+
+  muonPFTag_                  = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("PFMuonsLabel"));
+  muonPFIsoValueChargedAllTag_= consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValueChargedAll"));
+  muonPFIsoValueChargedTag_   = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValueCharged"));
+  muonPFIsoValueNeutralTag_   = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValueNeutral"));
+  muonPFIsoValueGammaTag_     = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValueGamma"));
+  muonPFIsoValuePUTag_        = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValuePU"));
       
-  clusterCollectionTag_    = ps.getParameter<edm::InputTag>("SuperClustersLabel");
-  gsftrackCollection_      = ps.getParameter<edm::InputTag>("GsfTracksElectronsLabel");
-  electronTag_             = ps.getParameter<edm::InputTag>("ElectronsLabel");
-  electronMapTag_          = ps.getParameter<edm::InputTag>("ElectronsMapLabel");
-  electronTkMapTag_        = ps.getParameter<edm::InputTag>("ElectronsTkMapLabel");
-  electronEcalMapTag_      = ps.getParameter<edm::InputTag>("ElectronsEcalMapLabel");
-  electronHcalMapTag_      = ps.getParameter<edm::InputTag>("ElectronsHcalMapLabel");
+  clusterCollectionTag_    = pset.getParameter<edm::InputTag>("SuperClustersLabel");
+  gsftrackCollection_      = pset.getParameter<edm::InputTag>("GsfTracksElectronsLabel");
     
-  electronEgmTag_          = ps.getParameter<edm::InputTag>("ElectronsEgmLabel");
-  electronEgmTkMapTag_     = ps.getParameter<edm::InputTag>("ElectronsEgmTkMapLabel");
-  electronEgmEcalMapTag_   = ps.getParameter<edm::InputTag>("ElectronsEgmEcalMapLabel");
-  electronEgmHcalMapTag_   = ps.getParameter<edm::InputTag>("ElectronsEgmHcalMapLabel");
+  electronEgmTag_          = consumes<edm::View<reco::GsfElectron> >(pset.getParameter<edm::InputTag>("ElectronsEgmLabel"));
+  electronEgmTkMapTag_     = pset.getParameter<edm::InputTag>("ElectronsEgmTkMapLabel");
+  electronEgmEcalMapTag_   = pset.getParameter<edm::InputTag>("ElectronsEgmEcalMapLabel");
+  electronEgmHcalMapTag_   = pset.getParameter<edm::InputTag>("ElectronsEgmHcalMapLabel");
     
-  EleID_VeryLooseTag_      = ps.getParameter<edm::InputTag>("eleID_VeryLooseTag");
-  EleID_LooseTag_          = ps.getParameter<edm::InputTag>("eleID_LooseTag");
-  EleID_MediumTag_         = ps.getParameter<edm::InputTag>("eleID_MediumTag");
-  EleID_TightTag_          = ps.getParameter<edm::InputTag>("eleID_TightTag");
+  mvaElectronTag_          = consumes<edm::View<reco::GsfElectron> >(pset.getParameter<edm::InputTag>("mvaElectronTag"));
+  mvaTrigV0MapTag_         = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("mvaTrigV0MapTag"));
+  mvaNonTrigV0MapTag_      = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("mvaNonTrigV0MapTag"));
     
-  EleID_HZZVeryLooseTag_   = ps.getParameter<edm::InputTag>("eleID_HZZVeryLooseTag");
-  EleID_HZZLooseTag_       = ps.getParameter<edm::InputTag>("eleID_HZZLooseTag");
-  EleID_HZZMediumTag_      = ps.getParameter<edm::InputTag>("eleID_HZZMediumTag");
-  EleID_HZZTightTag_       = ps.getParameter<edm::InputTag>("eleID_HZZTightTag");
+
+  electronPFIsoValueChargedAllTag_= consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("ElectronPFIsoValueChargedAll"));
+  electronPFIsoValueChargedTag_   = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("ElectronPFIsoValueCharged"));
+  electronPFIsoValueNeutralTag_   = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("ElectronPFIsoValueNeutral"));
+  electronPFIsoValueGammaTag_     = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("ElectronPFIsoValueGamma"));
+  electronPFIsoValuePUTag_        = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("ElectronPFIsoValuePU"));
     
-  mvaTrigV0MapTag_         = ps.getParameter<edm::InputTag>("mvaTrigV0MapTag");
-  mvaNonTrigV0MapTag_      = ps.getParameter<edm::InputTag>("mvaNonTrigV0MapTag");
-    
-    
-  electronPFIsoValueChargedAllTag_= ps.getParameter<edm::InputTag>("ElectronPFIsoValueChargedAll");
-  electronPFIsoValueChargedTag_   = ps.getParameter<edm::InputTag>("ElectronPFIsoValueCharged");
-  electronPFIsoValueNeutralTag_   = ps.getParameter<edm::InputTag>("ElectronPFIsoValueNeutral");
-  electronPFIsoValueGammaTag_     = ps.getParameter<edm::InputTag>("ElectronPFIsoValueGamma");
-  electronPFIsoValuePUTag_        = ps.getParameter<edm::InputTag>("ElectronPFIsoValuePU");
-    
-  eleRegressionEnergyErrorTag_= ps.getParameter<edm::InputTag>("eleRegressionEnergyErrorLabel");
-  eleRegressionEnergyTag_     = ps.getParameter<edm::InputTag>("eleRegressionEnergyLabel");
+  eleRegressionEnergyErrorTag_= pset.getParameter<edm::InputTag>("eleRegressionEnergyErrorLabel");
+  eleRegressionEnergyTag_     = pset.getParameter<edm::InputTag>("eleRegressionEnergyLabel");
         
 
   // PF photons
-  pfphotonsTag_                 = ps.getParameter<edm::InputTag>("PFPhotonsLabel");
-  photonPFIsoValueChargedAllTag_= ps.getParameter<edm::InputTag>("PhotonPFIsoValueChargedAll");
-  photonPFIsoValueChargedTag_   = ps.getParameter<edm::InputTag>("PhotonPFIsoValueCharged");
-  photonPFIsoValueNeutralTag_   = ps.getParameter<edm::InputTag>("PhotonPFIsoValueNeutral");
-  photonPFIsoValueGammaTag_     = ps.getParameter<edm::InputTag>("PhotonPFIsoValueGamma");
-  photonPFIsoValuePUTag_        = ps.getParameter<edm::InputTag>("PhotonPFIsoValuePU");
+  pfphotonsTag_                 = consumes<edm::View<reco::PFCandidate>>(pset.getParameter<edm::InputTag>("PFPhotonsLabel"));
+  photonPFIsoValueChargedAllTag_= consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("PhotonPFIsoValueChargedAll"));
+  photonPFIsoValueChargedTag_   = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("PhotonPFIsoValueCharged"));
+  photonPFIsoValueNeutralTag_   = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("PhotonPFIsoValueNeutral"));
+  photonPFIsoValueGammaTag_     = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("PhotonPFIsoValueGamma"));
+  photonPFIsoValuePUTag_        = consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("PhotonPFIsoValuePU"));
 
   // vertexing 
   // 3D w.r.t primary vertex DA
-  muonTag_Vert           = ps.getParameter<edm::InputTag>("MuonsLabelVert");
-  muonMapTag_Vert        = ps.getParameter<edm::InputTag>("MuonsMapLabelVert");
-  muonMapTag_VertValue   = ps.getParameter<edm::InputTag>("MuonsMapLabelVertValue");
-  muonMapTag_VertError   = ps.getParameter<edm::InputTag>("MuonsMapLabelVertError");
+  muonTag_Vert           = pset.getParameter<edm::InputTag>("MuonsLabelVert");
+  muonMapTag_Vert        = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsMapLabelVert"));
+  muonMapTag_VertValue   = consumes<edm::ValueMap<float> >( pset.getParameter<edm::InputTag>("MuonsMapLabelVertValue"));
+  muonMapTag_VertError   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsMapLabelVertError"));
   // KF
-  muonMapTag_VertKF        = ps.getParameter<edm::InputTag>("MuonsMapLabelVertKF");
-  muonMapTag_VertValueKF   = ps.getParameter<edm::InputTag>("MuonsMapLabelVertValueKF");
-  muonMapTag_VertErrorKF   = ps.getParameter<edm::InputTag>("MuonsMapLabelVertErrorKF");
+  muonMapTag_VertKF        = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsMapLabelVertKF"));
+  muonMapTag_VertValueKF   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsMapLabelVertValueKF"));
+  muonMapTag_VertErrorKF   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsMapLabelVertErrorKF"));
     
     
   // GD, Std and Kin vertex
-  muonMapTag_VertGD      = ps.getParameter<edm::InputTag>("MuonsMapLabelVertGD");
-  muonMapTag_VertGDMMMM  = ps.getParameter<edm::InputTag>("MuonsMapLabelVertGDMMMM");
-  muonMapTag_VertStd     = ps.getParameter<edm::InputTag>("MuonsMapLabelVertStd");
-  muonMapTag_VertStdMMMM = ps.getParameter<edm::InputTag>("MuonsMapLabelVertStdMMMM");
-  muonMapTag_VertKin     = ps.getParameter<edm::InputTag>("MuonsMapLabelVertKin");
-  muonMapTag_VertKinMMMM = ps.getParameter<edm::InputTag>("MuonsMapLabelVertKinMMMM");
+  muonMapTag_VertGD      = pset.getParameter<edm::InputTag>("MuonsMapLabelVertGD");
+  muonMapTag_VertGDMMMM  = pset.getParameter<edm::InputTag>("MuonsMapLabelVertGDMMMM");
+  muonMapTag_VertStd     = pset.getParameter<edm::InputTag>("MuonsMapLabelVertStd");
+  muonMapTag_VertStdMMMM = pset.getParameter<edm::InputTag>("MuonsMapLabelVertStdMMMM");
+  muonMapTag_VertKin     = pset.getParameter<edm::InputTag>("MuonsMapLabelVertKin");
+  muonMapTag_VertKinMMMM = pset.getParameter<edm::InputTag>("MuonsMapLabelVertKinMMMM");
     
   // STIP SLIP
-  muonSTIPMapTag_Vert   = ps.getParameter<edm::InputTag>("MuonsSTIPMapLabelVert");
-  muonSLIPMapTag_Vert   = ps.getParameter<edm::InputTag>("MuonsSLIPMapLabelVert");
+  muonSTIPMapTag_Vert   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsSTIPMapLabelVert"));
+  muonSLIPMapTag_Vert   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsSLIPMapLabelVert"));
     
-  muonSTIPMapTag_VertValue   = ps.getParameter<edm::InputTag>("MuonsSTIPMapLabelVertValue");
-  muonSLIPMapTag_VertValue   = ps.getParameter<edm::InputTag>("MuonsSLIPMapLabelVertValue");
-  muonSTIPMapTag_VertError   = ps.getParameter<edm::InputTag>("MuonsSTIPMapLabelVertError");
-  muonSLIPMapTag_VertError   = ps.getParameter<edm::InputTag>("MuonsSLIPMapLabelVertError");
+  muonSTIPMapTag_VertValue   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsSTIPMapLabelVertValue"));
+  muonSLIPMapTag_VertValue   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsSLIPMapLabelVertValue"));
+  muonSTIPMapTag_VertError   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsSTIPMapLabelVertError"));
+  muonSLIPMapTag_VertError   =consumes<edm::ValueMap<float> >( pset.getParameter<edm::InputTag>("MuonsSLIPMapLabelVertError"));
     
   // 3D w.r.t primary vertex DA
-  electronTag_Vert          = ps.getParameter<edm::InputTag>("ElectronsLabelVert");
-  electronMapTag_Vert       = ps.getParameter<edm::InputTag>("ElectronsMapLabelVert");
-  electronMapTag_VertValue  = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertValue");
-  electronMapTag_VertError  = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertError");
+  electronTag_Vert          = pset.getParameter<edm::InputTag>("ElectronsLabelVert");
+  electronMapTag_Vert       = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsMapLabelVert"));
+  electronMapTag_VertValue  = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsMapLabelVertValue"));
+  electronMapTag_VertError  = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsMapLabelVertError"));
   // KF
-  electronMapTag_VertKF       = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertKF");
-  electronMapTag_VertValueKF  = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertValueKF");
-  electronMapTag_VertErrorKF  = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertErrorKF");
+  electronMapTag_VertKF       = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsMapLabelVertKF"));
+  electronMapTag_VertValueKF  = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsMapLabelVertValueKF"));
+  electronMapTag_VertErrorKF  = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsMapLabelVertErrorKF"));
     
     
   // GD, Std and Kin vertex
-  electronMapTag_VertGD      = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertGD");
-  electronMapTag_VertGDEEEE  = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertGDEEEE");
-  electronMapTag_VertStd     = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertStd");
-  electronMapTag_VertStdEEEE = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertStdEEEE");
-  electronMapTag_VertKin     = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertKin");
-  electronMapTag_VertKinEEEE = ps.getParameter<edm::InputTag>("ElectronsMapLabelVertKinEEEE");
+  electronMapTag_VertGD      = pset.getParameter<edm::InputTag>("ElectronsMapLabelVertGD");
+  electronMapTag_VertGDEEEE  = pset.getParameter<edm::InputTag>("ElectronsMapLabelVertGDEEEE");
+  electronMapTag_VertStd     = pset.getParameter<edm::InputTag>("ElectronsMapLabelVertStd");
+  electronMapTag_VertStdEEEE = pset.getParameter<edm::InputTag>("ElectronsMapLabelVertStdEEEE");
+  electronMapTag_VertKin     = pset.getParameter<edm::InputTag>("ElectronsMapLabelVertKin");
+  electronMapTag_VertKinEEEE = pset.getParameter<edm::InputTag>("ElectronsMapLabelVertKinEEEE");
     
   // STIP SLIP
-  electronSTIPMapTag_Vert   = ps.getParameter<edm::InputTag>("ElectronsSTIPMapLabelVert");
-  electronSLIPMapTag_Vert   = ps.getParameter<edm::InputTag>("ElectronsSLIPMapLabelVert");
+  electronSTIPMapTag_Vert   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsSTIPMapLabelVert"));
+  electronSLIPMapTag_Vert   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsSLIPMapLabelVert"));
     
-  electronSTIPMapTag_VertValue   = ps.getParameter<edm::InputTag>("ElectronsSTIPMapLabelVertValue");
-  electronSLIPMapTag_VertValue   = ps.getParameter<edm::InputTag>("ElectronsSLIPMapLabelVertValue");
-  electronSTIPMapTag_VertError   = ps.getParameter<edm::InputTag>("ElectronsSTIPMapLabelVertError");
-  electronSLIPMapTag_VertError   = ps.getParameter<edm::InputTag>("ElectronsSLIPMapLabelVertError");
+  electronSTIPMapTag_VertValue   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsSTIPMapLabelVertValue"));
+  electronSLIPMapTag_VertValue   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsSLIPMapLabelVertValue"));
+  electronSTIPMapTag_VertError   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsSTIPMapLabelVertError"));
+  electronSLIPMapTag_VertError   = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ElectronsSLIPMapLabelVertError"));
        
   // geom. discr.
-  ftsigma_Vert           = ps.getParameter<edm::InputTag>("ftsigmaVert");
-  ftsigmalag_Vert        = ps.getParameter<edm::InputTag>("ftsigmalagVert");
-  gdX_Vert               = ps.getParameter<edm::InputTag>("gdX_Vert");
-  gdY_Vert               = ps.getParameter<edm::InputTag>("gdY_Vert");
-  gdZ_Vert               = ps.getParameter<edm::InputTag>("gdZ_Vert");
-  gdlagX_Vert            = ps.getParameter<edm::InputTag>("gdlagX_Vert");
-  gdlagY_Vert            = ps.getParameter<edm::InputTag>("gdlagY_Vert");
-  gdlagZ_Vert            = ps.getParameter<edm::InputTag>("gdlagZ_Vert");
-  gdlagProb_Vert         = ps.getParameter<edm::InputTag>("gdlagProb_Vert");
-  gdlagNdof_Vert         = ps.getParameter<edm::InputTag>("gdlagNdof_Vert");
+  ftsigma_Vert           = pset.getParameter<edm::InputTag>("ftsigmaVert");
+  ftsigmalag_Vert        = pset.getParameter<edm::InputTag>("ftsigmalagVert");
+  gdX_Vert               = pset.getParameter<edm::InputTag>("gdX_Vert");
+  gdY_Vert               = pset.getParameter<edm::InputTag>("gdY_Vert");
+  gdZ_Vert               = pset.getParameter<edm::InputTag>("gdZ_Vert");
+  gdlagX_Vert            = pset.getParameter<edm::InputTag>("gdlagX_Vert");
+  gdlagY_Vert            = pset.getParameter<edm::InputTag>("gdlagY_Vert");
+  gdlagZ_Vert            = pset.getParameter<edm::InputTag>("gdlagZ_Vert");
+  gdlagProb_Vert         = pset.getParameter<edm::InputTag>("gdlagProb_Vert");
+  gdlagNdof_Vert         = pset.getParameter<edm::InputTag>("gdlagNdof_Vert");
 
-  ftsigma_VertMMMM       = ps.getParameter<edm::InputTag>("ftsigmaVertMMMM");
-  ftsigmalag_VertMMMM    = ps.getParameter<edm::InputTag>("ftsigmalagVertMMMM");
-  gdX_VertMMMM           = ps.getParameter<edm::InputTag>("gdX_VertMMMM");
-  gdY_VertMMMM           = ps.getParameter<edm::InputTag>("gdY_VertMMMM");
-  gdZ_VertMMMM           = ps.getParameter<edm::InputTag>("gdZ_VertMMMM");
-  gdlagX_VertMMMM        = ps.getParameter<edm::InputTag>("gdlagX_VertMMMM");
-  gdlagY_VertMMMM        = ps.getParameter<edm::InputTag>("gdlagY_VertMMMM");
-  gdlagZ_VertMMMM        = ps.getParameter<edm::InputTag>("gdlagZ_VertMMMM");
-  gdlagProb_VertMMMM     = ps.getParameter<edm::InputTag>("gdlagProb_VertMMMM");
-  gdlagNdof_VertMMMM     = ps.getParameter<edm::InputTag>("gdlagNdof_VertMMMM");
+  ftsigma_VertMMMM       = pset.getParameter<edm::InputTag>("ftsigmaVertMMMM");
+  ftsigmalag_VertMMMM    = pset.getParameter<edm::InputTag>("ftsigmalagVertMMMM");
+  gdX_VertMMMM           = pset.getParameter<edm::InputTag>("gdX_VertMMMM");
+  gdY_VertMMMM           = pset.getParameter<edm::InputTag>("gdY_VertMMMM");
+  gdZ_VertMMMM           = pset.getParameter<edm::InputTag>("gdZ_VertMMMM");
+  gdlagX_VertMMMM        = pset.getParameter<edm::InputTag>("gdlagX_VertMMMM");
+  gdlagY_VertMMMM        = pset.getParameter<edm::InputTag>("gdlagY_VertMMMM");
+  gdlagZ_VertMMMM        = pset.getParameter<edm::InputTag>("gdlagZ_VertMMMM");
+  gdlagProb_VertMMMM     = pset.getParameter<edm::InputTag>("gdlagProb_VertMMMM");
+  gdlagNdof_VertMMMM     = pset.getParameter<edm::InputTag>("gdlagNdof_VertMMMM");
 
-  ftsigma_VertEEEE       = ps.getParameter<edm::InputTag>("ftsigmaVertEEEE");
-  ftsigmalag_VertEEEE    = ps.getParameter<edm::InputTag>("ftsigmalagVertEEEE");
-  gdX_VertEEEE           = ps.getParameter<edm::InputTag>("gdX_VertEEEE");
-  gdY_VertEEEE           = ps.getParameter<edm::InputTag>("gdY_VertEEEE");
-  gdZ_VertEEEE           = ps.getParameter<edm::InputTag>("gdZ_VertEEEE");
-  gdlagX_VertEEEE        = ps.getParameter<edm::InputTag>("gdlagX_VertEEEE");
-  gdlagY_VertEEEE        = ps.getParameter<edm::InputTag>("gdlagY_VertEEEE");
-  gdlagZ_VertEEEE        = ps.getParameter<edm::InputTag>("gdlagZ_VertEEEE");
-  gdlagProb_VertEEEE     = ps.getParameter<edm::InputTag>("gdlagProb_VertEEEE");
-  gdlagNdof_VertEEEE     = ps.getParameter<edm::InputTag>("gdlagNdof_VertEEEE");
+  ftsigma_VertEEEE       = pset.getParameter<edm::InputTag>("ftsigmaVertEEEE");
+  ftsigmalag_VertEEEE    = pset.getParameter<edm::InputTag>("ftsigmalagVertEEEE");
+  gdX_VertEEEE           = pset.getParameter<edm::InputTag>("gdX_VertEEEE");
+  gdY_VertEEEE           = pset.getParameter<edm::InputTag>("gdY_VertEEEE");
+  gdZ_VertEEEE           = pset.getParameter<edm::InputTag>("gdZ_VertEEEE");
+  gdlagX_VertEEEE        = pset.getParameter<edm::InputTag>("gdlagX_VertEEEE");
+  gdlagY_VertEEEE        = pset.getParameter<edm::InputTag>("gdlagY_VertEEEE");
+  gdlagZ_VertEEEE        = pset.getParameter<edm::InputTag>("gdlagZ_VertEEEE");
+  gdlagProb_VertEEEE     = pset.getParameter<edm::InputTag>("gdlagProb_VertEEEE");
+  gdlagNdof_VertEEEE     = pset.getParameter<edm::InputTag>("gdlagNdof_VertEEEE");
 
   //ConstraintVertex 4l
-  StandardFitVertex        = ps.getParameter<edm::InputTag>("StandardFitVertex");
-  StandardFitVertexMMMM    = ps.getParameter<edm::InputTag>("StandardFitVertexMMMM");
-  StandardFitVertexEEEE    = ps.getParameter<edm::InputTag>("StandardFitVertexEEEE");
-  KinematicFitVertex       = ps.getParameter<edm::InputTag>("KinematicFitVertex");
-  KinematicFitVertexMMMM   = ps.getParameter<edm::InputTag>("KinematicFitVertexMMMM");
-  KinematicFitVertexEEEE   = ps.getParameter<edm::InputTag>("KinematicFitVertexEEEE");
-  RefittedMass             = ps.getParameter<edm::InputTag>("RefittedMass");
-  RefittedMassMMMM         = ps.getParameter<edm::InputTag>("RefittedMassMMMM");
-  RefittedMassEEEE         = ps.getParameter<edm::InputTag>("RefittedMassEEEE");
+  StandardFitVertex        = pset.getParameter<edm::InputTag>("StandardFitVertex");
+  StandardFitVertexMMMM    = pset.getParameter<edm::InputTag>("StandardFitVertexMMMM");
+  StandardFitVertexEEEE    = pset.getParameter<edm::InputTag>("StandardFitVertexEEEE");
+  KinematicFitVertex       = pset.getParameter<edm::InputTag>("KinematicFitVertex");
+  KinematicFitVertexMMMM   = pset.getParameter<edm::InputTag>("KinematicFitVertexMMMM");
+  KinematicFitVertexEEEE   = pset.getParameter<edm::InputTag>("KinematicFitVertexEEEE");
+  RefittedMass             = pset.getParameter<edm::InputTag>("RefittedMass");
+  RefittedMassMMMM         = pset.getParameter<edm::InputTag>("RefittedMassMMMM");
+  RefittedMassEEEE         = pset.getParameter<edm::InputTag>("RefittedMassEEEE");
 
   //ConstraintVertex 3l
-  StandardFitVertexMMM     = ps.getParameter<edm::InputTag>("StandardFitVertexMMM");
-  StandardFitVertexMME     = ps.getParameter<edm::InputTag>("StandardFitVertexMME");
-  StandardFitVertexEEE     = ps.getParameter<edm::InputTag>("StandardFitVertexEEE");
-  StandardFitVertexMEE     = ps.getParameter<edm::InputTag>("StandardFitVertexMEE");
+  StandardFitVertexMMM     = pset.getParameter<edm::InputTag>("StandardFitVertexMMM");
+  StandardFitVertexMME     = pset.getParameter<edm::InputTag>("StandardFitVertexMME");
+  StandardFitVertexEEE     = pset.getParameter<edm::InputTag>("StandardFitVertexEEE");
+  StandardFitVertexMEE     = pset.getParameter<edm::InputTag>("StandardFitVertexMEE");
 
   // ConstraintVertex Dileptons
-  StandardFitVertexDiLep   = ps.getParameter<edm::InputTag>("StandardFitVertexDiLep");
+  StandardFitVertexDiLep   = pset.getParameter<edm::InputTag>("StandardFitVertexDiLep");
 
   //electronID
-  eleIDTag_                 = ps.getParameter<vtag>("eleIDLabel");
+  eleIDTag_                = pset.getParameter<vtag>("eleIDLabel");
 
-  // MCCP parameters
-  MCCP_cosTheta1Tag_       = ps.getParameter<edm::InputTag>("MCCP_cosTheta1Label");
-  MCCP_cosTheta2Tag_       = ps.getParameter<edm::InputTag>("MCCP_cosTheta2Label");
-  MCCP_cosThetaStarTag_    = ps.getParameter<edm::InputTag>("MCCP_cosThetaStarLabel");
-  MCCP_PhiTag_             = ps.getParameter<edm::InputTag>("MCCP_PhiLabel");
-  MCCP_Phi1Tag_            = ps.getParameter<edm::InputTag>("MCCP_Phi1Label");
-  MCCP_Phi2Tag_            = ps.getParameter<edm::InputTag>("MCCP_Phi2Label");
-  MCCP_phi1RFTag_          = ps.getParameter<edm::InputTag>("MCCP_phi1RFLabel");
-  MCCP_phi2RFTag_          = ps.getParameter<edm::InputTag>("MCCP_phi2RFLabel");
-  MCCP_MELATag_            = ps.getParameter<edm::InputTag>("MCCP_MELALabel");
-
-  // CP parameters
-  CP2e2mu_cosTheta1Tag_    = ps.getParameter<edm::InputTag>("CP2e2mu_cosTheta1Label");
-  CP2e2mu_cosTheta2Tag_    = ps.getParameter<edm::InputTag>("CP2e2mu_cosTheta2Label");
-  CP2e2mu_cosThetaStarTag_ = ps.getParameter<edm::InputTag>("CP2e2mu_cosThetaStarLabel");
-  CP2e2mu_PhiTag_          = ps.getParameter<edm::InputTag>("CP2e2mu_PhiLabel");
-  CP2e2mu_Phi1Tag_         = ps.getParameter<edm::InputTag>("CP2e2mu_Phi1Label");
-  CP2e2mu_Phi2Tag_         = ps.getParameter<edm::InputTag>("CP2e2mu_Phi2Label");
-  CP2e2mu_phi1RFTag_       = ps.getParameter<edm::InputTag>("CP2e2mu_phi1RFLabel");
-  CP2e2mu_phi2RFTag_       = ps.getParameter<edm::InputTag>("CP2e2mu_phi2RFLabel");
-  CP2e2mu_MELATag_         = ps.getParameter<edm::InputTag>("CP2e2mu_MELALabel");
-  
-  CP4mu_cosTheta1Tag_      = ps.getParameter<edm::InputTag>("CP4mu_cosTheta1Label");
-  CP4mu_cosTheta2Tag_      = ps.getParameter<edm::InputTag>("CP4mu_cosTheta2Label");
-  CP4mu_cosThetaStarTag_   = ps.getParameter<edm::InputTag>("CP4mu_cosThetaStarLabel");
-  CP4mu_PhiTag_            = ps.getParameter<edm::InputTag>("CP4mu_PhiLabel");
-  CP4mu_Phi1Tag_           = ps.getParameter<edm::InputTag>("CP4mu_Phi1Label");
-  CP4mu_Phi2Tag_           = ps.getParameter<edm::InputTag>("CP4mu_Phi2Label");
-  CP4mu_phi1RFTag_         = ps.getParameter<edm::InputTag>("CP4mu_phi1RFLabel");
-  CP4mu_phi2RFTag_         = ps.getParameter<edm::InputTag>("CP4mu_phi2RFLabel");
-  CP4mu_MELATag_           = ps.getParameter<edm::InputTag>("CP4mu_MELALabel");
-  
-  CP4e_cosTheta1Tag_       = ps.getParameter<edm::InputTag>("CP4e_cosTheta1Label");
-  CP4e_cosTheta2Tag_       = ps.getParameter<edm::InputTag>("CP4e_cosTheta2Label");
-  CP4e_cosThetaStarTag_    = ps.getParameter<edm::InputTag>("CP4e_cosThetaStarLabel");
-  CP4e_PhiTag_             = ps.getParameter<edm::InputTag>("CP4e_PhiLabel");
-  CP4e_Phi1Tag_            = ps.getParameter<edm::InputTag>("CP4e_Phi1Label");
-  CP4e_Phi2Tag_            = ps.getParameter<edm::InputTag>("CP4e_Phi2Label");
-  CP4e_phi1RFTag_          = ps.getParameter<edm::InputTag>("CP4e_phi1RFLabel");
-  CP4e_phi2RFTag_          = ps.getParameter<edm::InputTag>("CP4e_phi2RFLabel");
-  CP4e_MELATag_            = ps.getParameter<edm::InputTag>("CP4e_MELALabel");
-  
   // Other objets
-  photonsTag_              = ps.getParameter<edm::InputTag>("PhotonsLabel");
-  tracksTag_               = ps.getParameter<edm::InputTag>("TracksLabel");
-  jetsTag_                 = ps.getParameter<edm::InputTag>("JetsLabel");
-  PuJetMvaMCfullDiscr_     = ps.getParameter<edm::InputTag>("PuJetMvaMCfullDiscrLabel");
-  PuJetMvaMCfullId_        = ps.getParameter<edm::InputTag>("PuJetMvaMCfullIdLabel");
-  PuJetMvaDatafullDiscr_   = ps.getParameter<edm::InputTag>("PuJetMvaDatafullDiscrLabel");
-  PuJetMvaDatafullId_      = ps.getParameter<edm::InputTag>("PuJetMvaDatafullIdLabel");
-  rhojetsTag_              = ps.getParameter<edm::InputTag>("RhoJetsLabel");
-  verticesTag_             = ps.getParameter<edm::InputTag>("VerticesLabel");
+  photonsTag_              = consumes<edm::View<reco::Photon> >(pset.getParameter<edm::InputTag>("PhotonsLabel"));
+  tracksTag_               = consumes<vector<reco::Track> >(pset.getParameter<edm::InputTag>("TracksLabel"));
+  jetsTag_                 = consumes<vector<reco::PFJet> >(pset.getParameter<edm::InputTag>("JetsLabel"));
+  jetsDataTag_             = consumes<vector<reco::PFJet> >(pset.getParameter<edm::InputTag>("JetsDataLabel"));
+  jetsMVATag_              = consumes<vector<reco::PFJet> >(pset.getParameter<edm::InputTag>("JetsMVALabel"));
+  PuJetMvaMCfullDiscr_     = consumes<edm::ValueMap<float> > (pset.getParameter<edm::InputTag>("PuJetMvaMCfullDiscrLabel"));
+  PuJetMvaMCfullId_        = consumes<edm::ValueMap<float> > (pset.getParameter<edm::InputTag>("PuJetMvaMCfullIdLabel"));
+  PuJetMvaDatafullDiscr_   = consumes<edm::ValueMap<float> > (pset.getParameter<edm::InputTag>("PuJetMvaDatafullDiscrLabel"));
+  PuJetMvaDatafullId_      = consumes<edm::ValueMap<float> > (pset.getParameter<edm::InputTag>("PuJetMvaDatafullIdLabel"));
+  rhojetsTag_              = consumes<double>(pset.getParameter<edm::InputTag>("RhoJetsLabel"));
+  verticesTag_             = consumes<std::vector<reco::Vertex> >(pset.getParameter<edm::InputTag>("VerticesLabel"));
   
   // MET reco
-  genmetTag_              = ps.getParameter<edm::InputTag>("GenMETLabel"); // GenMET
-  trackermetTag_          = ps.getParameter<edm::InputTag>("TrackerMETLabel"); // TrackerMET
+  genmetTag_              = consumes<vector<reco::GenMET> >(pset.getParameter<edm::InputTag>("GenMETLabel")); // GenMET
+  trackermetTag_          = pset.getParameter<edm::InputTag>("TrackerMETLabel"); // TrackerMET
   // Calo MET
-  calometTag_             = ps.getParameter<edm::InputTag>("CaloMETLabel");
-  calometnohfTag_         = ps.getParameter<edm::InputTag>("CaloMET_NoHFLabel");
-  useAdditionalMET_       = ps.getUntrackedParameter<bool>("useAdditionalMET");
-  calomethoTag_           = ps.getParameter<edm::InputTag>("CaloMET_HOLabel");
-  calometoptTag_          = ps.getParameter<edm::InputTag>("CaloMET_OptLabel");
-  calometoptnohfTag_      = ps.getParameter<edm::InputTag>("CaloMET_OptNoHFLabel");
-  calometoptnohfhoTag_    = ps.getParameter<edm::InputTag>("CaloMET_OptNoHFHOLabel");
-  calometopthoTag_        = ps.getParameter<edm::InputTag>("CaloMET_OptHOLabel");
-  calometnohfhoTag_       = ps.getParameter<edm::InputTag>("CaloMET_NoHFHOLabel");
+  calometTag_             = pset.getParameter<edm::InputTag>("CaloMETLabel");
+  calometnohfTag_         = pset.getParameter<edm::InputTag>("CaloMET_NoHFLabel");
+  useAdditionalMET_       = pset.getUntrackedParameter<bool>("useAdditionalMET");
+  calomethoTag_           = pset.getParameter<edm::InputTag>("CaloMET_HOLabel");
+  calometoptTag_          = pset.getParameter<edm::InputTag>("CaloMET_OptLabel");
+  calometoptnohfTag_      = pset.getParameter<edm::InputTag>("CaloMET_OptNoHFLabel");
+  calometoptnohfhoTag_    = pset.getParameter<edm::InputTag>("CaloMET_OptNoHFHOLabel");
+  calometopthoTag_        = pset.getParameter<edm::InputTag>("CaloMET_OptHOLabel");
+  calometnohfhoTag_       = pset.getParameter<edm::InputTag>("CaloMET_NoHFHOLabel");
   
   // PF MET
-  pfmetTag_               = ps.getParameter<edm::InputTag>("PfMETLabel");
+  pfmetTag_               = consumes<vector<reco::PFMET> >(pset.getParameter<edm::InputTag>("PfMETLabel"));
+  
   // htMET
-  htmetic5Tag_            = ps.getParameter<edm::InputTag>("HtMET_IC5Label");
-  htmetkt4Tag_            = ps.getParameter<edm::InputTag>("HtMET_KT4Label");
-  htmetkt6Tag_            = ps.getParameter<edm::InputTag>("HtMET_KT6Label");
-  htmetsc5Tag_            = ps.getParameter<edm::InputTag>("HtMET_SC5Label");
-  htmetsc7Tag_            = ps.getParameter<edm::InputTag>("HtMET_SC7Label");
+  htmetic5Tag_            = pset.getParameter<edm::InputTag>("HtMET_IC5Label");
+  htmetkt4Tag_            = pset.getParameter<edm::InputTag>("HtMET_KT4Label");
+  htmetkt6Tag_            = pset.getParameter<edm::InputTag>("HtMET_KT6Label");
+  htmetsc5Tag_            = pset.getParameter<edm::InputTag>("HtMET_SC5Label");
+  htmetsc7Tag_            = pset.getParameter<edm::InputTag>("HtMET_SC7Label");
   // JES correction MET
-  jescormetic5Tag_        = ps.getParameter<edm::InputTag>("MET_JESCorIC5CaloJetLabel");
-  jescormetkt4Tag_        = ps.getParameter<edm::InputTag>("MET_JESCorKT4CaloJetLabel");
-  jescormetkt6Tag_        = ps.getParameter<edm::InputTag>("MET_JESCorKT6CaloJetLabel");
-  jescormetsc5Tag_        = ps.getParameter<edm::InputTag>("MET_JESCorSC5CaloJetLabel");
-  jescormetsc7Tag_        = ps.getParameter<edm::InputTag>("MET_JESCorSC7CaloJetLabel");
+  jescormetic5Tag_        = pset.getParameter<edm::InputTag>("MET_JESCorIC5CaloJetLabel");
+  jescormetkt4Tag_        = pset.getParameter<edm::InputTag>("MET_JESCorKT4CaloJetLabel");
+  jescormetkt6Tag_        = pset.getParameter<edm::InputTag>("MET_JESCorKT6CaloJetLabel");
+  jescormetsc5Tag_        = pset.getParameter<edm::InputTag>("MET_JESCorSC5CaloJetLabel");
+  jescormetsc7Tag_        = pset.getParameter<edm::InputTag>("MET_JESCorSC7CaloJetLabel");
   // Type I Muon Correction MET
-  cormetMuTag_            = ps.getParameter<edm::InputTag>("CorMETGlobalMuLabel");
-    
-  // btagging
-  tCHighEff_bTag_         = ps.getParameter<edm::InputTag>("tCHighEff_bTagLabel");
-  tCHighPur_bTag_         = ps.getParameter<edm::InputTag>("tCHighPur_bTagLabel");
-  /*     jPHighEff_bTag_         = ps.getParameter<edm::InputTag>("jPHighEff_bTagLabel"); */
-  /*     jBP_bTag_               = ps.getParameter<edm::InputTag>("jBP_bTagLabel"); */
-  /*     sSVHighEff_bTag_        = ps.getParameter<edm::InputTag>("sSVHighEff_bTagLabel"); */
-  /*     sSVHighPur_bTag_        = ps.getParameter<edm::InputTag>("sSVHighPur_bTagLabel"); */
-  cSV_bTag_               = ps.getParameter<edm::InputTag>("cSV_bTagLabel");
-  /*     cSVMVA_bTag_            = ps.getParameter<edm::InputTag>("cSVMVA_bTagLabel"); */
-  /*     sEByIP3d_bTag_          = ps.getParameter<edm::InputTag>("sEByIP3d_bTagLabel"); */
-  /*     sEByPt_bTag_            = ps.getParameter<edm::InputTag>("sEByPt_bTagLabel"); */
-  /*     sM_bTag_                = ps.getParameter<edm::InputTag>("sM_bTagLabel"); */
-  /*     sMByIP3d_bTag_          = ps.getParameter<edm::InputTag>("sMByIP3d_bTagLabel"); */
-  /*     sMByPt_bTag_            = ps.getParameter<edm::InputTag>("sMByPt_bTagLabel"); */
+  cormetMuTag_            = pset.getParameter<edm::InputTag>("CorMETGlobalMuLabel");
+
+   // btagging
+  tCHighEff_bTag_         = consumes<edm::AssociationVector<edm::RefToBaseProd<reco::Jet>,std::vector<float>,edm::RefToBase<reco::Jet>,unsigned int,edm::helper::AssociationIdenticalKeyReference> >(pset.getParameter<edm::InputTag>("tCHighEff_bTagLabel"));
+  tCHighPur_bTag_         = consumes<edm::AssociationVector<edm::RefToBaseProd<reco::Jet>,std::vector<float>,edm::RefToBase<reco::Jet>,unsigned int,edm::helper::AssociationIdenticalKeyReference> >(pset.getParameter<edm::InputTag>("tCHighPur_bTagLabel"));
+  cSV_bTag_               = consumes<edm::AssociationVector<edm::RefToBaseProd<reco::Jet>,std::vector<float>,edm::RefToBase<reco::Jet>,unsigned int,edm::helper::AssociationIdenticalKeyReference> >(pset.getParameter<edm::InputTag>("cSV_bTagLabel"));
+  
   
   // Conversion finder
-  ConvMapDistTag_       = ps.getParameter<edm::InputTag>("ConvMapDist");
-  ConvMapDcotTag_       = ps.getParameter<edm::InputTag>("ConvMapDcot");
-  isVBF_ = ps.getParameter<bool>("isVBF");
-  
-  
-  // get names from module parameters, then derive slot numbers
+  ConvMapDistTag_       = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ConvMapDist"));
+  ConvMapDcotTag_       = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("ConvMapDcot"));
+    
+  // Matching
+  goodElectronMCMatch_  = consumes<edm::Association<std::vector<reco::GenParticle> > >(pset.getParameter<edm::InputTag>("goodElectronMCMatch"));
+  myElectrons_          = consumes<reco::CandidateCollection>(pset.getParameter<edm::InputTag>("myElectrons"));
+  goodMuonMCMatch_      = consumes<edm::Association<std::vector<reco::GenParticle> > >(pset.getParameter<edm::InputTag>("goodMuonMCMatch"));
+  myMuons_              = consumes<reco::CandidateCollection>(pset.getParameter<edm::InputTag>("myMuons"));
+  goodGammaMCMatch_     = consumes<edm::Association<std::vector<reco::GenParticle> > >(pset.getParameter<edm::InputTag>("goodGammaMCMatch"));
+  myGammas_             = consumes<reco::CandidateCollection>(pset.getParameter<edm::InputTag>("myGammas"));
+
+  // Beam Spot
+  offlineBeamSpot_      = consumes<reco::BeamSpot>(pset.getParameter<edm::InputTag>("offlineBeamSpot"));
+
+// get names from module parameters, then derive slot numbers
   n_                  = 0;
   firstevent_         = true;  
   //produces<vector<std::string> >();
 
   // PG and FRC 06-07-11
-  debug	=	ps.getUntrackedParameter<bool> ("debug", false);
+  debug	=	pset.getUntrackedParameter<bool> ("debug", false);
   
   //===============================================================================================
   //Create the root file
   theFile_ = new TFile(rootFileName.c_str(), "RECREATE");
   //theFile_->cd();
 
-  //outputFile_ = ps.getParameter<std::string>("outputFile");
+  //outputFile_ = pset.getParameter<std::string>("outputFile");
   //rootFile_   = TFile::Open(outputFile_.c_str(),"RECREATE"); // open output file to store histograms
 
   // Counter of number of analyzed events
   nevt=0;
-  /*
-  // Muon PF Ring Isolation
-  fMuonIsoMVA = new MuonMVAEstimator();
-  vector<string> muoniso_weightfiles,muoniso_weightfiles_path;
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-BarrelPt5To10_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-EndcapPt5To10_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-BarrelPt10ToInf_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-EndcapPt10ToInf_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-Tracker_V0_BDTG.weights.xml");
-  muoniso_weightfiles.push_back("Muon/MuonAnalysisTools/data/MuonIsoMVA_sixie-Global_V0_BDTG.weights.xml");
-  for(unsigned ifile=0 ; ifile < muoniso_weightfiles.size() ; ++ifile) {
-    string path_mvaWeightFileMuonIsoMVA;
-    path_mvaWeightFileMuonIsoMVA = edm::FileInPath (muoniso_weightfiles[ifile].c_str() ).fullPath();
-    muoniso_weightfiles_path.push_back(path_mvaWeightFileMuonIsoMVA);
-  }
-  fMuonIsoMVA->initialize("MuonIso_BDTG_IsoRings",
-  MuonMVAEstimator::kIsoRings,
-  kTRUE,
-  muoniso_weightfiles_path);
-  fMuonIsoMVA->SetPrintMVADebug(kTRUE);
-  fMuonIsoMVA->SetPrintMVADebug(kTRUE);
-  */
-  // Electron PF Ring Isolation
-  //fElectronIsoMVA = new EGammaMvaEleEstimator();
-  //vector<string> eleiso_weightfiles,eleiso_weightfiles_path;
-  
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_BarrelPt5To10.weights.xml");
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_EndcapPt5To10.weights.xml");
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_BarrelPt10ToInf.weights.xml");
-  // eleiso_weightfiles.push_back("EGamma/EGammaAnalysisTools/data/ElectronIso_BDTG_V0_EndcapPt10ToInf.weights.xml");
-  
-  //  for(unsigned ifile=0 ; ifile < eleiso_weightfiles.size() ; ++ifile) {
-    //string path_mvaWeightFileElectronIsoMVA;
-    //path_mvaWeightFileElectronIsoMVA = edm::FileInPath (eleiso_weightfiles[ifile].c_str() ).fullPath();
-    //eleiso_weightfiles_path.push_back(path_mvaWeightFileElectronIsoMVA);
-    //}
-  
-  
-  //fElectronIsoMVA->initialize("EleIso_BDTG_IsoRings",
-  //			      EGammaMvaEleEstimator::kIsoRings,
-  //		      kTRUE,
-  //		      eleiso_weightfiles_path);
-  // fElectronIsoMVA->SetPrintMVADebug(kTRUE);
+ 
 }
 
  
@@ -653,13 +562,13 @@ void HZZ4LeptonsRootTree::beginJob() {
   // HLT 
   mytree->Branch("HLTPathsFired",HLTPathsFired,"HLTPathsFired/C");
   mytree->Branch("RECO_nMuHLTMatch",&RECO_nMuHLTMatch,"RECO_nMuHLTMatch/I");
-  mytree->Branch("RECO_nMuHLTMatchPAT",&RECO_nMuHLTMatchPAT,"RECO_nMuHLTMatchPAT/I");
-  mytree->Branch("RECO_nMuHLTMatch_asym_PAT",&RECO_nMuHLTMatch_asym_PAT,"RECO_nMuHLTMatch_asym_PAT/I");
-  mytree->Branch("RECO_nEleHLTMatchPAT",&RECO_nEleHLTMatchPAT,"RECO_nEleHLTMatchPAT/I");
+  mytree->Branch("RECO_nEleHLTMatch",&RECO_nEleHLTMatch,"RECO_nEleHLTMatch/I");
   mytree->Branch("RECOMU_PT_MuHLTMatch",&RECOMU_PT_MuHLTMatch);
-  mytree->Branch("RECOMU_PT_MuHLTMatchPAT",&RECOMU_PT_MuHLTMatchPAT);
-  mytree->Branch("RECOMU_PT_MuHLTMatch_asym_PAT",&RECOMU_PT_MuHLTMatch_asym_PAT);
-  mytree->Branch("RECOELE_PT_EleHLTMatchPAT",&RECOELE_PT_EleHLTMatchPAT);
+  mytree->Branch("RECOMU_ETA_MuHLTMatch",&RECOMU_ETA_MuHLTMatch);
+  mytree->Branch("RECOMU_PHI_MuHLTMatch",&RECOMU_PHI_MuHLTMatch);
+  mytree->Branch("RECOELE_PT_EleHLTMatch",&RECOELE_PT_EleHLTMatch);
+  mytree->Branch("RECOELE_ETA_EleHLTMatch",&RECOELE_ETA_EleHLTMatch);
+  mytree->Branch("RECOELE_PHI_EleHLTMatch",&RECOELE_PHI_EleHLTMatch);
   //=============================================================  
   //
   //           Create Branchs for gen particles variables
@@ -1304,8 +1213,9 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
   }
 
   //GIORGIA fillTracks(evt);
-  //GIORGIA fillVertices(evt);
+  
   if (fillPUinfo) fillPU(evt);
+  EventsMCReWeighting(evt);
 
   // fill HLT block
   //fillHLTFired(evt);
@@ -1320,41 +1230,36 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
     fillmc(evt);
   }
 
+  // Vertices
+  edm::Handle<reco::VertexCollection> recoPrimaryVertexCollection;
+  evt.getByToken(verticesTag_,recoPrimaryVertexCollection);
+  PV = *recoPrimaryVertexCollection;
+  fillVertices(evt);
+  
+  
   // Fill RECO block in the rootple
   // PF Jets
-  //  filljets(evt);
+  filljets(evt);
   
   if (useAdditionalRECO==true) {
     fillAdditionalRECO(evt);
   }
   
-  // Fill RECO rest frame block in the rootple
-  if (useAdditionalRECO==false){    
-    if ( decaychannel=="2e2mu")  fillCP2e2mu(evt);
-    if ( decaychannel=="4mu" )   fillCP4mu(evt);
-    if ( decaychannel=="4e")     fillCP4e(evt);
-  }
-
-  if (useAdditionalRECO==true) {
-    fillCP2e2mu(evt);
-    fillCP4mu(evt);
-    fillCP4e(evt);
-  }
   
   //GENMET
   if (fillMCTruth) {
     edm::Handle<reco::GenMETCollection> genmetHandle;
-    evt.getByLabel(genmetTag_,genmetHandle);
+    evt.getByToken(genmetTag_,genmetHandle);
     for ( GenMETCollection::const_iterator i=genmetHandle->begin(); i!=genmetHandle->end(); i++) {
       genmet = i->pt();
     }
   }
- 
+
+  
   // Filling electron and muons vectors
   fillMuons(evt,es);
   fillElectrons(evt,es);
   fillPhotons(evt);  
-  fillIsolationByRings(evt,es);
 
   //btagging
   fillBTagging(evt);
@@ -1363,7 +1268,18 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
   fillMET(evt);
 
   //Beam Spot
-  fillBeamSpot(evt);
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  evt.getByToken(offlineBeamSpot_,recoBeamSpotHandle) ;
+  bs = *recoBeamSpotHandle;
+  BeamSpot_X=bs.position().x();
+  BeamSpot_Y=bs.position().y();
+  BeamSpot_Z=bs.position().z();
+
+  cout << "BeamSpot:"
+    << "  bs_X=" << BeamSpot_X
+    << "  bs_Y=" << BeamSpot_Y
+    << "  bs_Z=" << BeamSpot_Z
+    << endl;
 
   // Geometrical discriminant 
   // if (useAdditionalRECO==false){
@@ -1390,8 +1306,6 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
   //}
   // fillConstraintVtxTriLeptons(evt);
   // fillConstraintVtxDiLeptons(evt);
-  //fillMCCP(evt);
-  //EventsReWeighting(evt);
   //fillRho(evt); 
   //==============================================
   //=        End of the main program             =
@@ -1449,15 +1363,16 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
  
   // Photons
   edm::Handle<edm::View<reco::Photon> > photons;
-  iEvent.getByLabel(photonsTag_, photons);
+  iEvent.getByToken(photonsTag_, photons);
   RECO_NPHOT=photons->size();
   edm::Handle<edm::Association<vector<reco::GenParticle> > > GenParticlesMatchPhot;
-  iEvent.getByLabel("goodGammaMCMatch", GenParticlesMatchPhot);
+  iEvent.getByToken(goodGammaMCMatch_, GenParticlesMatchPhot);
   edm::Handle<reco::CandidateCollection > CollPhot;
-  iEvent.getByLabel("myGammas", CollPhot);
+  iEvent.getByToken(myGammas_, CollPhot);
   bool ismyGammas=false;
   if (CollPhot.isValid()) ismyGammas=true;
   int iphot=0;
+  
   for (edm::View<reco::Photon>::const_iterator cand = photons->begin(); cand != photons->end(); ++cand) {
     if (iphot>19) break;
     //RECO_NPHOT.push_back(iphot);
@@ -1491,23 +1406,21 @@ void HZZ4LeptonsRootTree::fillPhotons(const edm::Event& iEvent){
   
   // Photons
   edm::Handle<edm::View<reco::PFCandidate> > pfphotons;
-  iEvent.getByLabel(pfphotonsTag_, pfphotons);
+  iEvent.getByToken(pfphotonsTag_, pfphotons);
   edm::Handle<edm::ValueMap<double> > isoPFChargedAllphmap; 
-  iEvent.getByLabel(photonPFIsoValueChargedAllTag_, isoPFChargedAllphmap); 
+  iEvent.getByToken(photonPFIsoValueChargedAllTag_, isoPFChargedAllphmap); 
   edm::Handle<edm::ValueMap<double> > isoPFChargedphmap; 
-  iEvent.getByLabel(photonPFIsoValueChargedTag_, isoPFChargedphmap); 
+  iEvent.getByToken(photonPFIsoValueChargedTag_, isoPFChargedphmap); 
   edm::Handle<edm::ValueMap<double> > isoPFNeutralphmap; 
-  iEvent.getByLabel(photonPFIsoValueNeutralTag_, isoPFNeutralphmap); 
+  iEvent.getByToken(photonPFIsoValueNeutralTag_, isoPFNeutralphmap); 
   edm::Handle<edm::ValueMap<double> > isoPFGammaphmap;
-  iEvent.getByLabel(photonPFIsoValueGammaTag_, isoPFGammaphmap); 
+  iEvent.getByToken(photonPFIsoValueGammaTag_, isoPFGammaphmap); 
   edm::Handle<edm::ValueMap<double> > isoPFPUphmap; 
-  iEvent.getByLabel(photonPFIsoValuePUTag_, isoPFPUphmap);
+  iEvent.getByToken(photonPFIsoValuePUTag_, isoPFPUphmap);
   iphot=0;
   RECO_NPFPHOT=pfphotons->size();
   cout << "There are " << pfphotons->size() << " photons" << endl;
   for (edm::View<reco::PFCandidate>::const_iterator cand = pfphotons->begin(); cand != pfphotons->end(); ++cand) {
-    if (iphot>19) break;
-    //RECO_NPFPHOT.push_back(iphot);
     edm::Ref<edm::View<reco::PFCandidate> > phtrackref(pfphotons,iphot); 
     RECOPFPHOT_PT.push_back(cand->pt());
     // error on pt of photon taken from #include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
@@ -1568,10 +1481,9 @@ void HZZ4LeptonsRootTree::fillBTagging(const edm::Event& iEvent)
   cSV_BTagJet_ET.clear();
   // trackCountingHighEffBJetTags
   edm::Handle<reco::JetTagCollection> bTagHandle;
-  iEvent.getByLabel(tCHighEff_bTag_,bTagHandle);
+  iEvent.getByToken(tCHighEff_bTag_,bTagHandle);
   for (reco::JetTagCollection::const_iterator btagIter=bTagHandle->begin(); btagIter!=bTagHandle->end();++btagIter) {
     iBtag++;
-    if(iBtag>=49) continue;
     if (btagIter->second>-99999. && btagIter->second<99999.){
       /*cout<<" Jet "<< iBtag
 	  <<" has b tag discriminator trackCountingHighEffBJetTags = "<<btagIter->second
@@ -1585,10 +1497,9 @@ void HZZ4LeptonsRootTree::fillBTagging(const edm::Event& iEvent)
   }
   // trackCountingHighPurBJetTags
   edm::Handle<reco::JetTagCollection> bTagHandle_b;
-  iEvent.getByLabel(tCHighPur_bTag_,bTagHandle_b);
+  iEvent.getByToken(tCHighPur_bTag_,bTagHandle_b);
   for (reco::JetTagCollection::const_iterator btagIter=bTagHandle_b->begin(); btagIter!=bTagHandle_b->end();++btagIter) {
     iBtag++;
-    if(iBtag>=49) continue;
     if (btagIter->second>-99999. && btagIter->second<99999.){
       /*cout<<" Jet "<< iBtag
 	  <<" has b tag discriminator trackCountingHighPurBJetTags = "<<btagIter->second
@@ -1602,10 +1513,9 @@ void HZZ4LeptonsRootTree::fillBTagging(const edm::Event& iEvent)
   }
   // combinedSecondaryVertexBJetTags
   edm::Handle<reco::JetTagCollection> bTagHandle_g;
-  iEvent.getByLabel(cSV_bTag_,bTagHandle_g);
+  iEvent.getByToken(cSV_bTag_,bTagHandle_g);
   for (reco::JetTagCollection::const_iterator btagIter=bTagHandle_g->begin(); btagIter!=bTagHandle_g->end();++btagIter) {
     iBtag++;
-    if(iBtag>=49) continue;
     if (btagIter->second>-99999. && btagIter->second<99999.){
       /*cout<<" Jet "<< iBtag
 	  <<" has b tag discriminator combinedSecondaryVertexBJetTags = "<<btagIter->second
@@ -1640,193 +1550,94 @@ void HZZ4LeptonsRootTree::filljets(const edm::Event& iEvent)
   edm::Handle<edm::ValueMap<int> > puJetIdFlagMC;
   edm::Handle<edm::ValueMap<float> > puJetIdMVAData;
   edm::Handle<edm::ValueMap<int> > puJetIdFlagData;
-  // if (fillMCTruth == 1){
-  //   iEvent.getByLabel(jetsTag_, pfjets);
-  //   iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
-  //   iEvent.getByLabel(PuJetMvaMCfullId_,puJetIdFlagMC);
-  // }
-  // else{
-  //   iEvent.getByLabel("ak5PFJetsCorrectionData", pfjets);
-  //   iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
-  //   iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
-  // }
+ 
   if (fillMCTruth == 1){
-    iEvent.getByLabel(jetsTag_, pfjets);
-    iEvent.getByLabel("hTozzTo4leptonsPFJetSelector", pfjetsmva);
-    iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);
+    iEvent.getByToken(jetsTag_, pfjets);
+    iEvent.getByToken(jetsMVATag_, pfjetsmva);
+    iEvent.getByToken(PuJetMvaMCfullDiscr_,puJetIdMVAMC);
   }
   else{
-    iEvent.getByLabel("ak4PFJetsCorrectionData", pfjets);
-    iEvent.getByLabel("hTozzTo4leptonsPFJetSelector", pfjetsmva);
-    iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
+    iEvent.getByToken(jetsDataTag_, pfjets);
+    iEvent.getByToken(jetsMVATag_, pfjetsmva);
+    iEvent.getByToken(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
     
   }
   RECO_PFJET_N=pfjets->size();
   cout << "Number of PFJets in the event= " << RECO_PFJET_N << endl;
   int index_jets = 0;
   for ( PFJetCollection::const_iterator i=pfjets->begin(); i!=pfjets->end(); i++) {  
-    if (index_jets>99) continue;
-    //RECO_PFJET_N.push_back(index_jets);
     edm::Ref<reco::PFJetCollection> pfjetref(pfjets,index_jets);
       
     float mva = 0.;
-    int idflag = -1;
     int pupass = 1;
 
-    if (!isVBF_){
-      if (fillMCTruth == 1){
-	mva = (*puJetIdMVAMC)[pfjetref];
-	idflag = (*puJetIdFlagMC)[pfjetref];
-      }
-      else{
-	mva = (*puJetIdMVAData)[pfjetref];
-	idflag = (*puJetIdFlagData)[pfjetref];
-      }
-      
-      /* 	if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )){ */
-      /* 	  pupass=3; */
-      /* 	} */
-      /* 	else if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium )){ */
-      /* 	  pupass=2; */
-      /* 	} */
-      // old selection
-      //	if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose )){
-      //	  pupass=1;
-      //	}
-      //
-      /* 	else{ */
-      /* 	  pupass=0; */
-      /* 	} */
-      
-      
-      //      New Selection
-      if(i->pt()>20.){
-	if(i->eta()>3.){
-	  if(mva<=-0.45)pupass=0;
-	}else if(i->eta()>2.75){
-	  if(mva<=-0.55)pupass=0;
-	}else if(i->eta()>2.5){
-	  if(mva<=-0.6)pupass=0;
-	}else if(mva<=-0.63)pupass=0;
-      }else{
-	if(i->eta()>3.){
-	  if(mva<=-0.95)pupass=0;
-	}else if(i->eta()>2.75){
-	  if(mva<=-0.94)pupass=0;
-	}else if(i->eta()>2.5){
-	  if(mva<=-0.96)pupass=0;
-	}else if(mva<=-0.95)pupass=0;
-      }
+    
+    if (fillMCTruth == 1){
+      mva = (*puJetIdMVAMC)[pfjetref];
     }
-    else {
-      cout << "Looking for VBF analysis" << endl;
-      edm::Handle<reco::PFJetCollection> pfjets_step2;
-      // if (fillMCTruth == 1){
-      // 	iEvent.getByLabel(edm::InputTag("ak5PFJetsCorrection","","step2"), pfjets_step2);
-      // 	iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
-      // 	iEvent.getByLabel(PuJetMvaMCfullId_,puJetIdFlagMC);
-      // }
-      // else{
-      // 	iEvent.getByLabel(edm::InputTag("ak5PFJetsCorrectionData","","step2"), pfjets_step2);
-      // 	iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
-      // 	iEvent.getByLabel(PuJetMvaDatafullId_,puJetIdFlagData);
-      // }
-      if (fillMCTruth == 1){
-	iEvent.getByLabel(edm::InputTag("ak4PFJetsCorrection","","step2"), pfjets_step2);
-	iEvent.getByLabel(PuJetMvaMCfullDiscr_,puJetIdMVAMC);      
-      }
-      else{
-	iEvent.getByLabel(edm::InputTag("ak4PFJetsCorrectionData","","step2"), pfjets_step2);
-	iEvent.getByLabel(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
-      }
-      int index_jets_step2 = 0;
-      for ( PFJetCollection::const_iterator j=pfjets_step2->begin(); j!=pfjets_step2->end(); j++) {
-	if (index_jets_step2>199) continue;
-	edm::Ref<reco::PFJetCollection> pfjetref_step2(pfjets_step2,index_jets_step2);   
-	//cout << "Reading jets" << endl;
-	if (fillMCTruth == 1){
-	  mva = (*puJetIdMVAMC)[pfjetref_step2];
-	  idflag = (*puJetIdFlagMC)[pfjetref_step2];
-	}
-	else{
-	  mva = (*puJetIdMVAData)[pfjetref_step2];
-	  idflag = (*puJetIdFlagData)[pfjetref_step2];
-	}
-	int pupass = -1;
-	  
-	/* 	  if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kTight )){ */
-	/* 	    pupass=3; */
-	/* 	  } */
-	/* 	  else if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kMedium )){ */
-	/* 	    pupass=2; */
-	/* 	  } */
-	if( PileupJetIdentifier::passJetId( idflag, PileupJetIdentifier::kLoose )){
-	  pupass=1;
-	}
-	/* 	  else{ */
-	/* 	    pupass=0; */
-	/* 	  } */
-	
-	if (i->eta()==j->eta()) {
-	  RECO_PFJET_PUID.push_back(pupass);
-	  RECO_PFJET_PUID_MVA.push_back(mva);
-	  cout << "Jet mathing with pt= " << i->pt() << " and PU ID mva is " << mva << endl;
-	}
-	index_jets_step2++;
-      }
+    else{
+      mva = (*puJetIdMVAData)[pfjetref];
     }
+    
+      
+    //      New Selection
+    if(i->pt()>20.){
+      if(i->eta()>3.){
+	if(mva<=-0.45)pupass=0;
+      }else if(i->eta()>2.75){
+	if(mva<=-0.55)pupass=0;
+      }else if(i->eta()>2.5){
+	if(mva<=-0.6)pupass=0;
+      }else if(mva<=-0.63)pupass=0;
+    }else{
+      if(i->eta()>3.){
+	if(mva<=-0.95)pupass=0;
+      }else if(i->eta()>2.75){
+	if(mva<=-0.94)pupass=0;
+      }else if(i->eta()>2.5){
+	if(mva<=-0.96)pupass=0;
+      }else if(mva<=-0.95)pupass=0;
+    }
+   
+    
     RECO_PFJET_CHARGE.push_back(i->charge());
     RECO_PFJET_ET.push_back(i->et());
     RECO_PFJET_PT.push_back(i->pt());
     RECO_PFJET_ETA.push_back(i->eta());
     RECO_PFJET_PHI.push_back(i->phi());
-    if (!isVBF_) {
-      RECO_PFJET_PUID.push_back(pupass);
-      RECO_PFJET_PUID_MVA.push_back(mva);
-    }
+    RECO_PFJET_PUID.push_back(pupass);
+    RECO_PFJET_PUID_MVA.push_back(mva);
+    
     cout 
-       << "PF Jet with ET= " << RECO_PFJET_ET[index_jets]   
-       << " PT="   << RECO_PFJET_PT[index_jets]   
-       << " ETA="  << RECO_PFJET_ETA[index_jets]  
-       << " PHI="  << RECO_PFJET_PHI[index_jets]  
-       << " PUID=" << RECO_PFJET_PUID[index_jets] 
-       << " PUID_MVA=" << RECO_PFJET_PUID_MVA[index_jets] 
-       << endl;
+      << "PF Jet with ET= " << RECO_PFJET_ET[index_jets]   
+      << " PT="   << RECO_PFJET_PT[index_jets]   
+      << " ETA="  << RECO_PFJET_ETA[index_jets]  
+      << " PHI="  << RECO_PFJET_PHI[index_jets]  
+      << " PUID=" << RECO_PFJET_PUID[index_jets] 
+      << " PUID_MVA=" << RECO_PFJET_PUID_MVA[index_jets] 
+      << endl;
     index_jets++;
   } // for loop on PFJets jets
   
   edm::Handle<double> rhoHandle;
-  if (!use2011EA) {
-    //rhojetsTag_=edm::InputTag("kt6PFJetsCentralNeutral:rho");      
-    iEvent.getByLabel(rhojetsTag_,rhoHandle); 
-    if (rhoHandle.isValid() ) {
-      RHO_mu=*rhoHandle;
-      cout << "RHO mu fastjet= " << RHO_mu << endl; 
-    }
-    else {
-      cout << "Not valid RHO collection" << endl;
-    }
-    //rhojetsTag_=edm::InputTag("kt6PFJets:rho");
-    iEvent.getByLabel(rhojetsTag_,rhoHandle); 
-    if (rhoHandle.isValid() ) {
-      RHO_ele=*rhoHandle;
-      cout << "RHO ele fastjet= " << RHO_ele << endl; 
-    }
-    else {
-      cout << "Not valid RHO collection" << endl;
-    }
+  
+  //rhojetsTag_=edm::InputTag("kt6PFJetsCentralNeutral:rho");      
+  iEvent.getByToken(rhojetsTag_,rhoHandle); 
+  if (rhoHandle.isValid() ) {
+    RHO_mu=*rhoHandle;
+    cout << "RHO mu fastjet= " << RHO_mu << endl; 
   }
   else {
-    iEvent.getByLabel(rhojetsTag_,rhoHandle); 
-    if (rhoHandle.isValid() ) {
-      RHO=*rhoHandle;
-      cout << "RHO fastjet= " << RHO << endl; 
-    }
-    else {
-      cout << "Not valid RHO collection" << endl;
-    }
-    RHO_ele=RHO;
-    RHO_mu=RHO;
+    cout << "Not valid RHO collection" << endl;
+  }
+  //rhojetsTag_=edm::InputTag("kt6PFJets:rho");
+  iEvent.getByToken(rhojetsTag_,rhoHandle); 
+  if (rhoHandle.isValid() ) {
+    RHO_ele=*rhoHandle;
+    cout << "RHO ele fastjet= " << RHO_ele << endl; 
+  }
+  else {
+    cout << "Not valid RHO collection" << endl;
   }
 }
   
@@ -1849,7 +1660,7 @@ float HZZ4LeptonsRootTree::delR(float eta1,float phi1,float eta2,float phi2){
 void HZZ4LeptonsRootTree::fillMET(const edm::Event& evt)
 {
   edm::Handle<reco::PFMETCollection> pfmetcoll;
-  evt.getByLabel(pfmetTag_, pfmetcoll);
+  evt.getByToken(pfmetTag_, pfmetcoll);
   if(!pfmetcoll.isValid()) return;
   const PFMETCollection *pfmetcol = pfmetcoll.product();
   const PFMET *pfmet;
@@ -1876,19 +1687,19 @@ void HZZ4LeptonsRootTree::fillMET(const edm::Event& evt)
 void HZZ4LeptonsRootTree::fillPU(const edm::Event& iEvent)
 {
   edm::Handle<vector<PileupSummaryInfo> > PupInfo;
-  iEvent.getByLabel(PileupSrc_, PupInfo);
+  iEvent.getByToken(PileupSrc_, PupInfo);
   if(!PupInfo.isValid()) return;
   for( vector<PileupSummaryInfo>::const_iterator cand = PupInfo->begin();cand != PupInfo->end(); ++ cand ) {
     num_PU_vertices = cand->getTrueNumInteractions();
     PU_BunchCrossing = cand->getBunchCrossing();
   }
 }
-
+//=============================================================                                                                                                           //                                                                                                                                                                        //          madgraph MC samples reweighing                                                                                                                                //                                                                                                                                                                        //=============================================================          
 void HZZ4LeptonsRootTree::EventsMCReWeighting(const edm::Event& iEvent){
   MC_weighting.clear();
   float EventWeight = 1.0;
   edm::Handle<GenEventInfoProduct> gen_ev_info;
-  iEvent.getByLabel("generator", gen_ev_info);
+  iEvent.getByToken(generator_, gen_ev_info);
   if(!gen_ev_info.isValid()) return;
   EventWeight = gen_ev_info->weight();
   //std::cout<<"mc_weight = "<< gen_ev_info->weight() <<std::endl;                                                                                                                                       
@@ -1922,17 +1733,18 @@ void HZZ4LeptonsRootTree::fillHLTFired(const edm::Event& iEvent)
 void HZZ4LeptonsRootTree::triggermatching(const edm::Event& iEvent)
 {
   RECOMU_PT_MuHLTMatch.clear();
-  RECOMU_PT_MuHLTMatchPAT.clear();
-  RECOMU_PT_MuHLTMatch_asym_PAT.clear();
-  RECOELE_PT_EleHLTMatchPAT.clear();
+  RECOELE_PT_EleHLTMatch.clear();
   cout << "Start Trigger matching for muon" << endl;
   // check HLTrigger/Configuration/python/HLT_GRun_cff.py
+  
   edm::Handle<trigger::TriggerEvent> handleTriggerEvent;
-  iEvent.getByLabel(triggerEvent, handleTriggerEvent );
+  iEvent.getByToken(triggerEvent, handleTriggerEvent );
   const trigger::TriggerObjectCollection & toc(handleTriggerEvent->getObjects());
-  size_t nMuHLT =0;
-  std::vector<reco::Particle>  HLTMuMatched;
-  std::vector<string> HLTMuMatchedNames;
+ 
+  size_t nMuHLT=0, nEleHLT=0;
+  std::vector<reco::Particle>  HLTMuMatched, HLTEleMatched;
+  std::vector<string> HLTMuMatchedNames,HLTEleMatchedNames;
+  
   for ( size_t ia = 0; ia < handleTriggerEvent->sizeFilters(); ++ ia) {
     std::string fullname = handleTriggerEvent->filterTag(ia).encode();
     //std::cout<< "Trigger fullname::== " << fullname<< std::endl;
@@ -1961,148 +1773,61 @@ void HZZ4LeptonsRootTree::triggermatching(const edm::Event& iEvent)
 	  HLTMuMatchedNames.push_back(name); 
 	  cout << "Matching " << triggerFilter.c_str()  << endl; 
 	  nMuHLT++; 
-	} 
-	/* else {	     */
-	/*   for (unsigned int l=0;l<triggerFilter_asym.size();l++){ */
-	/*     //cout << "Trigger Filter " << triggerFilter_asym.at(1).c_str()  << endl; */
-	/*     if (name == triggerFilter_asym.at(l).c_str() ) { */
-	/* 	HLTMuMatched.push_back(toc[*ki].particle()); */
-	/* 	cout << "Matching " << triggerFilter_asym.at(l).c_str()<< endl; */
-	/* 	nMuHLT++; */
-	/*     } */
-	/*   } */
-	/* } */
+	}
+	if (name == triggerEleFilter.c_str()) { 
+	  HLTEleMatched.push_back(toc[*ki].particle());
+	  HLTEleMatchedNames.push_back(name); 
+	  cout << "Matching " << triggerEleFilter.c_str()  << endl; 
+	  nEleHLT++; 
+	}
       }
     }
   }
 
-  // Based on PAT processing
+  
+  // Based on processing
   edm::Handle<edm::View<reco::Muon> > MuCandidates;
-  iEvent.getByLabel(muonTag_, MuCandidates);
-  typedef std::vector< TriggerObjectStandAlone > TriggerObjectStandAloneCollection;
-  edm::Handle<edm::Association<TriggerObjectStandAloneCollection> > matches;
-  iEvent.getByLabel(triggerMatchObject, matches);
-  //edm::Handle<TriggerObjectStandAloneMatch> match;
-  //iEvent.getByLabel("muonTriggerMatchHLT", match);
-  // edm::Handle<TriggerObjectStandAloneCollection> pattrigger_;
-  // iEvent.getByLabel("patTrigger", pattrigger_);
+  iEvent.getByToken(muonTag_, MuCandidates);
+
   float maxDeltaR_=0.2;
   float maxDPtRel_=1.0;
-  int nMuHLTMatch=0,nMuHLTMatchPat=0,nMuHLTMatch_asym_Pat=0;
+  int nMuHLTMatch=0;
+  
   for (edm::View<reco::Muon>::const_iterator iCand = MuCandidates->begin(); iCand != MuCandidates->end(); ++iCand){
-    unsigned int i=iCand-MuCandidates->begin();
     cout << "Muon with pt= " << iCand->pt() << ": check trigger matching" << endl;
     if (IsMuMatchedToHLTMu(*iCand,  HLTMuMatched , HLTMuMatchedNames, maxDeltaR_, maxDPtRel_)==true){
       nMuHLTMatch++;
       cout << "Muon HLT Matched with pT= " << iCand->pt() << endl;
       RECOMU_PT_MuHLTMatch.push_back(iCand->pt());
-    }
-    edm::Ref<edm::View<reco::Muon> > muonRef(MuCandidates,i);
-    edm::Ref<std::vector<pat::TriggerObjectStandAlone> > pattriggerref = (*matches)[muonRef];
-    unsigned idx=1;
-    //bool pathLastFilterAccepted=true;
-    if (pattriggerref.isNonnull() && pattriggerref.isAvailable()){
-      //for (unsigned int j=0;j<pattriggerref->pathNames(pathLastFilterAccepted).size();j++){
-      //  cout << (pattriggerref->pathNames(pathLastFilterAccepted)).at(j).c_str() << endl;
-      //}
-      //for (unsigned int j=0;j<pattriggerref->filterLabels().size();j++){
-      //  cout << (pattriggerref->filterLabels()).at(j).c_str() << endl;
-      //}
-      //cout << "Muon HLT Matching PAT: ref= " << pattriggerref->hasPathName(std::string("HLT_DoubleMu3_v*"),idx) << " "
-      //   << pattriggerref->hasFilterLabel(std::string("hltDiMuonL3PreFiltered5")) << " "
-      //   << pattriggerref->hasCollection(std::string("hltL3MuonCandidates"))
-      //   << endl;
-      //if (pattriggerref->hasPathName(std::string("HLT_DoubleMu7_v*"),idx)==true ||
-      //  (pattriggerref->hasPathName(std::string("HLT_DoubleMu5_v*"),idx)==true  && pattriggerref->hasFilterLabel(std::string("hltDiMuonL3PreFiltered5"))==true)
-      //  ) {
-      if (pattriggerref->hasCollection(std::string(triggerHLTcollection.c_str()))==true &&
-	  ( (pattriggerref->hasPathName(std::string("HLT_Mu40_eta2p1_v*"),idx)==true  && pattriggerref->hasFilterLabel(std::string(triggerFilter.c_str()))==true))	  
-	  )
-	{
-	  cout << "Muon HLT Matched PAT" << endl;
-	  nMuHLTMatchPat++;
-	  RECOMU_PT_MuHLTMatchPAT.push_back(iCand->pt());
-	}
+      RECOMU_ETA_MuHLTMatch.push_back(iCand->eta());
+      RECOMU_PHI_MuHLTMatch.push_back(iCand->phi());
     }
   }
-  cout << "N. Muons HLT Matched= " << nMuHLTMatch << " and PAT= " << nMuHLTMatchPat << " FiredString:" << HLTPathsFired << endl;
+  cout << "N. Muons HLT Matched= " << nMuHLTMatch << " FiredString:" << HLTPathsFired << endl;
   RECO_nMuHLTMatch    = nMuHLTMatch;
-  RECO_nMuHLTMatchPAT = nMuHLTMatchPat;
-  // Double Mu asymmetric trigger
-  edm::Handle<edm::Association<TriggerObjectStandAloneCollection> > matches_asym;
-  iEvent.getByLabel(triggerMatchObject_asym, matches_asym);
-  for (edm::View<reco::Muon>::const_iterator iCand = MuCandidates->begin(); iCand != MuCandidates->end(); ++iCand){
-    unsigned int i=iCand-MuCandidates->begin();
-    cout << "Muon with pt= " << iCand->pt() << ": check trigger matching" << endl;
-    edm::Ref<edm::View<reco::Muon> > muonRef(MuCandidates,i);
-    edm::Ref<std::vector<pat::TriggerObjectStandAlone> > pattriggerref = (*matches_asym)[muonRef];
-    unsigned idx=1;
-    //bool pathLastFilterAccepted=true;
-    if (pattriggerref.isNonnull() && pattriggerref.isAvailable()){
-      if (pattriggerref->hasCollection(std::string(triggerHLTcollection.c_str()))==true &&
-	  ( 
-	   (pattriggerref->hasPathName(std::string("HLT_Mu9_v*"),idx)==true || pattriggerref->hasPathName(std::string("HLT_Mu15_v*"),idx)==true ||
-	    pattriggerref->hasPathName(std::string("HLT_Mu24_v*"),idx)==true || pattriggerref->hasPathName(std::string("HLT_Mu30_v*"),idx)==true || 
-	    pattriggerref->hasPathName(std::string("HLT_Mu40_eta2p1_v*"),idx)==true )
-	    )){
-	cout << "Muon HLT PAT with pT=" << iCand->pt() << endl;
-	nMuHLTMatch_asym_Pat++;
-	RECOMU_PT_MuHLTMatch_asym_PAT.push_back(iCand->pt());
-      }
-      else {
-	for(unsigned int l=0;l<triggerFilter_asym.size();l++){
-	  if (pattriggerref->hasCollection(std::string(triggerHLTcollection.c_str()))==true &&
-	      ( (pattriggerref->hasPathName(std::string("HLT_Mu9_v*"),idx)==true || pattriggerref->hasPathName(std::string("HLT_Mu15_v*"),idx)==true ||
-		 pattriggerref->hasPathName(std::string("HLT_Mu24_v*"),idx)==true || pattriggerref->hasPathName(std::string("HLT_Mu30_v*"),idx)==true || 
-		 pattriggerref->hasPathName(std::string("HLT_Mu40_v*"),idx)==true ) &&
-		pattriggerref->hasFilterLabel(std::string(triggerFilter_asym.at(l).c_str()))==true)
-	      )
-	    {
-	      cout << "Muon HLT Matched with HLT path and asymmetric PAT filter with pT= " << iCand->pt()<< endl;
-	      nMuHLTMatch_asym_Pat++;
-	      RECOMU_PT_MuHLTMatch_asym_PAT[i]=iCand->pt();
-	    }
-	}
-      }
-    }
-  }
-  cout << "N. Muons HLT asym Matched= " << nMuHLTMatch << " and asym PAT= " << nMuHLTMatch_asym_Pat << endl;
-  RECO_nMuHLTMatch    = nMuHLTMatch;
-  RECO_nMuHLTMatch_asym_PAT = nMuHLTMatch_asym_Pat;
+
   cout << "Start Trigger matching for electron" << endl;
-  int nEleHLTMatchPat=0;
+  int nEleHLTMatch=0;
   edm::Handle<edm::View<reco::GsfElectron> > EleCandidates;
-  iEvent.getByLabel(electronEgmTag_, EleCandidates);
-  typedef std::vector< TriggerObjectStandAlone > TriggerObjectStandAloneCollection;
-  edm::Handle<edm::Association<TriggerObjectStandAloneCollection> > matchesele;
-  iEvent.getByLabel(triggerMatchObjectEle, matchesele);
+  iEvent.getByToken(electronEgmTag_, EleCandidates);
+
   for (edm::View<reco::GsfElectron>::const_iterator iCand = EleCandidates->begin(); iCand != EleCandidates->end(); ++iCand){
-    unsigned int i=iCand-EleCandidates->begin();
     cout << "Electron with pt= " << iCand->pt() << ": check trigger matching" << endl;
-    edm::Ref<edm::View<reco::GsfElectron> > electronRef(EleCandidates,i);
-    edm::Ref<std::vector<pat::TriggerObjectStandAlone> > pattriggerref = (*matchesele)[electronRef];
-    unsigned idx=1;
-    // bool pathLastFilterAccepted=true;
-    if (pattriggerref.isNonnull() && pattriggerref.isAvailable()){
-      if (
-	  ( pattriggerref->hasPathName(std::string("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v*"),idx)==true
-	    ||
-	    pattriggerref->hasPathName(std::string("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v*"),idx)==true
-	    ||
-	    pattriggerref->hasPathName(std::string("HLT_Ele17_SW_TightCaloEleId_Ele8HE_L1R_v*"),idx)==true
-	    ))
-	{
-	  cout << "Electron HLT Matching PAT" << endl;
-	  nEleHLTMatchPat++;
-	  RECOELE_PT_EleHLTMatchPAT.push_back(iCand->pt());
-	}
+    if (IsEleMatchedToHLTEle(*iCand,  HLTEleMatched , HLTEleMatchedNames, maxDeltaR_, maxDPtRel_)==true){
+      cout << "Electron HLT Matched with pT= " << iCand->pt() << endl;
+      nEleHLTMatch++;
+      RECOELE_PT_EleHLTMatch.push_back(iCand->pt());
+      RECOELE_ETA_EleHLTMatch.push_back(iCand->eta());
+      RECOELE_PHI_EleHLTMatch.push_back(iCand->phi());
     }
   }
-  cout << "N. Electrons HLT Matched= " << nEleHLTMatchPat << endl;
-  RECO_nEleHLTMatchPAT = nEleHLTMatchPat;
+  
+  cout << "N. Electrons HLT Matched= " << nEleHLTMatch << endl;
+  RECO_nEleHLTMatch = nEleHLTMatch;
+
+  
 }
 
-//bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu(const reco::Muon &mu,std::vector<reco::Particle> HLTMu,std::vector<string> HLTMuNames,double DR,double DPtRel) 
 bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu ( const reco::Muon &mu, std::vector<reco::Particle> HLTMu , std::vector<string> HLTMuNames, double DR, double DPtRel ) {
   size_t dim =  HLTMu.size();
   size_t nPass=0;
@@ -2116,6 +1841,22 @@ bool HZZ4LeptonsRootTree::IsMuMatchedToHLTMu ( const reco::Muon &mu, std::vector
   }
   return (nPass>0);
 }
+
+bool HZZ4LeptonsRootTree::IsEleMatchedToHLTEle ( const reco::GsfElectron &ele, std::vector<reco::Particle> HLTEle , std::vector<string> HLTEleNames, double DR, double DPtRel ) {
+  size_t dim =  HLTEle.size();
+  size_t nPass=0;
+  if (dim==0) return false;
+  for (size_t k =0; k< dim; k++ ) {
+    //cout << "HLT ele filter is= " << HLTEleNames[k].c_str() << " Delta R= " << deltaR(HLTEle[k], ele) << " Delta pT= " << fabs(HLTEle[k].pt() - ele.pt())/ HLTEle[k].pt() << endl;
+    if (  (deltaR(HLTEle[k], ele) < DR)   && (fabs(HLTEle[k].pt() - ele.pt())/ HLTEle[k].pt()<DPtRel)){ 
+      cout << "HLT ele filter is= " << HLTEleNames[k].c_str() << " Delta R= " << deltaR(HLTEle[k], ele) << " Delta pT= " << fabs(HLTEle[k].pt() - ele.pt())/ HLTEle[k].pt() << endl;
+      nPass++ ;
+    }
+  }
+  return (nPass>0);
+}
+  
+
 //=============================================================
 //
 //            Method for Genrated Particles Tree
@@ -2155,16 +1896,10 @@ void HZZ4LeptonsRootTree::fillgenparticles(const edm::Event& iEvent, const edm::
   MC_ZZ_PHI.clear();
   MC_ZZ_THETA.clear();
   MC_ZZ_PDGID.clear();
-  // get the weight
-  //edm::Handle<GenEventInfoProduct> hEventInfo;
-  //iEvent.getByLabel("generator", hEventInfo);
-  //if (hEventInfo.isValid())
-  //  Weightgen=hEventInfo->weight();
-  //else 
-  //  Weightgen=1.;
+ 
   // get gen particle candidates 
   edm::Handle<reco::GenParticleCollection> genCandidates;           
-  iEvent.getByLabel("genParticles", genCandidates);
+  iEvent.getByToken(genParticles_, genCandidates);
   es.getData( pdt_ );
   vector<float> leptonpt,leptoneta,leptonphi,leptontheta,leptonpdgid;
   for ( GenParticleCollection::const_iterator mcIter=genCandidates->begin(); mcIter!=genCandidates->end(); ++mcIter ) {
@@ -2298,9 +2033,8 @@ void HZZ4LeptonsRootTree::fillgenparticles(const edm::Event& iEvent, const edm::
   i=0; 
   //j=0;
   edm::Handle<edm::View<Candidate> >  fourlCandidates;
-  iEvent.getByLabel("fourgenleptons", fourlCandidates);
+  iEvent.getByToken(fourgenleptons_, fourlCandidates);
   for (edm::View<Candidate>::const_iterator mcIter=fourlCandidates->begin(); mcIter!=fourlCandidates->end(); ++mcIter ) {
-    if (i>49 ) continue;
     cout << " MC 4l Mass= " << mcIter->mass()
 	 << " Charge= " 
 	 << mcIter->daughter(0)->daughter(0)->charge() << " " 
@@ -2343,7 +2077,7 @@ void HZZ4LeptonsRootTree::fillgenparticles(const edm::Event& iEvent, const edm::
   ii=0;
   l=0;
   edm::Handle<edm::View<Candidate> >  ZZCandidates;
-  iEvent.getByLabel("digenZ", ZZCandidates);
+  iEvent.getByToken(digenZ_, ZZCandidates);
   for (edm::View<Candidate>::const_iterator mcIterZZ=ZZCandidates->begin(); mcIterZZ!=ZZCandidates->end(); ++mcIterZZ ) {
     if (i>3 ) continue;
     cout << "MC ZZ Mass= " << mcIterZZ->p4().mass() 
@@ -2385,9 +2119,8 @@ void HZZ4LeptonsRootTree::fillgenparticles(const edm::Event& iEvent, const edm::
 // MC Higgs 
 void HZZ4LeptonsRootTree::fillmc(const edm::Event& iEvent)
 {
-  cout << "MC collection name= " << MCcollName<< endl;
   edm::Handle<edm::View<Candidate> > Candidates;
-  iEvent.getByLabel(MCcollName, Candidates);
+  iEvent.getByToken(MCcollName, Candidates);
   for( edm::View<Candidate>::const_iterator cand = Candidates->begin();cand != Candidates->end(); ++ cand ) { 
     cout << "Filling MC variables" << endl;
     const reco::Candidate& theParticle = (*cand);
@@ -2492,23 +2225,6 @@ void HZZ4LeptonsRootTree::fillRho(const edm::Event& evt){
   //float RhoIsoValue = *rhoHandle;
   double RhoIsoValue = *(rhoHandle.product());
   Rho2.push_back(RhoIsoValue);
-}
-*/
-//=============================================================
-//
-//          madgraph MC samples reweighing       
-//
-//=============================================================
-/*
-void HZZ4LeptonsRootTree::EventsReWeighting(const edm::Event& evt){
-  MC_weighting.clear();
-  float EventWeight = 1.0;
-  edm::Handle<GenEventInfoProduct> gen_ev_info;
-  evt.getByLabel(genEventInfo_, gen_ev_info);
-  if(!gen_ev_info.isValid()) return;
-  EventWeight = gen_ev_info->weight();
-  float mc_weight = ( EventWeight > 0 ) ? 1 : -1;
-  MC_weighting.push_back(mc_weight);
 }
 */
 //=============================================================
@@ -2646,83 +2362,74 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
   iSetup.get<IdealMagneticFieldRecord>().get( magfield_ );        
   // Muons
   edm::Handle<edm::View<reco::Muon> > MuCandidates;
-  iEvent.getByLabel(muonTag_, MuCandidates);
-  // rho for isolation
-  /*edm::Handle<double> rhoIso_h;
-  iEvent.getByLabel(rhoIsoInputTag, rhoIso_h);
-  float rhoIso = *(rhoIso_h.product());
-  std::cout<<"rhoIso = "<< rhoIso <<std::endl;*/
+  iEvent.getByToken(muonTag_, MuCandidates);
+ 
   // Vertexing
   // 3D
   edm::Handle<edm::View<reco::Muon> > VertMuCandidates;
   iEvent.getByLabel(muonTag_Vert, VertMuCandidates);
   // 3D w.r.t primary vertex DA
   edm::Handle<edm::ValueMap<float> > vertexmumap;
-  iEvent.getByLabel(muonMapTag_Vert, vertexmumap);
+  iEvent.getByToken(muonMapTag_Vert, vertexmumap);
   
   edm::Handle<edm::ValueMap<float> > vertexmumapvalue;
-  iEvent.getByLabel(muonMapTag_VertValue, vertexmumapvalue);
+  iEvent.getByToken(muonMapTag_VertValue, vertexmumapvalue);
   
   edm::Handle<edm::ValueMap<float> > vertexmumaperror;
-  iEvent.getByLabel(muonMapTag_VertError, vertexmumaperror);
+  iEvent.getByToken(muonMapTag_VertError, vertexmumaperror);
   
   // 3D w.r.t primary vertex KF
   edm::Handle<edm::ValueMap<float> > vertexmumapKF;
-  iEvent.getByLabel(muonMapTag_VertKF, vertexmumapKF);
+  iEvent.getByToken(muonMapTag_VertKF, vertexmumapKF);
   
   edm::Handle<edm::ValueMap<float> > vertexmumapvalueKF;
-  iEvent.getByLabel(muonMapTag_VertValueKF, vertexmumapvalueKF);
+  iEvent.getByToken(muonMapTag_VertValueKF, vertexmumapvalueKF);
   
   edm::Handle<edm::ValueMap<float> > vertexmumaperrorKF;
-  iEvent.getByLabel(muonMapTag_VertErrorKF, vertexmumaperrorKF);
+  iEvent.getByToken(muonMapTag_VertErrorKF, vertexmumaperrorKF);
+  
   // Particle Flow Isolation
   edm::Handle<edm::ValueMap<double> > isoPFChargedAllmumap;
-  iEvent.getByLabel(muonPFIsoValueChargedAllTag_, isoPFChargedAllmumap);
+  iEvent.getByToken(muonPFIsoValueChargedAllTag_, isoPFChargedAllmumap);
   
   edm::Handle<edm::ValueMap<double> > isoPFChargedmumap;
-  iEvent.getByLabel(muonPFIsoValueChargedTag_, isoPFChargedmumap);
+  iEvent.getByToken(muonPFIsoValueChargedTag_, isoPFChargedmumap);
   
   edm::Handle<edm::ValueMap<double> > isoPFNeutralmumap;
-  iEvent.getByLabel(muonPFIsoValueNeutralTag_, isoPFNeutralmumap);
+  iEvent.getByToken(muonPFIsoValueNeutralTag_, isoPFNeutralmumap);
   
   edm::Handle<edm::ValueMap<double> > isoPFGammamumap;
-  iEvent.getByLabel(muonPFIsoValueGammaTag_, isoPFGammamumap);
+  iEvent.getByToken(muonPFIsoValueGammaTag_, isoPFGammamumap);
   
   edm::Handle<edm::ValueMap<double> > isoPFPUmumap;
-  iEvent.getByLabel(muonPFIsoValuePUTag_, isoPFPUmumap);
+  iEvent.getByToken(muonPFIsoValuePUTag_, isoPFPUmumap);
   
   // STIP SLIP
   edm::Handle<edm::ValueMap<float> > stipmumap;
-  iEvent.getByLabel(muonSTIPMapTag_Vert, stipmumap);
+  iEvent.getByToken(muonSTIPMapTag_Vert, stipmumap);
   
   edm::Handle<edm::ValueMap<float> > slipmumap;
-  iEvent.getByLabel(muonSLIPMapTag_Vert, slipmumap);
+  iEvent.getByToken(muonSLIPMapTag_Vert, slipmumap);
   
   edm::Handle<edm::ValueMap<float> > stipmumapvalue;
-  iEvent.getByLabel(muonSTIPMapTag_VertValue, stipmumapvalue);
+  iEvent.getByToken(muonSTIPMapTag_VertValue, stipmumapvalue);
   
   edm::Handle<edm::ValueMap<float> > slipmumapvalue;
-  iEvent.getByLabel(muonSLIPMapTag_VertValue, slipmumapvalue);
+  iEvent.getByToken(muonSLIPMapTag_VertValue, slipmumapvalue);
   
   edm::Handle<edm::ValueMap<float> > stipmumaperror;
-  iEvent.getByLabel(muonSTIPMapTag_VertError, stipmumaperror);
+  iEvent.getByToken(muonSTIPMapTag_VertError, stipmumaperror);
   
   edm::Handle<edm::ValueMap<float> > slipmumaperror;
-  iEvent.getByLabel(muonSLIPMapTag_VertError, slipmumaperror);
+  iEvent.getByToken(muonSLIPMapTag_VertError, slipmumaperror);
   
-  // beam spot
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle ;
-  iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),recoBeamSpotHandle) ;
-  const reco::BeamSpot bs = *recoBeamSpotHandle ;
   // primary vertex
-  edm::Handle<VertexCollection> recoPVCollection;
-  iEvent.getByLabel(verticesTag_, recoPVCollection);
   Vertex primVertex;
   math::XYZPoint pVertex(0., 0., 0.);
-  bool pvfound = (recoPVCollection->size() != 0);
+  bool pvfound = (PV.size() != 0);
   cout << "pvfound=" << pvfound << endl;
   if(pvfound){
-    primVertex = recoPVCollection->front();
+    primVertex = PV.front();
     pVertex = math::XYZPoint(primVertex.position().x(), primVertex.position().y(), primVertex.position().z());
     //cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
     /* primVertex.position().x() << " " << */
@@ -2735,9 +2442,9 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
 
   // Matching
   edm::Handle<edm::Association<vector<reco::GenParticle> > > GenParticlesMatchMu;
-  iEvent.getByLabel("goodMuonMCMatch", GenParticlesMatchMu);
+  iEvent.getByToken(goodMuonMCMatch_, GenParticlesMatchMu);
   edm::Handle<reco::CandidateCollection > CollMu;
-  iEvent.getByLabel("myMuons", CollMu);
+  iEvent.getByToken(myMuons_, CollMu);
   if (GenParticlesMatchMu.isValid()){
     cout << endl<< "Muons:"<<endl<<"The reco collection to be matched has size= " <<  CollMu->size() << endl;
     cout << "The matched map collection has size= " <<  GenParticlesMatchMu->size() << endl;
@@ -2746,14 +2453,13 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
   int indexbis=0;
   cout<<"SIZE MuCandidates :"<<MuCandidates->size()<<endl; 
   RECO_NMU=MuCandidates->size();
+  
   for (edm::View<reco::Muon>::const_iterator cand = MuCandidates->begin();
        cand != MuCandidates->end(); ++cand) {
-    // if (cand->globalTrack().isNull()) continue;
-    // if (cand->track().isNull()) continue;
-    //RECO_NMU.push_back(indexbis);
+
     edm::Ref<edm::View<reco::Muon> > mutrackref(MuCandidates,indexbis);
     edm::Ref<edm::View<reco::Muon> > mutrackrefv(VertMuCandidates,indexbis); 
-    //coding as Nicola
+
     RECOMU_isPFMu.push_back(cand->isPFMuon());
     cout<<"RECOMU_isPFmu SIZE: "<<RECOMU_isPFMu.size()<<endl;
     RECOMU_isGlobalMu.push_back(cand->isGlobalMuon());
@@ -3179,32 +2885,11 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   edm::Handle<reco::SuperClusterCollection> clusters;
   iEvent.getByLabel(clusterCollectionTag_,clusters);
   
-  // GsfTracks
-  edm::Handle<reco::GsfTrackCollection> gsfTracks;
-  iEvent.getByLabel(gsftrackCollection_,gsfTracks);
-  
-  // Electrons
-  /*  edm::Handle<edm::View<reco::GsfElectron> > EleCandidates; */
-  /*     iEvent.getByLabel(electronTag_, EleCandidates); */
-  
-  /*     // Isolation */
-  /*     edm::Handle<edm::ValueMap<float> > isoTkelemap; */
-  /*     iEvent.getByLabel(electronTkMapTag_, isoTkelemap); */
-  
-  /*     edm::Handle<edm::ValueMap<float> > isoEcalelemap; */
-  /*     iEvent.getByLabel(electronEcalMapTag_, isoEcalelemap); */
-  
-  /*     edm::Handle<edm::ValueMap<float> > isoHcalelemap; */
-  /*     iEvent.getByLabel(electronHcalMapTag_, isoHcalelemap); */
-  
-  /*     edm::Handle<edm::ValueMap<float> > isoelemap; */
-  /*     iEvent.getByLabel(electronMapTag_, isoelemap); */
-  
   // EG isolation
   //edm::Handle<reco::GsfElectronRefVector> EleRefs;
   //iEvent.getByLabel(electronEgmTag_, EleRefs);
   edm::Handle<edm::View<reco::GsfElectron> > EleRefs;
-  iEvent.getByLabel(electronEgmTag_, EleRefs);
+  iEvent.getByToken(electronEgmTag_, EleRefs);
   
   //    edm::Handle<edm::ValueMap<double> > egmisoTkelemap;
   //iEvent.getByLabel(electronEgmTkMapTag_, egmisoTkelemap);
@@ -3215,41 +2900,27 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   //edm::Handle<edm::ValueMap<double> > egmisoHcalelemap;
   //iEvent.getByLabel(electronEgmHcalMapTag_, egmisoHcalelemap);
   
-  //Electron ID CiC
-  /* std::vector<edm::Handle<edm::ValueMap<float> > > eleIdCutHandles(4) ; */
-  /*     iEvent.getByLabel  (EleID_VeryLooseTag_ , eleIdCutHandles[0]) ; */
-  /*     iEvent.getByLabel  (EleID_LooseTag_ , eleIdCutHandles[1]) ; */
-  /*     iEvent.getByLabel  (EleID_MediumTag_ , eleIdCutHandles[2]) ; */
-  /*     iEvent.getByLabel  (EleID_TightTag_ , eleIdCutHandles[3]) ; */
-  
-  /*     //Electron ID HZZ CiC */
-  /*     std::vector<edm::Handle<edm::ValueMap<float> > > eleIdHZZCutHandles(4) ; */
-  /*     iEvent.getByLabel  (EleID_HZZVeryLooseTag_ , eleIdHZZCutHandles[0]) ; */
-  /*     iEvent.getByLabel  (EleID_HZZLooseTag_ , eleIdHZZCutHandles[1]) ; */
-  /*     iEvent.getByLabel  (EleID_HZZMediumTag_ , eleIdHZZCutHandles[2]) ; */
-  /*     iEvent.getByLabel  (EleID_HZZTightTag_ , eleIdHZZCutHandles[3]) ; */
-  
   //Electron ID MVA Trig and Non Trig
   edm::Handle<edm::ValueMap<float> >  mvaTrigV0map;
-  iEvent.getByLabel(mvaTrigV0MapTag_, mvaTrigV0map);
+  iEvent.getByToken(mvaTrigV0MapTag_, mvaTrigV0map);
   edm::Handle<edm::ValueMap<float> >  mvaNonTrigV0map;
-  iEvent.getByLabel(mvaNonTrigV0MapTag_, mvaNonTrigV0map);
+  iEvent.getByToken(mvaNonTrigV0MapTag_, mvaNonTrigV0map);
   
   // Particle Flow Isolation
   edm::Handle<edm::ValueMap<double> > isoPFChargedAllelemap;
-  iEvent.getByLabel(electronPFIsoValueChargedAllTag_, isoPFChargedAllelemap);
+  iEvent.getByToken(electronPFIsoValueChargedAllTag_, isoPFChargedAllelemap);
   
   edm::Handle<edm::ValueMap<double> > isoPFChargedelemap;
-  iEvent.getByLabel(electronPFIsoValueChargedTag_, isoPFChargedelemap);
+  iEvent.getByToken(electronPFIsoValueChargedTag_, isoPFChargedelemap);
   
   edm::Handle<edm::ValueMap<double> > isoPFNeutralelemap;
-  iEvent.getByLabel(electronPFIsoValueNeutralTag_, isoPFNeutralelemap);
+  iEvent.getByToken(electronPFIsoValueNeutralTag_, isoPFNeutralelemap);
   
   edm::Handle<edm::ValueMap<double> > isoPFGammaelemap;
-  iEvent.getByLabel(electronPFIsoValueGammaTag_, isoPFGammaelemap);
+  iEvent.getByToken(electronPFIsoValueGammaTag_, isoPFGammaelemap);
   
   edm::Handle<edm::ValueMap<double> > isoPFPUelemap;
-  iEvent.getByLabel(electronPFIsoValuePUTag_, isoPFPUelemap);
+  iEvent.getByToken(electronPFIsoValuePUTag_, isoPFPUelemap);
   
   // electron regression
   //edm::Handle<edm::ValueMap<double> > eleRegressionEnergymap;
@@ -3264,83 +2935,59 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   iEvent.getByLabel(electronTag_Vert, VertEleCandidates);
   
   edm::Handle<edm::ValueMap<float> > vertexelemap;
-  iEvent.getByLabel(electronMapTag_Vert, vertexelemap);
+  iEvent.getByToken(electronMapTag_Vert, vertexelemap);
   
   edm::Handle<edm::ValueMap<float> > vertexelemapvalue;
-  iEvent.getByLabel(electronMapTag_VertValue, vertexelemapvalue);
+  iEvent.getByToken(electronMapTag_VertValue, vertexelemapvalue);
   
   edm::Handle<edm::ValueMap<float> > vertexelemaperror;
-  iEvent.getByLabel(electronMapTag_VertError, vertexelemaperror);
+  iEvent.getByToken(electronMapTag_VertError, vertexelemaperror);
   
   // 3D KF
   edm::Handle<edm::ValueMap<float> > vertexelemapKF;
-  iEvent.getByLabel(electronMapTag_VertKF, vertexelemapKF);
+  iEvent.getByToken(electronMapTag_VertKF, vertexelemapKF);
   
   edm::Handle<edm::ValueMap<float> > vertexelemapvalueKF;
-  iEvent.getByLabel(electronMapTag_VertValueKF, vertexelemapvalueKF);
+  iEvent.getByToken(electronMapTag_VertValueKF, vertexelemapvalueKF);
   
   edm::Handle<edm::ValueMap<float> > vertexelemaperrorKF;
-  iEvent.getByLabel(electronMapTag_VertErrorKF, vertexelemaperrorKF);
+  iEvent.getByToken(electronMapTag_VertErrorKF, vertexelemaperrorKF);
   
-  
-  // 3D w.r.t GD 2e2mu vertex
-  edm::Handle<edm::ValueMap<float> > vertexelemapGD;
-  iEvent.getByLabel(electronMapTag_VertGD, vertexelemapGD);
-  // 3D w.r.t GD 4mu vertex 
-  edm::Handle<edm::ValueMap<float> > vertexelemapGDEEEE;
-  iEvent.getByLabel(electronMapTag_VertGDEEEE, vertexelemapGDEEEE);
-  //    // 3D w.r.t std 2e2mu vertex
-  // edm::Handle<edm::ValueMap<float> > vertexelemapStd;
-  //iEvent.getByLabel(electronMapTag_VertStd, vertexelemapStd);
-  //// 3D w.r.t Std 4mu vertex
-  //edm::Handle<edm::ValueMap<float> > vertexelemapStdEEEE;
-  //iEvent.getByLabel(electronMapTag_VertStdEEEE, vertexelemapStdEEEE);
-  //// 3D w.r.t std 2e2mu vertex
-  //edm::Handle<edm::ValueMap<float> > vertexelemapKin;
-  //iEvent.getByLabel(electronMapTag_VertKin, vertexelemapKin);
-  // // 3D w.r.t Kin 4mu vertex
-  //edm::Handle<edm::ValueMap<float> > vertexelemapKinEEEE;
-  //iEvent.getByLabel(electronMapTag_VertKinEEEE, vertexelemapKinEEEE);
+
+ 
   // STIP SLIP
   edm::Handle<edm::ValueMap<float> > stipelemap;
-  iEvent.getByLabel(electronSTIPMapTag_Vert, stipelemap);
+  iEvent.getByToken(electronSTIPMapTag_Vert, stipelemap);
   
   edm::Handle<edm::ValueMap<float> > slipelemap;
-  iEvent.getByLabel(electronSLIPMapTag_Vert, slipelemap);
+  iEvent.getByToken(electronSLIPMapTag_Vert, slipelemap);
   
   edm::Handle<edm::ValueMap<float> > stipelemapvalue;
-  iEvent.getByLabel(electronSTIPMapTag_VertValue, stipelemapvalue);
+  iEvent.getByToken(electronSTIPMapTag_VertValue, stipelemapvalue);
   
   edm::Handle<edm::ValueMap<float> > slipelemapvalue;
-  iEvent.getByLabel(electronSLIPMapTag_VertValue, slipelemapvalue);
+  iEvent.getByToken(electronSLIPMapTag_VertValue, slipelemapvalue);
   
   edm::Handle<edm::ValueMap<float> > stipelemaperror;
-  iEvent.getByLabel(electronSTIPMapTag_VertError, stipelemaperror);
+  iEvent.getByToken(electronSTIPMapTag_VertError, stipelemaperror);
   
   edm::Handle<edm::ValueMap<float> > slipelemaperror;
-  iEvent.getByLabel(electronSLIPMapTag_VertError, slipelemaperror);		
+  iEvent.getByToken(electronSLIPMapTag_VertError, slipelemaperror);		
   
   // Conversion Finder
   edm::Handle<edm::ValueMap<float> > conversiondistmap;
-  iEvent.getByLabel(ConvMapDistTag_, conversiondistmap);
+  iEvent.getByToken(ConvMapDistTag_, conversiondistmap);
   
   edm::Handle<edm::ValueMap<float> > conversiondcotmap;
-  iEvent.getByLabel(ConvMapDcotTag_, conversiondcotmap);
-  
-  // beam spot
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle ;
-  iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),recoBeamSpotHandle) ;
-  const reco::BeamSpot bs = *recoBeamSpotHandle ;
+  iEvent.getByToken(ConvMapDcotTag_, conversiondcotmap);
   
   // primary vertex
-  edm::Handle<VertexCollection> recoPVCollection;
-  iEvent.getByLabel(verticesTag_, recoPVCollection);
   Vertex primVertex;
   math::XYZPoint pVertex(0., 0., 0.);
-  bool pvfound = (recoPVCollection->size() != 0);
+  bool pvfound = (PV.size() != 0);
   cout << "pvfound=" << pvfound << endl;
   if(pvfound){
-    primVertex = recoPVCollection->front();
+    primVertex = PV.front();
     pVertex = math::XYZPoint(primVertex.position().x(), primVertex.position().y(), primVertex.position().z());
     cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
       /* primVertex.position().x() << " " << */
@@ -3351,45 +2998,14 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
       pVertex.z() << endl;
   }
   
-  //ECAL Reduced RecHit Input Tag
-  edm::Handle< EcalRecHitCollection > reducedEBRecHits;
-  edm::Handle< EcalRecHitCollection > reducedEERecHits;
   
-  string EcalRecHitsEB="";
-  string EcalRecHitsEE="";
-  
-  if (useRECOformat) {
-    EcalRecHitsEB="EcalRecHitsEB";
-    EcalRecHitsEE="EcalRecHitsEE";
-  }
-  else {
-    EcalRecHitsEB="reducedEcalRecHitsEB";
-    EcalRecHitsEE="reducedEcalRecHitsEE";
-  }
-  
-  iEvent.getByLabel( edm::InputTag(EcalRecHitsEB.c_str()), reducedEBRecHits );
-  iEvent.getByLabel( edm::InputTag(EcalRecHitsEE.c_str()), reducedEERecHits );
-  
-  //calo topology
-  //const CaloTopology * topology ;
-  //const EcalChannelStatus *chStatus ;
-  unsigned long long cacheIDTopo_=0;
-  edm::ESHandle<CaloTopology> theCaloTopo;
-  if (cacheIDTopo_!=iSetup.get<CaloTopologyRecord>().cacheIdentifier()){
-    cacheIDTopo_=iSetup.get<CaloTopologyRecord>().cacheIdentifier();
-    iSetup.get<CaloTopologyRecord>().get(theCaloTopo);
-  }
-  //topology = theCaloTopo.product() ;
-  edm::ESHandle<EcalChannelStatus> pChannelStatus;
-  iSetup.get<EcalChannelStatusRcd>().get(pChannelStatus);
-  //    chStatus = pChannelStatus.product();
   int index=0;
   RECO_NELE=EleRefs->size();
   // Matching
   edm::Handle<edm::Association<vector<reco::GenParticle> > > GenParticlesMatchEle;
-  iEvent.getByLabel("goodElectronMCMatch", GenParticlesMatchEle);
+  iEvent.getByToken(goodElectronMCMatch_, GenParticlesMatchEle);
   edm::Handle<reco::CandidateCollection > CollEle;
-  iEvent.getByLabel("myElectrons", CollEle);
+  iEvent.getByToken(myElectrons_, CollEle);
   if (GenParticlesMatchEle.isValid()){
     cout << endl<< "Electrons:"<<endl<<"The reco collection to be matched has size= " <<  CollEle->size() << endl;
     cout << "The matched map collection has size= " <<  GenParticlesMatchEle->size() << endl;
@@ -3397,8 +3013,6 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   //
   for (edm::View<reco::GsfElectron>::const_iterator cand = EleRefs->begin(); 
        cand != EleRefs->end(); ++cand) {
-    if(index>99) break;
-    //RECO_NELE.push_back(index);
     edm::Ref<edm::View<reco::GsfElectron> > eletrackref(EleRefs,index);
     edm::Ref<edm::View<reco::GsfElectron> > eletrackrefv(VertEleCandidates,index);
     // Global variables
@@ -3666,46 +3280,9 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
       if(fabs(MyS->dRz1()) < 100.)  ele_seedDrz1.push_back(double(MyS->dRz1()));
     }
     
- 
-
-    // CiC electron IDs
-    /*  ele_eidVeryLoose[index] = (*(eleIdCutHandles[0]))[eletrackref];  */
-    /*       ele_eidLoose[index] = (*(eleIdCutHandles[1]))[eletrackref];  */
-    /*       ele_eidMedium[index] = (*(eleIdCutHandles[2]))[eletrackref];  */
-    /*       ele_eidTight[index] = (*(eleIdCutHandles[3]))[eletrackref];  */
-    
-    /*       std::cout << "CiC eleID flag (veryloose,loose,medium,tight) = " */
-    /* 		<< ele_eidVeryLoose[index] << " "  */
-    /* 		<< ele_eidLoose[index]     << " "  */
-    /* 		<< ele_eidMedium[index]    << " "  */
-    /* 		<< ele_eidTight[index]     << " "  */
-    /* 		<< std::endl;  */
-    
-
-    /*       // CiC HZZ eleID */
-    /*       ele_eidHZZVeryLoose[index] = (*(eleIdHZZCutHandles[0]))[eletrackref];  */
-    /*       ele_eidHZZLoose[index] = (*(eleIdHZZCutHandles[1]))[eletrackref];  */
-    /*       ele_eidHZZMedium[index] = (*(eleIdHZZCutHandles[2]))[eletrackref];  */
-    /*       ele_eidHZZTight[index] = (*(eleIdHZZCutHandles[3]))[eletrackref];  */
-    
-    /*       std::cout << "CiC HZZ eleID flag (veryloose,loose,medium,tight) = " */
-    /* 		<< ele_eidHZZVeryLoose[index] << " "  */
-    /* 		<< ele_eidHZZLoose[index]     << " "  */
-    /* 		<< ele_eidHZZMedium[index]    << " "  */
-    /* 		<< ele_eidHZZTight[index]     << " "  */
-    /* 		<< std::endl; */
-    
-    /*       // Electron ID MVA */
-    /*       RECOELE_mvaTrigV0.push_back((*mvaTrigV0map)[eletrackref]; */
-    /*       RECOELE_mvaNonTrigV0.push_back((*mvaNonTrigV0map)[eletrackref]; */
-    
-    /*       std::cout << "BDT MVA eleID flag = " */
-    /* 	<< RECOELE_mvaTrigV0[index] << " " */
-    /* 	<< RECOELE_mvaNonTrigV0[index] << " " */
-    /* 	<< std::endl; */
-    
+    //
     edm::Handle<edm::View<reco::GsfElectron> > elecoll;
-    iEvent.getByLabel("gedGsfElectrons", elecoll);
+    iEvent.getByToken(mvaElectronTag_, elecoll);
     int indextris=0;
     for (edm::View<reco::GsfElectron>::const_iterator candid = elecoll->begin(); candid!=elecoll->end(); ++candid) {
       edm::Ref<edm::View<reco::GsfElectron> > eletrackrefa(elecoll,indextris);
@@ -3923,7 +3500,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
     iEvent.getByLabel(RECOcollNameZ.at(i), CandidatesZ); 
     int kk=0;
     for( edm::View<Candidate>::const_iterator cand = CandidatesZ->begin();cand != CandidatesZ->end(); ++ cand ) { 
-      if (kk>49) continue;
       if (i==0) RECO_ZMM_MASS.push_back(cand->p4().mass());
       if (i==0) RECO_ZMM_PT.push_back(cand->p4().pt());
       if (i==0) RECO_ZMM_ETA.push_back(cand->p4().eta());
@@ -3986,7 +3562,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
     iEvent.getByLabel(RECOcollNameZss.at(i), CandidatesZss); 
     int kk=0;
     for( edm::View<Candidate>::const_iterator cand = CandidatesZss->begin();cand != CandidatesZss->end(); ++ cand ) { 
-      if (kk>49) continue;
       if (i==0)  RECO_ZMMss_MASS.push_back(cand->p4().mass());
       if (i==0)  RECO_ZMMss_PT.push_back(cand->p4().pt());
       if (i==0)  RECO_ZMMss_ETA.push_back(cand->p4().eta());
@@ -4033,7 +3608,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
   iEvent.getByLabel(RECOcollNameDiLep, CandidatesDiLep); 
   int kkk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesDiLep->begin();cand != CandidatesDiLep->end(); ++ cand ) { 
-    if (kkk>49) continue;
     RECO_DiLep_MASS.push_back(cand->p4().mass());
     RECO_DiLep_PT.push_back(cand->p4().pt());
     RECO_DiLep_ETA.push_back(cand->p4().eta());
@@ -4060,7 +3634,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
   }
   int kk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesMMMM->begin();cand != CandidatesMMMM->end(); ++ cand ) { 
-    if (kk>99) break;
     RECO_MMMM_MASS.push_back(cand->p4().mass());
     RECO_MMMM_PT.push_back(cand->p4().pt());
     RECO_MMMM_ETA.push_back(cand->p4().eta());
@@ -4110,7 +3683,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
   }
   kk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesEEEE->begin();cand != CandidatesEEEE->end(); ++ cand ) {
-    if (kk>99) break;
     RECO_EEEE_MASS.push_back(cand->p4().mass());
     RECO_EEEE_PT.push_back(cand->p4().pt());
     RECO_EEEE_ETA.push_back(cand->p4().eta());
@@ -4160,7 +3732,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
   }
   kk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesEEMM->begin();cand != CandidatesEEMM->end(); ++ cand ) {
-    if (kk>99) break;
     RECO_EEMM_MASS.push_back(cand->p4().mass());
     RECO_EEMM_PT.push_back(cand->p4().pt());
     RECO_EEMM_ETA.push_back(cand->p4().eta());
@@ -4208,7 +3779,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
     iEvent.getByLabel(RECOcollNameLLL.at(i), CandidatesLLL); 
     int k=0;
     for( edm::View<Candidate>::const_iterator cand = CandidatesLLL->begin();cand != CandidatesLLL->end(); ++ cand ) { 
-      if (k>49) break;
       if (i==0) RECO_LLL0_MASS.push_back(cand->p4().mass());
       if (i==0) RECO_LLL0_PT.push_back(cand->p4().pt());
       if (i==1) RECO_LLL1_MASS.push_back(cand->p4().mass());
@@ -4248,7 +3818,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
     iEvent.getByLabel(RECOcollNameLLLLss.at(i), CandidatesLLLLss);
     int kk=0;
     for( edm::View<Candidate>::const_iterator cand = CandidatesLLLLss->begin();cand != CandidatesLLLLss->end(); ++ cand ) { 
-      if (kk>49) break;
       if (i==0) RECO_LLLL0ss_MASS.push_back(cand->p4().mass());
       if (i==0) RECO_LLLL0ss_PT.push_back(cand->p4().pt());
       if (i==1) RECO_LLLL1ss_MASS.push_back(cand->p4().mass());
@@ -4286,7 +3855,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
     iEvent.getByLabel(RECOcollNameLLLl.at(i), CandidatesLLLl);  
     int kk=0;
     for( edm::View<Candidate>::const_iterator cand = CandidatesLLLl->begin();cand != CandidatesLLLl->end(); ++ cand ) { 
-      if (kk>49) continue;
       if (i==0) RECO_LLLl0_MASS.push_back(cand->p4().mass());
       if (i==0) RECO_LLLl0_PT.push_back(cand->p4().pt());
       if (i==1) RECO_LLLl1_MASS.push_back(cand->p4().mass());
@@ -4325,7 +3893,6 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
   iEvent.getByLabel(RECOcollNameLLLL, CandidatesLLLL);
   kk=0;    
   for( edm::View<Candidate>::const_iterator cand = CandidatesLLLL->begin();cand != CandidatesLLLL->end(); ++ cand ) {
-    if (kk>99) break;
     cout << "4lepton (any flavour and charge) candidate of type=" << RECOcollNameLLLL.label() << " of mass=" << cand->p4().mass() << " and pt=" << cand->p4().pt() <<endl;
     
     RECO_LLLL_MASS.push_back(cand->p4().mass());
@@ -4354,114 +3921,7 @@ void HZZ4LeptonsRootTree::fillAdditionalRECO(const edm::Event& iEvent)
   }
 }
 
-void HZZ4LeptonsRootTree::fillBeamSpot(const edm::Event& iEvent)
-{
-  // Beamspot 
-  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  iEvent.getByLabel(edm::InputTag("offlineBeamSpot"),recoBeamSpotHandle) ;
-  const BeamSpot bs = *recoBeamSpotHandle;
-  BeamSpot_X=bs.position().x();
-  BeamSpot_Y=bs.position().y();
-  BeamSpot_Z=bs.position().z();
 
-  cout << "BeamSpot:"
-    << "  bs_X=" << BeamSpot_X
-    << "  bs_Y=" << BeamSpot_Y
-    << "  bs_Z=" << BeamSpot_Z
-    << endl;
-}
-
-void HZZ4LeptonsRootTree::fillIsolationByRings(const edm::Event& iEvent,const edm::EventSetup& iSetup)
-{
-  edm::Handle<reco::VertexCollection> hVertex;
-  iEvent.getByLabel(verticesTag_, hVertex);
-  const reco::VertexCollection *pvCol = hVertex.product();
-  edm::Handle<reco::MuonCollection> MuCandidates;
-  iEvent.getByLabel(muonTag_, MuCandidates);
-  reco::MuonCollection IdentifiedMuons;
-  for (reco::MuonCollection::const_iterator iM = MuCandidates->begin(); 
-       iM != MuCandidates->end(); ++iM) {
-    if(!(iM->innerTrack().isNonnull())) {
-      continue;
-    } 
-    if(!(iM->isGlobalMuon() || iM->isTrackerMuon())) continue;
-    if(iM->innerTrack()->numberOfValidHits() < 11 ) continue;
-    IdentifiedMuons.push_back(*iM);
-  }
-  edm::Handle<reco::GsfElectronCollection> EleRefs;
-  iEvent.getByLabel(electronEgmTag_, EleRefs);
-  reco::GsfElectronCollection IdentifiedElectrons;
-  for (reco::GsfElectronCollection::const_iterator iE = EleRefs->begin(); 
-       iE != EleRefs->end(); ++iE) {
-    double electronTrackZ = 0;
-    if (iE->gsfTrack().isNonnull()) {
-      electronTrackZ = iE->gsfTrack()->dz(pvCol->at(0).position());
-    } else if (iE->closestCtfTrackRef().isNonnull()) {
-      electronTrackZ = iE->closestCtfTrackRef()->dz(pvCol->at(0).position());
-    }    
-    if(fabs(electronTrackZ) > 0.2)  continue;
-    if(fabs(iE->superCluster()->eta())<1.479) {     
-      if(iE->pt() > 20) {
-        if(iE->sigmaIetaIeta()       > 0.01)  continue;
-        if(fabs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.007) continue;
-        if(fabs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-        if(iE->hadronicOverEm()       > 0.15)  continue;    
-      } else {
-        if(iE->sigmaIetaIeta()       > 0.012)  continue;
-        if(fabs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.007) continue;
-        if(fabs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-        if(iE->hadronicOverEm()       > 0.15) continue;    
-      } 
-    } else {     
-      if(iE->pt() > 20) {
-        if(iE->sigmaIetaIeta()       > 0.03)  continue;
-        if(fabs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.010) continue;
-        if(fabs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-      } else {
-        if(iE->sigmaIetaIeta()       > 0.032)  continue;
-        if(fabs(iE->deltaEtaSuperClusterTrackAtVtx()) > 0.010) continue;
-        if(fabs(iE->deltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-      }
-    }
-    IdentifiedElectrons.push_back(*iE);
-  }
-  
-  //
-  //edm::Handle<reco::PFCandidateCollection> particles;    
-  //iEvent.getByLabel("particleFlow", particles);
-  //const reco::PFCandidateCollection &inPfCands = *(particles.product());
-  // Muon MVA Isolation via ring
-  //int indexa=0;
-  //for (reco::MuonCollection::const_iterator cand = MuCandidates->begin(); cand != MuCandidates->end(); ++cand) {
-  //  
-  //  double isomvamu = fMuonIsoMVA->mvaValue( *cand, pvCol->at(0), 
-  //					    inPfCands, RHO_mu, 
-  //					    MuonEffectiveArea::kMuEAData2011, 
-  //					    IdentifiedElectrons, IdentifiedMuons);
-  //cout << "Muon Isolation via ring= " << isomvamu << endl;
-  //
-  //RECOMU_PF_RingsIsoMVA[indexa]=isomvamu;
-  //indexa++;
-  //}
-  
-  
-  // Electron PF MVA Ring Isolation
-  
-  // int indexb=0;
-  //for (reco::GsfElectronCollection::const_iterator cand = EleRefs->begin(); cand != EleRefs->end(); ++cand) {
-  //  
-  //  double isomvaele = fElectronIsoMVA->mvaValue( *cand, pvCol->at(0),
-  //						    inPfCands, RHO_ele,
-  //					    //ElectronEffectiveArea::kEleEAFall11MC,
-  //					    ElectronEffectiveArea::kEleEAData2011,
-  //					    IdentifiedElectrons, IdentifiedMuons);
-  //
-  //cout << "Electron Isolation via ring= " << isomvaele << endl;
-  //
-  //RECOELE_PF_RingsIsoMVA[indexb]=isomvaele;
-  //indexb++;
-  //}
-}
 void HZZ4LeptonsRootTree::fillP3Covariance(const reco::PFCandidate &c, TMatrixDSym &bigCov, int offset) const 
 {
   double dp = PFEnergyResolution().getEnergyResolutionEm(c.energy(), c.eta());
@@ -4499,7 +3959,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx2e2mu(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertex, StandardFitVtx_);
   int jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtx_->begin(); cand!=StandardFitVtx_->end(); ++cand){
-    if (jjj > 99) break;
     StdFitVertexX.push_back(cand->position().x());
     StdFitVertexY.push_back(cand->position().y());
     StdFitVertexZ.push_back(cand->position().z());
@@ -4531,7 +3990,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx2e2mu(const edm::Event& iEvent)
   iEvent.getByLabel(RefittedMass, refmassmap);
   int kk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesEEMM->begin();cand != CandidatesEEMM->end(); ++ cand ) {
-    if (kk > 99) break;
     edm::Ref<edm::View<Candidate> > Ref(CandidatesEEMM,kk);
     //cout << "Original 2e2mu mass is= " << cand->p4().mass() << " Refitted mass is= " << (*refmassmap)[Ref] << endl;
     RECO_EEMM_MASS_REFIT.push_back((*refmassmap)[Ref]);
@@ -4541,7 +3999,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx2e2mu(const edm::Event& iEvent)
   iEvent.getByLabel(KinematicFitVertex, KinematicFitVtx_);
   jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=KinematicFitVtx_->begin(); cand!=KinematicFitVtx_->end(); ++cand){
-    if (jjj > 99) break;
     KinFitVertexX.push_back(cand->position().x());
     KinFitVertexY.push_back(cand->position().y());
     KinFitVertexZ.push_back(cand->position().z());
@@ -4576,7 +4033,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx4mu(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertexMMMM, StandardFitVtx_);
   int jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtx_->begin(); cand!=StandardFitVtx_->end(); ++cand){
-    if (jjj > 99) break;
     StdFitVertexXMMMM.push_back(cand->position().x());
     StdFitVertexYMMMM.push_back(cand->position().y());
     StdFitVertexZMMMM.push_back(cand->position().z());
@@ -4608,7 +4064,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx4mu(const edm::Event& iEvent)
   iEvent.getByLabel(RefittedMassMMMM, refmassmap);
   int kk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesMMMM->begin();cand != CandidatesMMMM->end(); ++ cand ) {
-    if (kk > 99) break;
     edm::Ref<edm::View<Candidate> > Ref(CandidatesMMMM,kk);
     //cout << "Original 4mu mass is= " << cand->p4().mass() << " Refitted mass is= " << (*refmassmap)[Ref] << endl;
     RECO_MMMM_MASS_REFIT.push_back((*refmassmap)[Ref]);
@@ -4618,7 +4073,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx4mu(const edm::Event& iEvent)
   iEvent.getByLabel(KinematicFitVertexMMMM, KinematicFitVtx_);
   jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=KinematicFitVtx_->begin(); cand!=KinematicFitVtx_->end(); ++cand){
-    if (jjj > 99) break;
     KinFitVertexXMMMM.push_back(cand->position().x());
     KinFitVertexYMMMM.push_back(cand->position().y());
     KinFitVertexZMMMM.push_back(cand->position().z());
@@ -4653,7 +4107,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx4e(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertexEEEE, StandardFitVtx_);
   int jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtx_->begin(); cand!=StandardFitVtx_->end(); ++cand){
-    if (jjj > 99) break;
     StdFitVertexXEEEE.push_back(cand->position().x());
     StdFitVertexYEEEE.push_back(cand->position().y());
     StdFitVertexZEEEE.push_back(cand->position().z());
@@ -4685,7 +4138,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx4e(const edm::Event& iEvent)
   iEvent.getByLabel(RefittedMassEEEE, refmassmap);
   int kk=0;
   for( edm::View<Candidate>::const_iterator cand = CandidatesEEEE->begin();cand != CandidatesEEEE->end(); ++ cand ) {
-    if (kk > 99) break;
     edm::Ref<edm::View<Candidate> > Ref(CandidatesEEEE,kk);
     cout << "Original 4e mass is= " << cand->p4().mass() << " Refitted mass is= " << (*refmassmap)[Ref] << endl;
     RECO_EEEE_MASS_REFIT.push_back((*refmassmap)[Ref]);
@@ -4695,7 +4147,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtx4e(const edm::Event& iEvent)
   iEvent.getByLabel(KinematicFitVertexEEEE, KinematicFitVtx_);
   jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=KinematicFitVtx_->begin(); cand!=KinematicFitVtx_->end(); ++cand){
-    if (jjj > 99) break;
     KinFitVertexXEEEE.push_back(cand->position().x());
     KinFitVertexYEEEE.push_back(cand->position().y());
     KinFitVertexZEEEE.push_back(cand->position().z());
@@ -4742,7 +4193,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtxTriLeptons(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertexMMM, StandardFitVtxMMM_);
   int jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtxMMM_->begin(); cand!=StandardFitVtxMMM_->end(); ++cand){
-    if (jjj > 39) break;
     StdFitVertexChi2rMMM.push_back(cand->chi2()/cand->ndof());
     StdFitVertexProbMMM.push_back(TMath::Prob(cand->chi2(),cand->ndof()));
     /*cout << "Std Fit MMM: " 
@@ -4754,7 +4204,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtxTriLeptons(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertexMME, StandardFitVtxMME_);
   jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtxMME_->begin(); cand!=StandardFitVtxMME_->end(); ++cand){
-    if (jjj > 19) break;
     StdFitVertexChi2rMME.push_back(cand->chi2()/cand->ndof());
     StdFitVertexProbMME.push_back(TMath::Prob(cand->chi2(),cand->ndof()));
     /*cout << "Std Fit MME: " 
@@ -4766,7 +4215,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtxTriLeptons(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertexEEE, StandardFitVtxEEE_);
   jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtxEEE_->begin(); cand!=StandardFitVtxEEE_->end(); ++cand){
-    if (jjj > 19) break;
     StdFitVertexChi2rEEE.push_back(cand->chi2()/cand->ndof());
     StdFitVertexProbEEE.push_back(TMath::Prob(cand->chi2(),cand->ndof()));
     /*cout << "Std Fit EEE: " 
@@ -4778,7 +4226,6 @@ void HZZ4LeptonsRootTree::fillConstraintVtxTriLeptons(const edm::Event& iEvent)
   iEvent.getByLabel(StandardFitVertexMEE, StandardFitVtxMEE_);
   jjj=0;
   for (vector<reco::Vertex>::const_iterator cand=StandardFitVtxMEE_->begin(); cand!=StandardFitVtxMEE_->end(); ++cand){
-    if (jjj > 19) break;
     StdFitVertexChi2rMEE.push_back(cand->chi2()/cand->ndof());
     StdFitVertexProbMEE.push_back(TMath::Prob(cand->chi2(),cand->ndof()));
     /*cout << "Std Fit MEE: " 
@@ -5040,384 +4487,6 @@ void HZZ4LeptonsRootTree::fillGD4e(const edm::Event& iEvent)
   }
 }
 
-void HZZ4LeptonsRootTree::fillCP2e2mu(const edm::Event& iEvent)
-{
-  RECORF_2e2mu_cosTheta1_spin.clear();
-  RECORF_2e2mu_cosTheta2_spin.clear();
-  RECORF_2e2mu_cosThetaStar_spin.clear();
-  RECORF_2e2mu_Phi_spin.clear();
-  RECORF_2e2mu_Phi1_spin.clear();
-  RECORF_2e2mu_Phi2_spin.clear();
-  RECORF_2e2mu_phi1RF_spin.clear();
-  RECORF_2e2mu_phi2RF_spin.clear();
-  RECORF_2e2mu_MELA.clear();
-  edm::Handle<std::vector<double> > cosTheta1Handle;
-  iEvent.getByLabel(CP2e2mu_cosTheta1Tag_,cosTheta1Handle);
-  
-  edm::Handle<std::vector<double> > cosTheta2Handle;
-  iEvent.getByLabel(CP2e2mu_cosTheta2Tag_,cosTheta2Handle);
-    
-  edm::Handle<std::vector<double> > cosThetaStarHandle;
-  iEvent.getByLabel(CP2e2mu_cosThetaStarTag_,cosThetaStarHandle);
-    
-  edm::Handle<std::vector<double> > PhiHandle;
-  iEvent.getByLabel(CP2e2mu_PhiTag_,PhiHandle);
-    
-  edm::Handle<std::vector<double> > Phi1Handle;
-  iEvent.getByLabel(CP2e2mu_Phi1Tag_,Phi1Handle);
-    
-  edm::Handle<std::vector<double> > Phi2Handle;
-  iEvent.getByLabel(CP2e2mu_Phi2Tag_,Phi2Handle);
-    
-  edm::Handle<std::vector<double> > phi1RFHandle;
-  iEvent.getByLabel(CP2e2mu_phi1RFTag_,phi1RFHandle);
-    
-  edm::Handle<std::vector<double> > phi2RFHandle;
-  iEvent.getByLabel(CP2e2mu_phi2RFTag_,phi2RFHandle);
-
-  edm::Handle<std::vector<double> > MELAHandle;
-  iEvent.getByLabel(CP2e2mu_MELATag_,MELAHandle);
-     
-  int iii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta1Handle->begin(); candTheta!=cosTheta1Handle->end(); ++candTheta){
-    if (iii>99) break;
-    RECORF_2e2mu_cosTheta1_spin.push_back((*candTheta));
-    iii++;
-  }
-  int ii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta2Handle->begin(); candTheta!=cosTheta2Handle->end(); ++candTheta){
-    if (ii>99) break;
-    RECORF_2e2mu_cosTheta2_spin.push_back((*candTheta));
-    ii++;
-  }
-  int iij=0;
-  for (std::vector<double>::const_iterator candThetaStar=cosThetaStarHandle->begin(); candThetaStar!=cosThetaStarHandle->end(); ++candThetaStar){
-    if (iij>99) break;
-    RECORF_2e2mu_cosThetaStar_spin.push_back((*candThetaStar));
-    iij++;
-  }
-  int iiii=0;
-  for (std::vector<double>::const_iterator candPhi=PhiHandle->begin(); candPhi!=PhiHandle->end(); ++candPhi){
-    if (iiii>99) break;
-    RECORF_2e2mu_Phi_spin.push_back((*candPhi));
-    iiii++;
-  }
-  int iiiii=0;
-  for (std::vector<double>::const_iterator candPhi1=Phi1Handle->begin(); candPhi1!=Phi1Handle->end(); ++candPhi1){
-    if (iiiii>99) break;
-    RECORF_2e2mu_Phi1_spin.push_back((*candPhi1));
-    iiiii++;
-  }
-  int iiiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=Phi2Handle->begin(); candPhi2!=Phi2Handle->end(); ++candPhi2){
-    if (iiiiii>99) break;
-    RECORF_2e2mu_Phi2_spin.push_back((*candPhi2));
-    iiiiii++;
-  }
-  int jjiii=0;
-  for (std::vector<double>::const_iterator candPhi1=phi1RFHandle->begin(); candPhi1!=phi1RFHandle->end(); ++candPhi1){
-    if (jjiii>99) break;
-    RECORF_2e2mu_phi1RF_spin.push_back((*candPhi1));
-    jjiii++;
-  }
-  int jjiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=phi2RFHandle->begin(); candPhi2!=phi2RFHandle->end(); ++candPhi2){
-    if (jjiiii>99) break;
-    RECORF_2e2mu_phi2RF_spin.push_back((*candPhi2));
-    jjiiii++;
-  }
-  int jjiiiii=0;
-  for (std::vector<double>::const_iterator candMELA=MELAHandle->begin(); candMELA!=MELAHandle->end(); ++candMELA){
-    if (jjiiiii>99) break;
-    RECORF_2e2mu_MELA.push_back((*candMELA));
-    //if (RECORF_2e2mu_MELA>-998.) cout << "MELA for 2e2mu combination= " << RECORF_2e2mu_MELA[jjiiiii] << endl;
-    jjiiiii++;
-  }
-}
-
-
-void HZZ4LeptonsRootTree::fillCP4e(const edm::Event& iEvent)
-{
-  RECORF_4e_cosTheta1_spin.clear();
-  RECORF_4e_cosTheta2_spin.clear();
-  RECORF_4e_cosThetaStar_spin.clear();
-  RECORF_4e_Phi_spin.clear();
-  RECORF_4e_Phi1_spin.clear();
-  RECORF_4e_Phi2_spin.clear();
-  RECORF_4e_phi1RF_spin.clear();
-  RECORF_4e_phi2RF_spin.clear();
-  RECORF_4e_MELA.clear();
-  edm::Handle<std::vector<double> > cosTheta1Handle;
-  iEvent.getByLabel(CP4e_cosTheta1Tag_,cosTheta1Handle);
-  
-  edm::Handle<std::vector<double> > cosTheta2Handle;
-  iEvent.getByLabel(CP4e_cosTheta2Tag_,cosTheta2Handle);
-    
-  edm::Handle<std::vector<double> > cosThetaStarHandle;
-  iEvent.getByLabel(CP4e_cosThetaStarTag_,cosThetaStarHandle);
-  
-  edm::Handle<std::vector<double> > PhiHandle;
-  iEvent.getByLabel(CP4e_PhiTag_,PhiHandle);
-    
-  edm::Handle<std::vector<double> > Phi1Handle;
-  iEvent.getByLabel(CP4e_Phi1Tag_,Phi1Handle);
-    
-  edm::Handle<std::vector<double> > Phi2Handle;
-  iEvent.getByLabel(CP4e_Phi2Tag_,Phi2Handle);
-    
-  edm::Handle<std::vector<double> > phi1RFHandle;
-  iEvent.getByLabel(CP4e_phi1RFTag_,phi1RFHandle);
-    
-  edm::Handle<std::vector<double> > phi2RFHandle;
-  iEvent.getByLabel(CP4e_phi2RFTag_,phi2RFHandle);
-    
-  edm::Handle<std::vector<double> > MELAHandle;
-  iEvent.getByLabel(CP4e_MELATag_,MELAHandle);
-  int iii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta1Handle->begin(); candTheta!=cosTheta1Handle->end(); ++candTheta){
-    if (iii>99) break;
-    RECORF_4e_cosTheta1_spin.push_back((*candTheta));
-    iii++;
-  }
-  int ii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta2Handle->begin(); candTheta!=cosTheta2Handle->end(); ++candTheta){
-    if (ii>99) break;
-    RECORF_4e_cosTheta2_spin.push_back((*candTheta));
-    ii++;
-  }
-  int iij=0;
-  for (std::vector<double>::const_iterator candThetaStar=cosThetaStarHandle->begin(); candThetaStar!=cosThetaStarHandle->end(); ++candThetaStar){
-    if (iij>99) break;
-    RECORF_4e_cosThetaStar_spin.push_back((*candThetaStar));
-    iij++;
-  }
-  int iiii=0;
-  for (std::vector<double>::const_iterator candPhi=PhiHandle->begin(); candPhi!=PhiHandle->end(); ++candPhi){
-    if (iiii>99) break;
-    RECORF_4e_Phi_spin.push_back((*candPhi));
-    iiii++;
-  }
-  int iiiii=0;
-  for (std::vector<double>::const_iterator candPhi1=Phi1Handle->begin(); candPhi1!=Phi1Handle->end(); ++candPhi1){
-    if (iiiii>99) break;
-    RECORF_4e_Phi1_spin.push_back((*candPhi1));
-    iiiii++;
-  }
-  int iiiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=Phi2Handle->begin(); candPhi2!=Phi2Handle->end(); ++candPhi2){
-    if (iiiiii>99) break;
-    RECORF_4e_Phi2_spin.push_back((*candPhi2));
-    iiiiii++;
-  }
-  int jjiii=0;
-  for (std::vector<double>::const_iterator candPhi1=phi1RFHandle->begin(); candPhi1!=phi1RFHandle->end(); ++candPhi1){
-    if (jjiii>99) break;
-    RECORF_4e_phi1RF_spin.push_back((*candPhi1));
-    jjiii++;
-  }
-  int jjiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=phi2RFHandle->begin(); candPhi2!=phi2RFHandle->end(); ++candPhi2){
-    if (jjiiii>99) break;
-    RECORF_4e_phi2RF_spin.push_back((*candPhi2));
-    jjiiii++;
-  }
-  int jjiiiii=0;
-  for (std::vector<double>::const_iterator candMELA=MELAHandle->begin(); candMELA!=MELAHandle->end(); ++candMELA){
-    if (jjiiiii>99) break;
-    RECORF_4e_MELA.push_back((*candMELA));
-    //if (RECORF_4e_MELA[jjiiiii]>-998.) cout << "MELA for 4e combination= " << RECORF_4e_MELA[jjiiiii] << endl;
-    jjiiiii++;
-  }
-}
-
-void HZZ4LeptonsRootTree::fillCP4mu(const edm::Event& iEvent)
-{
-  RECORF_4mu_cosTheta1_spin.clear();
-  RECORF_4mu_cosTheta2_spin.clear();
-  RECORF_4mu_cosThetaStar_spin.clear();
-  RECORF_4mu_Phi_spin.clear();
-  RECORF_4mu_Phi1_spin.clear();
-  RECORF_4mu_Phi2_spin.clear();
-  RECORF_4mu_phi1RF_spin.clear();
-  RECORF_4mu_phi2RF_spin.clear();
-  RECORF_4mu_MELA.clear();
-  edm::Handle<std::vector<double> > cosTheta1Handle;
-  iEvent.getByLabel(CP4mu_cosTheta1Tag_,cosTheta1Handle);
-    
-  edm::Handle<std::vector<double> > cosTheta2Handle;
-  iEvent.getByLabel(CP4mu_cosTheta2Tag_,cosTheta2Handle);
-    
-  edm::Handle<std::vector<double> > cosThetaStarHandle;
-  iEvent.getByLabel(CP4mu_cosThetaStarTag_,cosThetaStarHandle);
-    
-  edm::Handle<std::vector<double> > PhiHandle;
-  iEvent.getByLabel(CP4mu_PhiTag_,PhiHandle);
-    
-  edm::Handle<std::vector<double> > Phi1Handle;
-  iEvent.getByLabel(CP4mu_Phi1Tag_,Phi1Handle);
-    
-  edm::Handle<std::vector<double> > Phi2Handle;
-  iEvent.getByLabel(CP4mu_Phi2Tag_,Phi2Handle);
-    
-  edm::Handle<std::vector<double> > phi1RFHandle;
-  iEvent.getByLabel(CP4mu_phi1RFTag_,phi1RFHandle);
-    
-  edm::Handle<std::vector<double> > phi2RFHandle;
-  iEvent.getByLabel(CP4mu_phi2RFTag_,phi2RFHandle);
-    
-  edm::Handle<std::vector<double> > MELAHandle;
-  iEvent.getByLabel(CP4mu_MELATag_,MELAHandle);
-    
-  int iii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta1Handle->begin(); candTheta!=cosTheta1Handle->end(); ++candTheta){
-    if (iii>99) break;
-    RECORF_4mu_cosTheta1_spin.push_back((*candTheta));
-    iii++;
-  }
-  int ii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta2Handle->begin(); candTheta!=cosTheta2Handle->end(); ++candTheta){
-    if (ii>99) break;
-    RECORF_4mu_cosTheta2_spin.push_back((*candTheta));
-    ii++;
-  }
-  int iij=0;
-  for (std::vector<double>::const_iterator candThetaStar=cosThetaStarHandle->begin(); candThetaStar!=cosThetaStarHandle->end(); ++candThetaStar){
-    if (iij>99) break;
-    RECORF_4mu_cosThetaStar_spin.push_back((*candThetaStar));
-    iij++;
-  }
-  int iiii=0;
-  for (std::vector<double>::const_iterator candPhi=PhiHandle->begin(); candPhi!=PhiHandle->end(); ++candPhi){
-    if (iiii>99) break;
-    RECORF_4mu_Phi_spin.push_back((*candPhi));
-    iiii++;
-  }
-  int iiiii=0;
-  for (std::vector<double>::const_iterator candPhi1=Phi1Handle->begin(); candPhi1!=Phi1Handle->end(); ++candPhi1){
-    if (iiiii>99) break;
-    RECORF_4mu_Phi1_spin.push_back((*candPhi1));
-    iiiii++;
-  }
-  int iiiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=Phi2Handle->begin(); candPhi2!=Phi2Handle->end(); ++candPhi2){
-    if (iiiiii>99) break;
-    RECORF_4mu_Phi2_spin.push_back((*candPhi2));
-    iiiiii++;
-  }
-  int jjiii=0;
-  for (std::vector<double>::const_iterator candPhi1=phi1RFHandle->begin(); candPhi1!=phi1RFHandle->end(); ++candPhi1){
-    if (jjiii>99) break;
-    RECORF_4mu_phi1RF_spin.push_back((*candPhi1));
-    jjiii++;
-  }
-  int jjiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=phi2RFHandle->begin(); candPhi2!=phi2RFHandle->end(); ++candPhi2){
-    if (jjiiii>99) break;
-    RECORF_4mu_phi2RF_spin.push_back((*candPhi2));
-    jjiiii++;
-  }
-  int jjiiiii=0;
-  for (std::vector<double>::const_iterator candMELA=MELAHandle->begin(); candMELA!=MELAHandle->end(); ++candMELA){
-    if (jjiiiii>99) break;
-    RECORF_4mu_MELA.push_back((*candMELA));
-    //if (RECORF_4mu_MELA[jjiiiii]>-998.) cout << "MELA for 4mu combination= " << RECORF_4mu_MELA[jjiiiii] << endl;
-    jjiiiii++;
-  }
-}
-
-void HZZ4LeptonsRootTree::fillMCCP(const edm::Event& iEvent)
-{
-  MCRF_cosTheta1_spin.clear();
-  MCRF_cosTheta2_spin.clear();
-  MCRF_cosThetaStar_spin.clear();
-  MCRF_Phi_spin.clear();
-  MCRF_Phi1_spin.clear();
-  MCRF_Phi2_spin.clear();
-  MCRF_phi1RF_spin.clear();
-  MCRF_phi2RF_spin.clear();
-  MCRF_MELA.clear();
-  edm::Handle<std::vector<double> > cosTheta1Handle;
-  iEvent.getByLabel(MCCP_cosTheta1Tag_,cosTheta1Handle);
-    
-  edm::Handle<std::vector<double> > cosTheta2Handle;
-  iEvent.getByLabel(MCCP_cosTheta2Tag_,cosTheta2Handle);
-    
-  edm::Handle<std::vector<double> > cosThetaStarHandle;
-  iEvent.getByLabel(MCCP_cosThetaStarTag_,cosThetaStarHandle);
-    
-  edm::Handle<std::vector<double> > PhiHandle;
-  iEvent.getByLabel(MCCP_PhiTag_,PhiHandle);
-    
-  edm::Handle<std::vector<double> > Phi1Handle;
-  iEvent.getByLabel(MCCP_Phi1Tag_,Phi1Handle);
-    
-  edm::Handle<std::vector<double> > Phi2Handle;
-  iEvent.getByLabel(MCCP_Phi2Tag_,Phi2Handle);
-    
-  edm::Handle<std::vector<double> > phi1RFHandle;
-  iEvent.getByLabel(MCCP_phi1RFTag_,phi1RFHandle);
-    
-  edm::Handle<std::vector<double> > phi2RFHandle;
-  iEvent.getByLabel(MCCP_phi2RFTag_,phi2RFHandle);
-    
-  edm::Handle<std::vector<double> > MELAHandle;
-  iEvent.getByLabel(MCCP_MELATag_,MELAHandle);
-  
-  int iii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta1Handle->begin(); candTheta!=cosTheta1Handle->end(); ++candTheta){
-    if (iii>9) break;
-    MCRF_cosTheta1_spin.push_back((*candTheta));
-    iii++;
-  }
-  int ii=0;
-  for (std::vector<double>::const_iterator candTheta=cosTheta2Handle->begin(); candTheta!=cosTheta2Handle->end(); ++candTheta){
-    if (ii>99) break;
-    MCRF_cosTheta2_spin.push_back((*candTheta));
-    ii++;
-  }
-  int iij=0;
-  for (std::vector<double>::const_iterator candThetaStar=cosThetaStarHandle->begin(); candThetaStar!=cosThetaStarHandle->end(); ++candThetaStar){
-    if (iij>99) break;
-    MCRF_cosThetaStar_spin.push_back((*candThetaStar));
-    iij++;
-  }
-  int iiii=0;
-  for (std::vector<double>::const_iterator candPhi=PhiHandle->begin(); candPhi!=PhiHandle->end(); ++candPhi){
-    if (iiii>99) break;
-    MCRF_Phi_spin.push_back((*candPhi));
-    iiii++;
-  }
-  int iiiii=0;
-  for (std::vector<double>::const_iterator candPhi1=Phi1Handle->begin(); candPhi1!=Phi1Handle->end(); ++candPhi1){
-    if (iiiii>99) break;
-    MCRF_Phi1_spin.push_back((*candPhi1));
-    iiiii++;
-  }
-  int iiiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=Phi2Handle->begin(); candPhi2!=Phi2Handle->end(); ++candPhi2){
-    if (iiiiii>99) break;
-    MCRF_Phi2_spin.push_back((*candPhi2));
-    iiiiii++;
-  }
-  int jjiii=0;
-  for (std::vector<double>::const_iterator candPhi1=phi1RFHandle->begin(); candPhi1!=phi1RFHandle->end(); ++candPhi1){
-    if (jjiii>99) break;
-    MCRF_phi1RF_spin.push_back((*candPhi1));
-    jjiii++;
-  }
-  int jjiiii=0;
-  for (std::vector<double>::const_iterator candPhi2=phi2RFHandle->begin(); candPhi2!=phi2RFHandle->end(); ++candPhi2){
-    if (jjiiii>99) break;
-    MCRF_phi2RF_spin.push_back((*candPhi2));
-    jjiiii++;
-  }
-  int jjiiiii=0;
-  for (std::vector<double>::const_iterator candMELA=MELAHandle->begin(); candMELA!=MELAHandle->end(); ++candMELA){
-    if (jjiiiii>99) break;
-    MCRF_MELA.push_back((*candMELA));
-    jjiiiii++;
-  }
-}
   
 //Vertices
 void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
@@ -5432,13 +4501,11 @@ void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
   RECO_VERTEXPROB.clear();
   RECO_VERTEX_TRACK_PT.clear();
   RECO_VERTEX_isValid.clear();
-  edm::Handle<reco::VertexCollection> recoPrimaryVertexCollection;
-  iEvent.getByLabel(verticesTag_,recoPrimaryVertexCollection);
-  RECO_NVTX=recoPrimaryVertexCollection->size();
+
+  RECO_NVTX=PV.size();
   //cout << "Number of Vertices in the event= " << RECO_NVTX << endl;
   int index_vertex = 0;
-  for (VertexCollection::const_iterator i=recoPrimaryVertexCollection->begin(); i!=recoPrimaryVertexCollection->end();i++) {
-    if(index_vertex>14) break;
+  for (VertexCollection::const_iterator i=PV.begin(); i!=PV.end();i++) {
     //RECO_NVTX.push_back(index_vertex);
     RECO_VERTEX_x.push_back(i->x());
     RECO_VERTEX_y.push_back(i->y());
@@ -5453,7 +4520,7 @@ void HZZ4LeptonsRootTree::fillVertices(const edm::Event& iEvent)
     for(std::vector<reco::TrackBaseRef>::const_iterator iter = i->tracks_begin();
 	iter != i->tracks_end(); iter++) {
       cout << "pT of tracks building the vertex= " << (**iter).pt() << endl; 
-      if (indice <100) RECO_VERTEX_TRACK_PT.push_back((**iter).pt());
+      RECO_VERTEX_TRACK_PT.push_back((**iter).pt());
       indice++;
     }
     index_vertex++;
@@ -5476,14 +4543,13 @@ void HZZ4LeptonsRootTree::fillTracks(const edm::Event& iEvent)
   RECO_TRACK_DZ.clear();
   RECO_TRACK_DZERR.clear();
   edm::Handle<reco::TrackCollection> tracks;
-  iEvent.getByLabel(tracksTag_, tracks);
+  iEvent.getByToken(tracksTag_, tracks);
   
   RECO_NTRACK=tracks->size();
   //
   cout << "Number of Tracks in the event= " << RECO_NTRACK << endl;
   int countk=0;
   for ( TrackCollection::const_iterator i=tracks->begin(); i!=tracks->end(); i++) { 
-    if (countk>199) break;
     //RECO_NTRACK=countk;
     RECO_TRACK_PT.push_back(i->pt());
     RECO_TRACK_ETA.push_back(i->eta());

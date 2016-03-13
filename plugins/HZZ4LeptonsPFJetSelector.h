@@ -4,7 +4,7 @@
 /**\class HZZ4LeptonsPFJetIDSelector
  *
  *
- * Original Author:  Ian Anderson
+ * Original Author:  Nicola De Filippis
  *
  * Refine PFJet collection to begin with
  *
@@ -20,6 +20,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
+#include "DataFormats/JetReco/interface/PFJet.h"
 
 class HZZ4LeptonsPFJetSelector : public edm::EDProducer {
  public:
@@ -30,7 +31,7 @@ class HZZ4LeptonsPFJetSelector : public edm::EDProducer {
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   bool isLoosePFJetID,isMediumPFJetID,isTightPFJetID;
-  edm::InputTag pfjetsLabel;
+  edm::EDGetTokenT<edm::View<reco::PFJet> > pfjetsLabel;
 
 };
 
