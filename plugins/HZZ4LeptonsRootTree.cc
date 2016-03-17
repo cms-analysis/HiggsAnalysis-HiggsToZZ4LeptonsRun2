@@ -1322,7 +1322,7 @@ void HZZ4LeptonsRootTree::analyze( const edm::Event& evt, const edm::EventSetup&
 
   // Fill RECO block in the rootple
   // PF Jets
-  //  filljets(evt);
+  filljets(evt);
   
   if (useAdditionalRECO==true) {
     fillAdditionalRECO(evt);
