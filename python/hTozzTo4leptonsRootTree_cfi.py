@@ -281,7 +281,7 @@ hTozzTo4leptonsRootTree = cms.EDAnalyzer("HZZ4LeptonsRootTree",
     # Other Objetcs
     PhotonsLabel       = cms.InputTag("photons"),
     TracksLabel        = cms.InputTag("generalTracks"),
-    JetsLabel          = cms.InputTag("ak5PFJetsCorrection"),
+    JetsLabel          = cms.InputTag("ak4PFJetsCorrection"),
     PuJetMvaMCfullDiscrLabel   = cms.InputTag("recoPuJetMvaMC:full53xDiscriminant"),
     PuJetMvaMCfullIdLabel      = cms.InputTag("recoPuJetMvaMC:full53xId"),                                              
     PuJetMvaDatafullDiscrLabel = cms.InputTag("recoPuJetMvaData:full53xDiscriminant"),
