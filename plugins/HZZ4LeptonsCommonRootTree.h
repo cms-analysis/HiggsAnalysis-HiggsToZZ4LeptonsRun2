@@ -660,6 +660,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     // Fiducial flags
     Tree_->Branch("RECOELE_isbarrel",    RECOELE_isbarrel,   "RECOELE_isbarrel[100]/I");   
     Tree_->Branch("RECOELE_isendcap",    RECOELE_isendcap,   "RECOELE_isendcap[100]/I");   
+    Tree_->Branch("RECOELE_isGap",       RECOELE_isGap,      "RECOELE_isGap[100]/I");
     Tree_->Branch("RECOELE_isEBetaGap",  RECOELE_isEBetaGap, "RECOELE_isEBetaGap[100]/I");   
     Tree_->Branch("RECOELE_isEBphiGap",  RECOELE_isEBphiGap, "RECOELE_isEBphiGap[100]/I");   
     Tree_->Branch("RECOELE_isEEdeeGap",  RECOELE_isEEdeeGap, "RECOELE_isEEdeeGap[100]/I");   
@@ -1624,6 +1625,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
       // Fiducial flags 
       RECOELE_isbarrel[i]    = 0;
       RECOELE_isendcap[i]    = 0;
+      RECOELE_isGap[i]  = 0;
       RECOELE_isEBetaGap[i]  = 0;
       RECOELE_isEBphiGap[i]  = 0;
       RECOELE_isEEdeeGap[i]  = 0;
@@ -3403,7 +3405,8 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
       if (cand->isEBPhiGap())  RECOELE_isEBphiGap[index]  = 1 ;  
       if (cand->isEEDeeGap())  RECOELE_isEEdeeGap[index]  = 1 ;  
       if (cand->isEERingGap()) RECOELE_isEEringGap[index] = 1 ;
- 
+      if (cand->isGap())       RECOELE_isGap[index] = 1 ;
+
       std::cout << "--fiducial flags: " 
 	<< "  isEB="        << RECOELE_isbarrel[index] 
 	<< "  isEBetagap="  << RECOELE_isEBetaGap[index] 
@@ -3411,6 +3414,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 	<< "  isEE="        << RECOELE_isendcap[index] 
         << "  isEEdeegap="  << RECOELE_isEEdeeGap[index] 
 	<< "  isEEringgap=" << RECOELE_isEEringGap[index] 
+        << "  isGap="       << RECOELE_isGap[index]
 	<< std::endl;
       
 
@@ -4736,15 +4740,12 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
       float mva = 0.;
       int pupass = 1;
       
-  
-      
       if (fillMCTruth == 1){
 	mva = (*puJetIdMVAMC)[pfjetrefmva];
       }
       else{
 	mva = (*puJetIdMVAData)[pfjetrefmva];
       }
-      
       
       //      New Selection
       if(i->pt()>20.){
@@ -4788,7 +4789,6 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     
     edm::Handle<double> rhoHandle;
 
-    /* rhojetsTag_=edm::InputTag("kt6PFJetsCentralNeutral:rho"); */
     iEvent.getByToken(rhojetsTag_,rhoHandle); 
     if (rhoHandle.isValid() ) {
       RHO_mu=*rhoHandle;
@@ -5226,7 +5226,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     RECOELE_ep[100], RECOELE_eSeedp[100], RECOELE_eSeedpout[100], RECOELE_eElepout[100],
     RECOELE_deltaEtaIn[100],RECOELE_deltaEtaSeed[100],RECOELE_deltaEtaEle[100],RECOELE_deltaPhiIn[100],
     RECOELE_deltaPhiSeed[100],RECOELE_deltaPhiEle[100],RECOELE_ecalEnergy[100];
-  int RECOELE_isbarrel[100], RECOELE_isendcap[100], RECOELE_isEBetaGap[100], RECOELE_isEBphiGap[100], RECOELE_isEEdeeGap[100], RECOELE_isEEringGap[100]; 
+  int RECOELE_isbarrel[100], RECOELE_isendcap[100], RECOELE_isEBetaGap[100], RECOELE_isEBphiGap[100], RECOELE_isEEdeeGap[100], RECOELE_isEEringGap[100], RECOELE_isGap[100]; 
   float RECOELE_sigmaIetaIeta[100], RECOELE_sigmaEtaEta[100], RECOELE_e15[100], RECOELE_e25max[100], RECOELE_e55[100], RECOELE_he[100], RECOELE_r9[100];
   float RECOELE_mva[100], RECOELE_fbrem[100],RECOELE_fbrem_mean[100],RECOELE_fbrem_mode[100];
   int RECOELE_nbrems[100], RECOELE_Class[100];

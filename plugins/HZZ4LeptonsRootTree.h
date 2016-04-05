@@ -741,6 +741,7 @@ private:
       // Fiducial flags
       std::vector<int> RECOELE_isbarrel;
       std::vector<int> RECOELE_isendcap;
+      std::vector<int> RECOELE_isGap;
       std::vector<int> RECOELE_isEBetaGap;
       std::vector<int> RECOELE_isEBphiGap;
       std::vector<int> RECOELE_isEEdeeGap;
