@@ -149,8 +149,12 @@ else:
     #hTozzTo4leptonsElectronSequence=cms.Sequence(hTozzTo4leptonsElectronIdSequence + hTozzTo4leptonsElectronSelector)
     hTozzTo4leptonsElectronSequence=cms.Sequence(hTozzTo4leptonsElectronSelector)
     
+    # Muon Calibration
+    from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMuonCalibrator_cfi import *
+    
     # Muon ghost cleaning
     from HiggsAnalysis.HiggsToZZ4Leptons.muonCleanerBySegments_cfi import *
+    cleanMuonsBySegments.src = cms.InputTag("hTozzTo4leptonsMuonCalibrator")
 
     # Muon relaxed selection
     from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMuonSelector_cfi import *
