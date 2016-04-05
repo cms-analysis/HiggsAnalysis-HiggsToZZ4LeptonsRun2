@@ -65,7 +65,6 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
     
   iEvent.getByToken(muonLabel, muons);
 
-  KalmanMuonCalibrator calibrator;
   double corrPt=0.,corrPtError=0.;
   double smearedPt=0., smearedPtError=0.;
     
@@ -74,24 +73,26 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
     
     reco::Muon* calibmu = mIter->clone();
     
-    if (isData){    
+    if (isData){
+      KalmanMuonCalibrator calibrator("DATA_76X_13TeV");
       corrPt = calibrator.getCorrectedPt(mIter->pt(), mIter->eta(), mIter->phi(), mIter->charge());
       corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
       smearedPt=corrPt; // no smearing on data
       smearedPtError=corrPtError; // no smearing on data
     }
-    else { // isMC - calibration from data + smearing 
+    else { // isMC - calibration from data + smearing
+      KalmanMuonCalibrator calibrator("MC_76X_13TeV");
       corrPt = calibrator.getCorrectedPt(mIter->pt(), mIter->eta(), mIter->phi(), mIter->charge());
-      //corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
+      corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
       smearedPt = calibrator.smear(corrPt, mIter->eta());
       smearedPtError = smearedPt * calibrator.getCorrectedErrorAfterSmearing(smearedPt, mIter->eta(), corrPtError /smearedPt );
     }
-
-    cout << "Corrected Muon pT= " << smearedPt << " and pT error= " << smearedPtError << endl;
+    
+    cout << "Muon pT= " << calibmu->pt() << "Corrected Muon pT= " << smearedPt << " and pT error= " << smearedPtError << endl;
     reco::Candidate::PolarLorentzVector p4Polar_;
     p4Polar_ = reco::Candidate::PolarLorentzVector(smearedPt, mIter->eta(), mIter->phi(), mIter->mass());
+    calibmu->setP4(p4Polar_);
     
-    calibmu->setP4(p4Polar_);             
     Gmuon->push_back( *calibmu );
   }
 
