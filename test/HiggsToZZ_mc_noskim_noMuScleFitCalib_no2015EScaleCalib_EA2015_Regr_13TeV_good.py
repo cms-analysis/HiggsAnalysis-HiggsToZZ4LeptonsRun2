@@ -21,13 +21,6 @@ process.load('Configuration/EventContent/EventContent_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v12', '')
 
-# Global tracking geometry
-#process.GlobalTrackingGeometryESProducer = cms.ESProducer("GlobalTrackingGeometryESProducer")
-
-# Transient track builder
-#process.TransientTrackBuilderESProducer = cms.ESProducer("TransientTrackBuilderESProducer",
-#    ComponentName = cms.string('TransientTrackBuilder'),
-#)
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("VertexSelector",
                                             src = cms.InputTag('offlinePrimaryVertices'),
@@ -41,9 +34,8 @@ process.hTozzTo4leptonsElectronOrdering = cms.EDProducer("HZZ4LeptonsElectronOrd
                                                          electronCollection = cms.InputTag("gsfElectrons")
                                                          )
 
-
-process.load('HiggsAnalysis/HiggsToZZ4Leptons/muonCleanerBySegments_cfi')
-process.cleanMuonsBySegments.src = cms.InputTag("muons")
+process.load('HiggsAnalysis/HiggsToZZ4Leptons/hTozzTo4leptonsMuonCalibrator_cfi')
+process.hTozzTo4leptonsMuonCalibrator.isData = cms.bool(False) 
 
 
 process.load('HiggsAnalysis/HiggsToZZ4Leptons/hTozzTo4leptonsPreselection_data_noskim_cff') 
