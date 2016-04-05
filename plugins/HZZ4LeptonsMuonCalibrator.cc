@@ -66,8 +66,8 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
   iEvent.getByToken(muonLabel, muons);
 
   KalmanMuonCalibrator calibrator;
-  double corrPt=0.; //,corrPtError=0.;
-  double smearedPt=0.; //, smearedPtError=0.;
+  double corrPt=0.,corrPtError=0.;
+  double smearedPt=0., smearedPtError=0.;
     
   // Loop over muons
   for (mIter = muons->begin(); mIter != muons->end(); ++mIter ) {
@@ -76,16 +76,18 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
     
     if (isData){    
       corrPt = calibrator.getCorrectedPt(mIter->pt(), mIter->eta(), mIter->phi(), mIter->charge());
-      //corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
+      corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
       smearedPt=corrPt; // no smearing on data
+      smearedPtError=corrPtError; // no smearing on data
     }
-    else { // isMC
+    else { // isMC - calibration from data + smearing 
       corrPt = calibrator.getCorrectedPt(mIter->pt(), mIter->eta(), mIter->phi(), mIter->charge());
       //corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
       smearedPt = calibrator.smear(corrPt, mIter->eta());
-      //smearedPtError = smearedPt * calibrator.getCorrectedErrorAfterSmearing(smearedPt, mIter-<eta(), corrPtError /smearedPt );
+      smearedPtError = smearedPt * calibrator.getCorrectedErrorAfterSmearing(smearedPt, mIter->eta(), corrPtError /smearedPt );
     }
-    
+
+    cout << "Corrected Muon pT= " << smearedPt << " and pT error= " << smearedPtError << endl;
     reco::Candidate::PolarLorentzVector p4Polar_;
     p4Polar_ = reco::Candidate::PolarLorentzVector(smearedPt, mIter->eta(), mIter->phi(), mIter->mass());
     
