@@ -830,6 +830,7 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
         hTozzTo4leptonsHLTAnalysisFilter            +
         hTozzTo4leptonsElectronSelector             +
         electronMVAValueMapProducer                 +                   
+        hTozzTo4leptonsMuonCalibrator               +
         cleanMuonsBySegments                        +
         hTozzTo4leptonsMuonSelector                 +
         zToEE                                       +
