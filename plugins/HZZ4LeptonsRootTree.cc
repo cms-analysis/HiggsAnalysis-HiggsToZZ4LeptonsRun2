@@ -793,6 +793,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   // Fiducial flags
   mytree->Branch("RECOELE_isbarrel",&RECOELE_isbarrel);
   mytree->Branch("RECOELE_isendcap",&RECOELE_isendcap);
+  mytree->Branch("RECOELE_isGap",&RECOELE_isGap);
   mytree->Branch("RECOELE_isEBetaGap",&RECOELE_isEBetaGap);
   mytree->Branch("RECOELE_isEBphiGap",&RECOELE_isEBphiGap);
   mytree->Branch("RECOELE_isEEdeeGap",&RECOELE_isEEdeeGap);
@@ -2842,6 +2843,7 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   // Fiducial flags
   RECOELE_isbarrel.clear();
   RECOELE_isendcap.clear();
+  RECOELE_isGap.clear();
   RECOELE_isEBetaGap.clear();
   RECOELE_isEBphiGap.clear();
   RECOELE_isEEdeeGap.clear();
@@ -3222,6 +3224,7 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
     else  RECOELE_isbarrel.push_back(0);
     if (cand->isEE()) RECOELE_isendcap.push_back(1) ; 
     else  RECOELE_isendcap.push_back(0);
+    if (cand->isGap())       RECOELE_isGap.push_back(1);
     if (cand->isEBEtaGap())  RECOELE_isEBetaGap.push_back(1);  
     if (cand->isEBPhiGap())  RECOELE_isEBphiGap.push_back(1);  
     if (cand->isEEDeeGap())  RECOELE_isEEdeeGap.push_back(1);  
