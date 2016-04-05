@@ -3117,12 +3117,24 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
       if (fabs(sclRef->eta()) >= 2.3   && fabs(sclRef->eta()) < 2.4 )   EffectiveArea = 0.22;
       if (fabs(sclRef->eta()) >= 2.4 )                                  EffectiveArea = 0.29;
     }
-    else {// 7_4_X use eta 
-      if (fabs(cand->p4().eta()) >= 0.0   && fabs(cand->p4().eta()) < 0.8 )   EffectiveArea = 0.1830;
-      if (fabs(cand->p4().eta()) >= 0.8   && fabs(cand->p4().eta()) < 1.3 )   EffectiveArea = 0.1734;
-      if (fabs(cand->p4().eta()) >= 1.3   && fabs(cand->p4().eta()) < 2.0 )   EffectiveArea = 0.1077;
-      if (fabs(cand->p4().eta()) >= 2.0   && fabs(cand->p4().eta()) < 2.2 )   EffectiveArea = 0.1565;
-      if (fabs(cand->p4().eta()) >= 2.2 )                                     EffectiveArea = 0.2680;
+    else {
+      // 7_4_X use eta 
+      // if (fabs(cand->p4().eta()) >= 0.0   && fabs(cand->p4().eta()) < 0.8 )   EffectiveArea = 0.1830;
+      // if (fabs(cand->p4().eta()) >= 0.8   && fabs(cand->p4().eta()) < 1.3 )   EffectiveArea = 0.1734;
+      // if (fabs(cand->p4().eta()) >= 1.3   && fabs(cand->p4().eta()) < 2.0 )   EffectiveArea = 0.1077;
+      // if (fabs(cand->p4().eta()) >= 2.0   && fabs(cand->p4().eta()) < 2.2 )   EffectiveArea = 0.1565;
+      //if (fabs(cand->p4().eta()) >= 2.2 )                                     EffectiveArea = 0.2680;
+
+      // 7_6_X use eta supercluster   
+        if (fabs(sclRef->eta()) >= 0.0   && fabs(sclRef->eta()) < 1.0 )   EffectiveArea = 0.1752;
+        if (fabs(sclRef->eta()) >= 1.0   && fabs(sclRef->eta()) < 1.479 ) EffectiveArea = 0.1862;
+        if (fabs(sclRef->eta()) >= 1.479 && fabs(sclRef->eta()) < 2.0 )   EffectiveArea = 0.1411;
+        if (fabs(sclRef->eta()) >= 2.0   && fabs(sclRef->eta()) < 2.2 )   EffectiveArea = 0.1534;
+        if (fabs(sclRef->eta()) >= 2.2   && fabs(sclRef->eta()) < 2.3 )   EffectiveArea = 0.1903;
+        if (fabs(sclRef->eta()) >= 2.3   && fabs(sclRef->eta()) < 2.4 )   EffectiveArea = 0.2243;
+        if (fabs(sclRef->eta()) >= 2.4   && fabs(sclRef->eta()) < 5.0  )  EffectiveArea = 0.2687;
+
+
     }
     RECOELE_PFX_rho.push_back(((*isoPFChargedelemap)[eletrackref]+ max( ((*isoPFNeutralelemap)[eletrackref]+(*isoPFGammaelemap)[eletrackref]- max(RHO_ele,0.0)*EffectiveArea),0.0))/cand->p4().pt()); 
        
