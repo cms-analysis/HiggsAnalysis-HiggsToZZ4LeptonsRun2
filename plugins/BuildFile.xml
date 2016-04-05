@@ -58,6 +58,7 @@
 <use   name="HLTrigger/HLTcore"/>
 <use   name="MagneticField/Records"/>
 <use   name="MagneticField/Engine"/>
+<use   name="KaMuCa/Calibration"/>
 <use   name="clhep"/>
 <use   name="hepmc"/>
 <use   name="heppdt"/>
