@@ -241,6 +241,30 @@ bool HZZ4LeptonsHLTAnalysisFilter::filter(edm::Event& iEvent, const edm::EventSe
     }
     
   }
+  else if( out.Contains("Fall15")){
+    if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
+
+      cout << "This is HLT in MC" << endl;
+      cout<<" HLTPathsFired... "<<hlt<<endl;
+    }
+
+    if(
+       !hlt.Contains("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v") &&    // di-electron trigger                       
+       !hlt.Contains("HLT_Ele16_Ele12_Ele8_CaloIdL_TrackIdL_v") && // Triele                                          
+       !hlt.Contains("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v") &&     // di-muon trigger                               
+       !hlt.Contains("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v") &&   // di-muon trigger                               
+       !hlt.Contains("HLT_TripleMu_12_10_5_v") &&  // Trimuon                                                                                                                         
+       !hlt.Contains("HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v")   && // MuEle                                
+       !hlt.Contains("HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v") &&    // MuEle                              
+       !hlt.Contains("HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v") &&  // Mu-DiEle                                            
+       !hlt.Contains("HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v") && //DiMu-Ele 
+       !hlt.Contains("HLT_Ele23_WPLoose_Gsf_v") //Single-Ele  
+       ) {
+      if( debug )cout << "Event not passing the HLT trigger paths" << endl;
+      return false;
+    }
+
+  }
   
   return true;
 
