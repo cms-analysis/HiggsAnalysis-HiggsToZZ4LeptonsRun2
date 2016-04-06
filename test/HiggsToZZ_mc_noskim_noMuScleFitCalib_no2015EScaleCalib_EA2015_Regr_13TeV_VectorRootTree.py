@@ -22,6 +22,30 @@ process.load('Configuration/EventContent/EventContent_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v12', '')
 
+process.load('HiggsAnalysis.HiggsToZZ4Leptons.bunchSpacingProducer_cfi')
+process.load('RecoMET.METFilters.metFilters_cff')
+process.Path_BunchSpacingproducer=cms.Path(process.bunchSpacingProducer)
+process.Flag_HBHENoiseFilter = cms.Path(process.HBHENoiseFilterResultProducer * process.HBHENoiseFilter)
+process.Flag_HBHENoiseIsoFilter = cms.Path(process.HBHENoiseFilterResultProducer * process.HBHENoiseIsoFilter)
+## process.Flag_CSCTightHaloFilter = cms.Path(process.CSCTightHaloFilter)                                                                                                             
+## process.Flag_CSCTightHaloTrkMuUnvetoFilter = cms.Path(process.CSCTightHaloTrkMuUnvetoFilter)                                                                                       
+process.Flag_CSCTightHalo2015Filter = cms.Path(process.CSCTightHalo2015Filter)
+## process.Flag_HcalStripHaloFilter = cms.Path(process.HcalStripHaloFilter)   
+## process.Flag_hcalLaserEventFilter = cms.Path(process.hcalLaserEventFilter)                                                                                                         
+process.Flag_EcalDeadCellTriggerPrimitiveFilter = cms.Path(process.EcalDeadCellTriggerPrimitiveFilter)
+## process.Flag_EcalDeadCellBoundaryEnergyFilter = cms.Path(process.EcalDeadCellBoundaryEnergyFilter) 
+process.Flag_goodVertices = cms.Path(process.primaryVertexFilter)
+## process.Flag_trackingFailureFilter = cms.Path(process.goodVertices + process.trackingFailureFilter)                                                                                
+process.Flag_eeBadScFilter = cms.Path(process.eeBadScFilter)
+## process.Flag_ecalLaserCorrFilter = cms.Path(process.ecalLaserCorrFilter)                                                                                                           
+## process.Flag_trkPOGFilters = cms.Path(process.trkPOGFilters)                                                                                                                       
+## process.Flag_chargedHadronTrackResolutionFilter = cms.Path(process.chargedHadronTrackResolutionFilter)                                                                             
+## proces..Flag_muonBadTrackFilter = cms.Path(process.muonBadTrackFilter)                                                                                                             
+## and the sub-filters                                                                                                                                                                
+# process.Flag_trkPOG_manystripclus53X = cms.Path(~manystripclus53X)                                                                                                                  
+# process.Flag_trkPOG_toomanystripclus53X = cms.Path(~toomanystripclus53X)                                                                                                            
+# process.Flag_trkPOG_logErrorTooManyClusters = cms.Path(~logErrorTooManyClusters)                     
+
 
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("VertexSelector",
@@ -77,11 +101,20 @@ process.hTozzTo4leptonsSelectionPath = cms.Path(
 #process.hTozzTo4leptonsSelectionOutputModuleNew = hTozzTo4leptonsSelectionOutputModule.clone()
 #process.hTozzTo4leptonsSelectionOutputModuleNew.fileName = "hTozzToLeptons.root"
 
+process.schedule = cms.Schedule( process.Path_BunchSpacingproducer,
+                                 process.Flag_HBHENoiseFilter,
+                                 process.Flag_HBHENoiseIsoFilter,
+                                 process.Flag_CSCTightHalo2015Filter,
+                                 process.Flag_EcalDeadCellTriggerPrimitiveFilter,
+                                 process.Flag_goodVertices,
+                                 process.Flag_eeBadScFilter,
+                                 process.hTozzTo4leptonsSelectionPath )
+
 #process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 readFiles = cms.untracked.vstring(
