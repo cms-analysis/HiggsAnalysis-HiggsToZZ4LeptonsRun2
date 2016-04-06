@@ -21,6 +21,13 @@ process.load('Configuration/EventContent/EventContent_cff')
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v12', '')
 
+# Random generator
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+    calibratedElectrons = cms.PSet(
+        initialSeed = cms.untracked.uint32(1),
+        engineName = cms.untracked.string('TRandom3')
+    )
+)
 
 process.goodOfflinePrimaryVertices = cms.EDFilter("VertexSelector",
                                             src = cms.InputTag('offlinePrimaryVertices'),
@@ -29,18 +36,13 @@ process.goodOfflinePrimaryVertices = cms.EDFilter("VertexSelector",
                                         )
         
 
-# Electron ordering in pT
-process.hTozzTo4leptonsElectronOrdering = cms.EDProducer("HZZ4LeptonsElectronOrdering",
-                                                         electronCollection = cms.InputTag("gsfElectrons")
-                                                         )
-
 process.load('HiggsAnalysis/HiggsToZZ4Leptons/hTozzTo4leptonsMuonCalibrator_cfi')
 process.hTozzTo4leptonsMuonCalibrator.isData = cms.bool(False) 
 
+process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
+process.calibratedElectrons.isMC = cms.bool(True)
 
 process.load('HiggsAnalysis/HiggsToZZ4Leptons/hTozzTo4leptonsPreselection_data_noskim_cff') 
-process.hTozzTo4leptonsElectronSelector.electronCollection = cms.InputTag("gedGsfElectrons")
-# process.vetoElectrons.src = cms.InputTag("calibratedElectrons")  
 process.hTozzTo4leptonsHLTInfo.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 process.hTozzTo4leptonsCommonRootTreePresel.use2011EA = cms.untracked.bool(False)
 process.hTozzTo4leptonsCommonRootTreePresel.triggerEvent  = cms.InputTag("hltTriggerSummaryAOD","","HLT")
@@ -61,7 +63,6 @@ process.genanalysis= cms.Sequence(
 process.hTozzTo4leptonsSelectionPath = cms.Path(
   process.goodOfflinePrimaryVertices     *
   process.genanalysis *
-  process.hTozzTo4leptonsElectronOrdering *
   process.hTozzTo4leptonsSelectionSequenceData *
   process.hTozzTo4leptonsMatchingSequence *
   process.hTozzTo4leptonsCommonRootTreePresel
@@ -77,7 +78,7 @@ process.hTozzTo4leptonsSelectionPath = cms.Path(
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )
 readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 readFiles = cms.untracked.vstring(
