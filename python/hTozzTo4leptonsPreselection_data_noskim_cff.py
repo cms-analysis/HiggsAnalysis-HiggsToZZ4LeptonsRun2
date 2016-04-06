@@ -133,16 +133,30 @@ if useSkimEarlyData == 'true':
                                      )    
 else:
 
+    # Electron Preselector
+    from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronSequences_cff import *
+    hTozzTo4leptonsElectronPreSelector=HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronSelector_cfi.hTozzTo4leptonsElectronSelector.clone()
+    hTozzTo4leptonsElectronPreSelector.electronCollection=cms.InputTag("gedGsfElectrons")
+    hTozzTo4leptonsElectronPreSelector.electronEtaMax=cms.double(2.5)
+    hTozzTo4leptonsElectronPreSelector.electronPtMin=cms.double(5.)
+    hTozzTo4leptonsElectronPreSelector.useEleID=cms.bool(False)
 
     # Electron ordering in pT
     hTozzTo4leptonsElectronOrdering = cms.EDProducer("HZZ4LeptonsElectronOrdering",
-     electronCollection = cms.InputTag("gedGsfElectrons"),
+     electronCollection = cms.InputTag("hTozzTo4leptonsElectronPreSelector"),
     )
+
+    # Electron scale calibration
+    from EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi import *
+    calibratedElectrons.electrons = cms.InputTag('hTozzTo4leptonsElectronOrdering')
+    calibratedElectrons.correctionFile = cms.string(files["76XReReco"])
+    calibratedElectrons.isMC = cms.bool(True)
+
 
     # Electron relaxed selection
     from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronSequences_cff import *
     hTozzTo4leptonsElectronSelector=HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronSelector_cfi.hTozzTo4leptonsElectronSelector.clone()
-    hTozzTo4leptonsElectronSelector.electronCollection=cms.InputTag("hTozzTo4leptonsElectronOrdering")
+    hTozzTo4leptonsElectronSelector.electronCollection=cms.InputTag("calibratedElectrons")
     hTozzTo4leptonsElectronSelector.electronEtaMax=cms.double(2.5)
     hTozzTo4leptonsElectronSelector.electronPtMin=cms.double(3.)
     hTozzTo4leptonsElectronSelector.useEleID=cms.bool(False)
@@ -341,10 +355,10 @@ vetoElectrons =  cms.EDFilter("GsfElectronRefSelector",
 
 # MVA Electron ID
 from HiggsAnalysis.HiggsToZZ4Leptons.electronIdMVAProducer_CSA14_cfi import *
-#mvaTrigV0.electronTag    = cms.InputTag("hTozzTo4leptonsElectronSelector")
-#mvaNonTrigV0.electronTag = cms.InputTag("hTozzTo4leptonsElectronSelector")
-mvaTrigV025nsPHYS14.electronTag    = cms.InputTag("gedGsfElectrons")
-mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("gedGsfElectrons")
+# mvaTrigV025nsPHYS14.electronTag    = cms.InputTag("gedGsfElectrons")
+# mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("gedGsfElectrons")
+mvaTrigV025nsPHYS14.electronTag    = cms.InputTag("hTozzTo4leptonsElectronOrdering")
+mvaNonTrigV025nsPHYS14.electronTag = cms.InputTag("hTozzTo4leptonsElectronOrdering")
 
 # New MVA Electron ID
 from RecoEgamma.ElectronIdentification.ElectronMVAValueMapProducer_cfi import *
@@ -827,6 +841,9 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
 #        hTozzTo4leptonsHLTAnalysisData              +
         hTozzTo4leptonsHLTInfo                      +
         hTozzTo4leptonsHLTAnalysisFilter            +
+        hTozzTo4leptonsElectronPreSelector          +
+        hTozzTo4leptonsElectronOrdering             +
+        calibratedElectrons                         +
         hTozzTo4leptonsElectronSelector             +
         electronMVAValueMapProducer                 +                   
         hTozzTo4leptonsMuonCalibrator               +
