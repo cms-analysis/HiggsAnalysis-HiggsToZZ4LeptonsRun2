@@ -3206,7 +3206,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      int index_bjets[2]={-999,-999};
      
      for (int i=0;i<50;i++){
-	 if (cSV_BTagJet_DISCR[i] > 0.89){ // 74x
+	 if (cSV_BTagJet_DISCR[i] > 0.8){ // 76x
 	 if(cSV_BTagJet_PT[i]>30. && fabs(cSV_BTagJet_ETA[i])<4.7 ) cout << "Found a bjet (pT>30 and |eta|<2.4) with pT= " << cSV_BTagJet_PT[i] << endl;	 
 	 n_bjets++;
 	 if (n_bjets==1) index_bjets[0]=i; 
@@ -3257,8 +3257,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      for(int i=0;i<RECO_PFJET_N;i++){
        if (jetfail[i]!=0) continue;
        for (int j=0;j<50;j++){
-	 if (cSV_BTagJet_PT[j]==RECO_PFJET_PT[i] && cSV_BTagJet_DISCR[j]>0.89 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
-	   //if (cSV_BTagJet_DISCR[j]>0.89 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
+	 if (cSV_BTagJet_PT[j]==RECO_PFJET_PT[i] && cSV_BTagJet_DISCR[j]>0.8 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
+	   //if (cSV_BTagJet_DISCR[j]>0.8 && cSV_BTagJet_PT[j]>30. && fabs(cSV_BTagJet_ETA[j])<4.7) {
 	   n_match_bjets++;
 	   //if (n_match_bjets==1) jet1=i;
 	   //if (n_match_bjets==2) jet2=i;
@@ -3992,23 +3992,32 @@ double HZZ4LeptonsAnalysis::masserror( std::vector<TLorentzVector> Lep, std::vec
 double HZZ4LeptonsAnalysis::EAele(int index,bool use2011EA){
   
   double EffectiveArea=0.;
-      if (use2011EA){
-        if (fabs(RECOELE_scl_Eta[index]) >= 0.0   && fabs(RECOELE_scl_Eta[index]) < 1.0 )   EffectiveArea = 0.18;
-        if (fabs(RECOELE_scl_Eta[index]) >= 1.0   && fabs(RECOELE_scl_Eta[index]) < 1.479 ) EffectiveArea = 0.20;
-        if (fabs(RECOELE_scl_Eta[index]) >= 1.479 && fabs(RECOELE_scl_Eta[index]) < 2.0 )   EffectiveArea = 0.15;
-        if (fabs(RECOELE_scl_Eta[index]) >= 2.0   && fabs(RECOELE_scl_Eta[index]) < 2.2 )   EffectiveArea = 0.19;
-        if (fabs(RECOELE_scl_Eta[index]) >= 2.2   && fabs(RECOELE_scl_Eta[index]) < 2.3 )   EffectiveArea = 0.21;
-        if (fabs(RECOELE_scl_Eta[index]) >= 2.3   && fabs(RECOELE_scl_Eta[index]) < 2.4 )   EffectiveArea = 0.22;
-        if (fabs(RECOELE_scl_Eta[index]) >= 2.4 )                                       EffectiveArea = 0.29;
-      }
-      else { // 7_4_x use eta
-        if (fabs(RECOELE_ETA[index]) >= 0.0   && fabs(RECOELE_ETA[index]) < 0.8 )   EffectiveArea = 0.1830;
-        if (fabs(RECOELE_ETA[index]) >= 0.8   && fabs(RECOELE_ETA[index]) < 1.3 )   EffectiveArea = 0.1734;
-        if (fabs(RECOELE_ETA[index]) >= 1.3   && fabs(RECOELE_ETA[index]) < 2.0 )   EffectiveArea = 0.1077;
-        if (fabs(RECOELE_ETA[index]) >= 2.0   && fabs(RECOELE_ETA[index]) < 2.2 )   EffectiveArea = 0.1565;
-        if (fabs(RECOELE_ETA[index]) >= 2.2 )                                       EffectiveArea = 0.2680;
-      }
-
+  if (use2011EA){
+    if (fabs(RECOELE_scl_Eta[index]) >= 0.0   && fabs(RECOELE_scl_Eta[index]) < 1.0 )   EffectiveArea = 0.18;
+    if (fabs(RECOELE_scl_Eta[index]) >= 1.0   && fabs(RECOELE_scl_Eta[index]) < 1.479 ) EffectiveArea = 0.20;
+    if (fabs(RECOELE_scl_Eta[index]) >= 1.479 && fabs(RECOELE_scl_Eta[index]) < 2.0 )   EffectiveArea = 0.15;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.0   && fabs(RECOELE_scl_Eta[index]) < 2.2 )   EffectiveArea = 0.19;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.2   && fabs(RECOELE_scl_Eta[index]) < 2.3 )   EffectiveArea = 0.21;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.3   && fabs(RECOELE_scl_Eta[index]) < 2.4 )   EffectiveArea = 0.22;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.4 )                                       EffectiveArea = 0.29;
+  }
+  //else { // 7_4_x use eta                                                                                                                                                       
+  // if (fabs(RECOELE_ETA[index]) >= 0.0   && fabs(RECOELE_ETA[index]) < 0.8 )   EffectiveArea = 0.1830;                                                                          
+  // if (fabs(RECOELE_ETA[index]) >= 0.8   && fabs(RECOELE_ETA[index]) < 1.3 )   EffectiveArea = 0.1734;                                                                          
+  // if (fabs(RECOELE_ETA[index]) >= 1.3   && fabs(RECOELE_ETA[index]) < 2.0 )   EffectiveArea = 0.1077;                                                                          
+  // if (fabs(RECOELE_ETA[index]) >= 2.0   && fabs(RECOELE_ETA[index]) < 2.2 )   EffectiveArea = 0.1565;                                                                          
+  // if (fabs(RECOELE_ETA[index]) >= 2.2 )                                       EffectiveArea = 0.2680;                                                                          
+  //}                                                                                                                                                                             
+  else { // 7_6_X use eta supercluster                                                                                                                                            
+    if (fabs(RECOELE_scl_Eta[index]) >= 0.0   && fabs(RECOELE_scl_Eta[index]) < 1.0 )   EffectiveArea = 0.1752;
+    if (fabs(RECOELE_scl_Eta[index]) >= 1.0   && fabs(RECOELE_scl_Eta[index]) < 1.479 ) EffectiveArea = 0.1862;
+    if (fabs(RECOELE_scl_Eta[index]) >= 1.479 && fabs(RECOELE_scl_Eta[index]) < 2.0 )   EffectiveArea = 0.1411;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.0   && fabs(RECOELE_scl_Eta[index]) < 2.2 )   EffectiveArea = 0.1534;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.2   && fabs(RECOELE_scl_Eta[index]) < 2.3 )   EffectiveArea = 0.1903;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.3   && fabs(RECOELE_scl_Eta[index]) < 2.4 )   EffectiveArea = 0.2243;
+    if (fabs(RECOELE_scl_Eta[index]) >= 2.4   && fabs(RECOELE_scl_Eta[index]) < 5.0  )  EffectiveArea = 0.2687;
+  }
+  
   return EffectiveArea;
 
 }
