@@ -626,7 +626,7 @@ from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsMatchingSequence_cff  import
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsRootTree_cfi  import *
 hTozzTo4leptonsRootTreePresel=HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsRootTree_cfi.hTozzTo4leptonsRootTree.clone()
 hTozzTo4leptonsRootTreePresel.decaychannel = cms.string('2e2mu')
-hTozzTo4leptonsRootTreePresel.rootFileName = cms.untracked.string('roottree_leptons.root')
+hTozzTo4leptonsRootTreePresel.rootFileName = cms.untracked.string('roottree_leptons_vectors.root')
 # hlt
 hTozzTo4leptonsRootTreePresel.fillHLTinfo = cms.untracked.bool(False)                                           
 hTozzTo4leptonsRootTreePresel.HLTAnalysisinst = cms.string('hTozzTo4leptonsHLTAnalysisData')
