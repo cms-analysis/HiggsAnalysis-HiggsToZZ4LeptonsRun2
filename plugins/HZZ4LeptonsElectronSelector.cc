@@ -61,7 +61,7 @@ void HZZ4LeptonsElectronSelector::produce(edm::Event& iEvent, const edm::EventSe
     // Loop over GsfElectrons
     for (unsigned int i = 0; i < electrons->size(); ++i) {
       Ref<edm::View<reco::GsfElectron> > electronRef(electrons,i);
-      cout << "Electron selector found with pt" << electronRef->pt() << endl;
+      cout << "Electron selector found with pT= " << electronRef->pt() << endl;
       if (electronRef->pt() >= elecPtMin && fabs(electronRef->eta()) < elecEtaMax){
 	Gelec->push_back( *electronRef );
 	++counterelectron;
