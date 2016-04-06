@@ -5,6 +5,7 @@ git clone https://github.com/cms-analysis/HiggsAnalysis-HiggsToZZ4LeptonsRun2 Hi
 git clone -b 74x-root6 https://github.com/cms-analysis/HiggsAnalysis-CombinedLimit.git HiggsAnalysis/CombinedLimit 
 git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement -b V00-02-01-patch1
 git clone https://github.com/bachtis/Analysis.git -b KaMuCa_V2 KaMuCa 
+cp /afs/cern.ch/user/n/ndefilip/public/KalmanMuonCalibrator.cc $CMSSW_BASE/src/KaMuCa/Calibration/src/.
 git clone https://github.com/tocheng/KinZfitter.git
 git cms-merge-topic -u matteosan1:smearer_76X
 
