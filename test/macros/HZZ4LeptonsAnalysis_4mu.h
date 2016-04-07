@@ -1100,6 +1100,7 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    ofstream bnn_file;
+   double EAele(int ,bool );
    double masserror( std::vector<TLorentzVector> Lep, std::vector<double> pterr );
    void printmubnn(int i);
 };

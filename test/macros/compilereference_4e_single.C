@@ -58,7 +58,7 @@ int main(int argc, char ** argv){
   HZZ4LeptonsAnalysis make3(tree3,1.,dataconf,mcconf);
   //HZZ4LeptonsAnalysis make3(tree3);
 
-  sprintf(nome,"output_Spring15_Higgs.root");
+  sprintf(nome,"output_Fall15_Higgs.root");
   make3.Loop(nome);
 
   cout << "Create file with name: " << nome << endl;

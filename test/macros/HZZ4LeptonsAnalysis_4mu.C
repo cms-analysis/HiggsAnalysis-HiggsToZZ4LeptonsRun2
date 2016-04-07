@@ -24,7 +24,7 @@
 #include "ZZMatrixElement/MELA/src/computeAngles.cc"
 #include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
 
-#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+//#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
 
 using namespace std;
@@ -298,7 +298,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    ///////   
 
    // Pileup reweighting
-   edm::LumiReWeighting LumiWeights_;
+   //edm::LumiReWeighting LumiWeights_;
    
    // initialize 1-D reweighting 2012
    /*
