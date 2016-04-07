@@ -1929,7 +1929,8 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
       if(!PupInfo.isValid()) return;
       for( vector<PileupSummaryInfo>::const_iterator cand = PupInfo->begin();cand != PupInfo->end(); ++ cand ) { 
 	std::cout << " Pileup Information: bunchXing, nvtx: " << cand->getBunchCrossing() << " " << cand->getPU_NumInteractions() << std::endl;
-	num_PU_vertices=cand->getPU_NumInteractions();
+	if (cand->getBunchCrossing() == 0) num_PU_vertices=cand->getTrueNumInteractions();;
+	// num_PU_vertices=cand->getPU_NumInteractions(); in-time,out-of-time pileup
 	PU_BunchCrossing=cand->getBunchCrossing();
       }	
   }

@@ -1690,7 +1690,8 @@ void HZZ4LeptonsRootTree::fillPU(const edm::Event& iEvent)
   iEvent.getByToken(PileupSrc_, PupInfo);
   if(!PupInfo.isValid()) return;
   for( vector<PileupSummaryInfo>::const_iterator cand = PupInfo->begin();cand != PupInfo->end(); ++ cand ) {
-    num_PU_vertices = cand->getTrueNumInteractions();
+    if (cand->getBunchCrossing() == 0) num_PU_vertices=cand->getTrueNumInteractions();
+    // num_PU_vertices = cand->getPU_NumInteractions();
     PU_BunchCrossing = cand->getBunchCrossing();
   }
 }
