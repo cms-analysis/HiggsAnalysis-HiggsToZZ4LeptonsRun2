@@ -1114,115 +1114,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	//else continue;	
       }
 
-      // **** Step 1: SKIM ****
-      // the same for all sub-channels
-      // pair of leptons (irrespective of flavor/charge with pt > 20, 10) and a SF pair with mass > 40
-      // ele are gsf with |eta| < 2.5
-      // mu are global or tracker with |eta| < 2.4
-      
-      bool not_pass_Skim = 0;
-
-      
-      // 1)count the leptons and check pt > 10/20:
-      int N_leptons_skim = 0;
-      double maxPt_skim = -1;
-
-      
-      for(int i = 0; i < RECO_NMU; ++i){
-        
-      	if( (RECOMU_isGlobalMu[i] == 1 || RECOMU_isTrackerMu[i] == 1) && fabs( RECOMU_ETA[i] ) < 2.4 ){
-	
-		if( RECOMU_PT[i] <= 10 ) continue;
-		if( RECOMU_PT[i] > maxPt_skim ) maxPt_skim = RECOMU_PT[i];
-		++N_leptons_skim;
-	}
-      }
-
-      for(int i = 0; i < RECO_NELE; ++i){
-        
-       	if( fabs( RECOELE_ETA[i] ) < 2.5 ){
-	
-		if( RECOELE_PT[i] <= 10 ) continue;
-		if( RECOELE_PT[i] > maxPt_skim ) maxPt_skim = RECOELE_PT[i];
-		++N_leptons_skim;
-	}
-      }
-      
-      if( N_leptons_skim >= 2 && maxPt_skim > 20 ) /* ok */;
-      else not_pass_Skim = 1;
-
-
-      // 2) mass of at least one SF pair > 40 GeV
-      
-      //   RECO_NMU   RECO_NELE
-      double max_mass = -1;
-      
-      for (int i = 0; i < RECO_NMU + RECO_NELE; ++i)
-      	for (int j = i + 1; j < RECO_NMU + RECO_NELE; ++j){
-	  
-	  int i_mu =  ( i < RECO_NMU ) ? i : -1;
-	  int i_ele = ( i < RECO_NMU ) ? -1 : i - RECO_NMU;
-	  int j_mu =  ( j < RECO_NMU ) ? j : -1;
-	  int j_ele = ( j < RECO_NMU ) ? -1 : j - RECO_NMU;
-	  
-	  if(i < RECO_NMU && j < RECO_NMU ){
-	    //mu mu
-	    
-	    if( RECOMU_PT[i_mu] <= 3 ||  RECOMU_PT[j_mu] <= 3
-		|| fabs( RECOMU_ETA[i_mu] ) >= 2.4
-		|| fabs( RECOMU_ETA[j_mu] ) >= 2.4
-		|| !( RECOMU_isGlobalMu[i_mu] || RECOMU_isTrackerMu[i_mu] ) 
-		|| !( RECOMU_isGlobalMu[j_mu] || RECOMU_isTrackerMu[j_mu] ) 
-		) continue ;
-	    
-	    double mass = sqrt( pow( RECOMU_E[i_mu] + RECOMU_E[j_mu] ,2) 
-				- ( pow(RECOMU_PT[i_mu]*cos( RECOMU_PHI[i_mu] ) + RECOMU_PT[j_mu]*cos( RECOMU_PHI[j_mu] ),2) 
-				    + pow(RECOMU_PT[i_mu]*sin( RECOMU_PHI[i_mu] ) + RECOMU_PT[j_mu]*sin( RECOMU_PHI[j_mu] ),2) 
-				    + pow(RECOMU_P[i_mu]*cos( RECOMU_THETA[i_mu] ) + RECOMU_P[j_mu]*cos( RECOMU_THETA[j_mu] ),2) ) );
-	    
-	    if (mass > max_mass)  max_mass = mass;
-	  }
-	  else if (i >= RECO_NMU && j < RECO_NMU ){
-	    //e mu
-	    ;
-	  }
-	  else if (i < RECO_NMU && j >= RECO_NMU ){
-	    //mu e
-	    ;		
-	  }
-	  else if (i >= RECO_NMU && j >= RECO_NMU ){
-	    //e e
-	    
-	    if( RECOELE_PT[i_ele] <= 5 ||  RECOELE_PT[j_ele] <= 5
-		|| fabs( RECOELE_ETA[i_ele] ) >= 2.5
-		|| fabs( RECOELE_ETA[j_ele] ) >= 2.5
-		) continue ;
-	    
-	    double mass = sqrt( pow( RECOELE_E[i_ele] + RECOELE_E[j_ele] ,2) 
-				- ( pow(RECOELE_PT[i_ele]*cos( RECOELE_PHI[i_ele] ) + RECOELE_PT[j_ele]*cos( RECOELE_PHI[j_ele] ),2) 
-				    + pow(RECOELE_PT[i_ele]*sin( RECOELE_PHI[i_ele] ) + RECOELE_PT[j_ele]*sin( RECOELE_PHI[j_ele] ),2) 
-				    + pow(RECOELE_P[i_ele]*cos( RECOELE_THETA[i_ele] ) + RECOELE_P[j_ele]*cos( RECOELE_THETA[j_ele] ),2) ) );
-	    
-	    if (mass > max_mass)  max_mass = mass;
-	    
-	    
-	  }
-	  else cout << "\n what the hell ?!?!" << endl;
-	}// end loop on lepton pairs
-      
-      if( max_mass > 40 ) /* ok */;
-      else not_pass_Skim = 1;
-      
-      if( debug ) cout << "\n ** Step 1 (Skim): "
-		       << "\n N_leptons_skim" << N_leptons_skim	
-		       << "\n maxPt_skim" << maxPt_skim	
-		       << "\n max_mass" << max_mass	
-		       << endl ;
-      
-      //if(not_pass_Skim) continue;
       ++N_1 ;  // fill counter
       N_1_w=N_1_w+newweight;
-      
       
       
       // **** Step 2: TRIGGER, electron cleaning, lepton selection ****
@@ -1511,36 +1404,19 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  //&& RECOELE_gsftrack_expected_inner_hits[i]<=1 ) /* ok */ ;
 	else continue ;
 	
-	bool BDT_ok = 0; // Spring15 with CMSSW_7_4_5
-	if( RECOELE_PT[i] > 5. &&  RECOELE_PT[i] <= 10. ){
-		if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.586 ) BDT_ok = 1 ;
+	bool BDT_ok = 0; // Fall15 with CMSSW_7_6_x
+	if( RECOELE_PT[i] > 7. &&  RECOELE_PT[i] <= 10. ){
+		if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.265 ) BDT_ok = 1 ;
 		if( ( fabs(RECOELE_scl_Eta[i]) >= .8 && fabs(RECOELE_scl_Eta[i]) < 1.479 )
-						 && RECOELE_mvaNonTrigV0[i] > -0.712 ) BDT_ok = 1 ;
-		if( fabs(RECOELE_scl_Eta[i]) >= 1.479 && RECOELE_mvaNonTrigV0[i] > -0.662 ) BDT_ok = 1 ;
+						 && RECOELE_mvaNonTrigV0[i] > -0.556 ) BDT_ok = 1 ;
+		if( fabs(RECOELE_scl_Eta[i]) >= 1.479 && RECOELE_mvaNonTrigV0[i] > -0.551 ) BDT_ok = 1 ;
 	}
 	else { 
-		if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.652 ) BDT_ok = 1 ;
+		if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.072 ) BDT_ok = 1 ;
 		if( ( fabs(RECOELE_scl_Eta[i]) >= .8 && fabs(RECOELE_scl_Eta[i]) <= 1.479 )
-						 && RECOELE_mvaNonTrigV0[i] > -0.701 ) BDT_ok = 1 ;
-		if( fabs(RECOELE_scl_Eta[i]) > 1.479 && RECOELE_mvaNonTrigV0[i] > -0.350 ) BDT_ok = 1 ;
-	}
-
-	/*
-	bool BDT_ok = 0; // Phys14 with CMSSW_7_2_0                                                                                                                                    
-        if( RECOELE_PT[i] > 5. &&  RECOELE_PT[i] <= 10. ){
-	  if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.202 ) BDT_ok = 1 ;
-	  if( ( fabs(RECOELE_scl_Eta[i]) >= .8 && fabs(RECOELE_scl_Eta[i]) < 1.479 )
-	      && RECOELE_mvaNonTrigV0[i] > -0.444 ) BDT_ok = 1 ;
-	  if( fabs(RECOELE_scl_Eta[i]) >= 1.479 && RECOELE_mvaNonTrigV0[i] > 0.264 ) BDT_ok = 1 ;
-        }
-        else {
-	  if( fabs(RECOELE_scl_Eta[i]) < .8 && RECOELE_mvaNonTrigV0[i] > -0.110 ) BDT_ok = 1 ;
-	  if( ( fabs(RECOELE_scl_Eta[i]) >= .8 && fabs(RECOELE_scl_Eta[i]) <= 1.479 )
-	      && RECOELE_mvaNonTrigV0[i] > -0.284 ) BDT_ok = 1 ;
-	  if( fabs(RECOELE_scl_Eta[i]) > 1.479 && RECOELE_mvaNonTrigV0[i] > -0.212 ) BDT_ok = 1 ;
-        }
-	*/
-
+						 && RECOELE_mvaNonTrigV0[i] > -0.286 ) BDT_ok = 1 ;
+		if( fabs(RECOELE_scl_Eta[i]) > 1.479 && RECOELE_mvaNonTrigV0[i] > -0.267 ) BDT_ok = 1 ;
+	}	
 	if( !BDT_ok ) continue ;
 	
 	if( fabs(RECOELE_gsftrack_dxy[i]) < .5 
