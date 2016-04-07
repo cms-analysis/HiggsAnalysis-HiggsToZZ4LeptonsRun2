@@ -34,14 +34,9 @@ public :
    Float_t         Avginstlumi;
    Int_t           num_PU_vertices;
    Int_t           PU_BunchCrossing;
+   Float_t         MC_weighting;
    Int_t           RECO_nMuHLTMatch;
-   Int_t           RECO_nMuHLTMatchPAT;
-   Int_t           RECO_nMuHLTMatch_asym_PAT;
    Float_t         RECOMU_PT_MuHLTMatch[100];
-   Float_t         RECOMU_PT_MuHLTMatchPAT[100];
-   Float_t         RECOMU_PT_MuHLTMatch_asym_PAT[100];
-   Int_t           RECO_nEleHLTMatchPAT;
-   Float_t         RECOELE_PT_EleHLTMatchPAT[100];
    Char_t          HLTPathsFired[20000];
    Float_t         MC_E[7];
    Float_t         MC_PT[7];
@@ -226,7 +221,6 @@ public :
    Double_t        RECOELE_PFPUchAllPart[100];
    Double_t        RECOELE_PFX_dB[100];
    Double_t        RECOELE_PFX_rho[100];
-   Double_t        RECOELE_PF_RingsIsoMVA[100];
    Double_t        RECOELE_regEnergy[100];
    Double_t        RECOELE_regEnergyError[100];
    Float_t         RECOELE_SIP[100];
@@ -293,7 +287,6 @@ public :
    Double_t        RECOMU_PFPUchAllPart[100];
    Double_t        RECOMU_PFX_dB[100];
    Double_t        RECOMU_PFX_rho[100];
-   Double_t        RECOMU_PF_RingsIsoMVA[100];
    Double_t        RECOPFPHOT_PFchHad[20];
    Double_t        RECOPFPHOT_PFneuHad[20];
    Double_t        RECOPFPHOT_PFphoton[20];
@@ -564,14 +557,9 @@ public :
    TBranch        *b_Avginstlumi;   //!
    TBranch        *b_num_PU_vertices;   //!
    TBranch        *b_PU_BunchCrossing;   //!
+   TBranch        *b_MC_weighting;   //!
    TBranch        *b_RECO_nMuHLTMatch;   //!
-   TBranch        *b_RECO_nMuHLTMatchPAT;   //!
-   TBranch        *b_RECO_nMuHLTMatch_asym_PAT;   //!
    TBranch        *b_RECOMU_PT_MuHLTMatch;   //!
-   TBranch        *b_RECOMU_PT_MuHLTMatchPAT;   //!
-   TBranch        *b_RECOMU_PT_MuHLTMatch_asym_PAT;   //!
-   TBranch        *b_RECO_nEleHLTMatchPAT;   //!
-   TBranch        *b_RECOELE_PT_EleHLTMatchPAT;   //!
    TBranch        *b_HLTPathsFired;   //!
    TBranch        *b_MC_E;   //!
    TBranch        *b_MC_PT;   //!
@@ -756,7 +744,6 @@ public :
    TBranch        *b_RECOELE_PFPUchAllPart;   //!
    TBranch        *b_RECOELE_PFX_dB;   //!
    TBranch        *b_RECOELE_PFX_rho;   //!
-   TBranch        *b_RECOELE_PF_RingsIsoMVA;   //!
    TBranch        *b_RECOELE_regEnergy;   //!
    TBranch        *b_RECOELE_regEnergyError;   //!
    TBranch        *b_RECOELE_SIP;   //!
@@ -823,7 +810,6 @@ public :
    TBranch        *b_RECOMU_PFPUchAllPart;   //!
    TBranch        *b_RECOMU_PFX_dB;   //!
    TBranch        *b_RECOMU_PFX_rho;   //!
-   TBranch        *b_RECOMU_PF_RingsIsoMVA;   //!
    TBranch        *b_RECOPFPHOT_PFchHad;   //!
    TBranch        *b_RECOPFPHOT_PFneuHad;   //!
    TBranch        *b_RECOPFPHOT_PFphoton;   //!
@@ -1170,20 +1156,15 @@ void HZZ4LeptonsAnalysis::Init(TTree *tree)
    fChain->SetMakeClass(1);
 
 
-  fChain->SetBranchAddress("Run", &Run, &b_irun);
+   fChain->SetBranchAddress("Run", &Run, &b_irun);
    fChain->SetBranchAddress("Event", &Event, &b_ievt);
    fChain->SetBranchAddress("LumiSection", &LumiSection, &b_ils);
    fChain->SetBranchAddress("Avginstlumi", &Avginstlumi, &b_Avginstlumi);
    fChain->SetBranchAddress("num_PU_vertices", &num_PU_vertices, &b_num_PU_vertices);
    fChain->SetBranchAddress("PU_BunchCrossing", &PU_BunchCrossing, &b_PU_BunchCrossing);
+   fChain->SetBranchAddress("MC_weighting", &MC_weighting, &b_MC_weighting);
    fChain->SetBranchAddress("RECO_nMuHLTMatch", &RECO_nMuHLTMatch, &b_RECO_nMuHLTMatch);
-   fChain->SetBranchAddress("RECO_nMuHLTMatchPAT", &RECO_nMuHLTMatchPAT, &b_RECO_nMuHLTMatchPAT);
-   fChain->SetBranchAddress("RECO_nMuHLTMatch_asym_PAT", &RECO_nMuHLTMatch_asym_PAT, &b_RECO_nMuHLTMatch_asym_PAT);
    fChain->SetBranchAddress("RECOMU_PT_MuHLTMatch", RECOMU_PT_MuHLTMatch, &b_RECOMU_PT_MuHLTMatch);
-   fChain->SetBranchAddress("RECOMU_PT_MuHLTMatchPAT", RECOMU_PT_MuHLTMatchPAT, &b_RECOMU_PT_MuHLTMatchPAT);
-   fChain->SetBranchAddress("RECOMU_PT_MuHLTMatch_asym_PAT", RECOMU_PT_MuHLTMatch_asym_PAT, &b_RECOMU_PT_MuHLTMatch_asym_PAT);
-   fChain->SetBranchAddress("RECO_nEleHLTMatchPAT", &RECO_nEleHLTMatchPAT, &b_RECO_nEleHLTMatchPAT);
-   fChain->SetBranchAddress("RECOELE_PT_EleHLTMatchPAT", RECOELE_PT_EleHLTMatchPAT, &b_RECOELE_PT_EleHLTMatchPAT);
    fChain->SetBranchAddress("HLTPathsFired", HLTPathsFired, &b_HLTPathsFired);
    fChain->SetBranchAddress("MC_E", MC_E, &b_MC_E);
    fChain->SetBranchAddress("MC_PT", MC_PT, &b_MC_PT);
@@ -1368,7 +1349,6 @@ void HZZ4LeptonsAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("RECOELE_PFPUchAllPart", RECOELE_PFPUchAllPart, &b_RECOELE_PFPUchAllPart);
    fChain->SetBranchAddress("RECOELE_PFX_dB", RECOELE_PFX_dB, &b_RECOELE_PFX_dB);
    fChain->SetBranchAddress("RECOELE_PFX_rho", RECOELE_PFX_rho, &b_RECOELE_PFX_rho);
-   fChain->SetBranchAddress("RECOELE_PF_RingsIsoMVA", RECOELE_PF_RingsIsoMVA, &b_RECOELE_PF_RingsIsoMVA);
    fChain->SetBranchAddress("RECOELE_regEnergy", RECOELE_regEnergy, &b_RECOELE_regEnergy);
    fChain->SetBranchAddress("RECOELE_regEnergyError", RECOELE_regEnergyError, &b_RECOELE_regEnergyError);
    fChain->SetBranchAddress("RECOELE_SIP", RECOELE_SIP, &b_RECOELE_SIP);
@@ -1435,7 +1415,6 @@ void HZZ4LeptonsAnalysis::Init(TTree *tree)
    fChain->SetBranchAddress("RECOMU_PFPUchAllPart", RECOMU_PFPUchAllPart, &b_RECOMU_PFPUchAllPart);
    fChain->SetBranchAddress("RECOMU_PFX_dB", RECOMU_PFX_dB, &b_RECOMU_PFX_dB);
    fChain->SetBranchAddress("RECOMU_PFX_rho", RECOMU_PFX_rho, &b_RECOMU_PFX_rho);
-   fChain->SetBranchAddress("RECOMU_PF_RingsIsoMVA", RECOMU_PF_RingsIsoMVA, &b_RECOMU_PF_RingsIsoMVA);
    fChain->SetBranchAddress("RECOPFPHOT_PFchHad", RECOPFPHOT_PFchHad, &b_RECOPFPHOT_PFchHad);
    fChain->SetBranchAddress("RECOPFPHOT_PFneuHad", RECOPFPHOT_PFneuHad, &b_RECOPFPHOT_PFneuHad);
    fChain->SetBranchAddress("RECOPFPHOT_PFphoton", RECOPFPHOT_PFphoton, &b_RECOPFPHOT_PFphoton);

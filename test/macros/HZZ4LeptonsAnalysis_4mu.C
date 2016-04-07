@@ -24,8 +24,6 @@
 #include "ZZMatrixElement/MELA/src/computeAngles.cc"
 #include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
 
-//#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
-
 
 using namespace std;
 // using namespace RooFit;
@@ -297,54 +295,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    }
    ///////   
 
-   // Pileup reweighting
-   //edm::LumiReWeighting LumiWeights_;
-   
-   // initialize 1-D reweighting 2012
-   /*
-   LumiWeights_ = edm::LumiReWeighting(
-				       "puProfile_Summer12_53X.root",
-				       "puProfile_Data_8TeV.root",
-				       "pileup",
-				       "pileup");
-   
+   // Pileup reweighting 2015 data vs Fall15 MC in 76x
+
    TFile *_filePU;
-   boost::shared_ptr<TH1> puMCtrue;
-
-   if (MC_type == "Summer12"){
-     _filePU= TFile::Open("puProfile_Summer12_53X.root");
-     puMCtrue=boost::shared_ptr<TH1>(  (static_cast<TH1*>(_filePU->Get("pileup")->Clone() )) );
-     puMCtrue->Scale(double(1./puMCtrue->Integral(0,-1)));
-   }
-   
-   if (MC_type == "Fall11") {
-     _filePU=TFile::Open("PUvertices/PUvertices_DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_true.root"); 
-     puMCtrue=boost::shared_ptr<TH1>(  (static_cast<TH1*>(_filePU->Get("nPUvertices")->Clone() )) );
-     puMCtrue->Scale(double(1./puMCtrue->Integral(0,-1)));
-   }
-   */
-
-   Char_t PU_MC[500];
-   TString datasetBaseNew=basename(datasetChar);
-   TString samplename=datasetBaseNew.ReplaceAll("output_","");
-   if (MC_type == "Summer12") sprintf(PU_MC,"PUvertices/PUvertices_%s.root",samplename.Data());
-   else if (MC_type == "Fall11") sprintf(PU_MC,"PUvertices/PUvertices_%s.root",samplename.Data());
-   // else sprintf(PU_MC,"PUvertices/PUvertices_DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball.root");
-   // cout << PU_MC << endl;
-   // TFile *_filePUMC = TFile::Open(PU_MC);
-   // boost::shared_ptr<TH1> puMC=boost::shared_ptr<TH1>(  (static_cast<TH1*>(_filePUMC->Get("nPUvertices")->Clone() )) );
-   // puMC->Scale(double(1./puMC->Integral(0,-1)));
-   
-   // TH1F *puMC_ratio;   
-   // if (MC_type == "Summer12" || MC_type == "Fall11"){
-   //   puMC_ratio=new TH1F("puMC_ratio", "puMC_ratio", 70,0., 70.);
-   //   for (int nbins=1;nbins<=puMCtrue->GetNbinsX(); nbins++){
-   //     if (puMC->GetBinContent(nbins)>0.) {
-   // 	 puMC_ratio->SetBinContent(nbins,double(puMCtrue->GetBinContent(nbins)/puMC->GetBinContent(nbins)));
-   //     }
-   //   } 
-   // }
-
+   _filePU= TFile::Open("pileup_MC_Data_76x_50ns_25ns_silver.root");     
+   TH1D *puweight = (TH1D*)_filePU->Get("puweight"); 
 
    /////////////Lepton Efficiency Scale Factrons/////////////
    // Load histograms
@@ -1001,47 +956,26 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       newweight=weight;
       cout << "Starting weight= " << newweight << endl;
 
-      // pileup reweighting 2012 and 2011
+      // Weight for MCNLO samples
+      if( datasetName.Contains("amcatnlo")) {      
+	cout << "Reweighting sample of amcatnlo with weight= " << MC_weighting << endl;
+	weight=weight*MC_weighting;
+      }
+      
+      // pileup reweighting 2015
       hPUvertices->Fill(num_PU_vertices,weight);
 
-      double weightMC=1.;
-
-      /*
-      if (MC_type == "Summer12" || MC_type == "Fall11"){
-	Int_t binx = puMC_ratio->GetXaxis()->FindBin(num_PU_vertices);
-	cout << " bin x= " << binx << " " << puMC_ratio->GetBinContent(binx) << endl;	
-	weightMC=double(puMC_ratio->GetBinContent(binx));
-      }      
-            
-      double pu_weight_data=1.;
-      if (MC_type == "Summer12") pu_weight_data=LumiWeights_.weight( float(num_PU_vertices) );      
-      if (MC_type == "Fall11") {
-	Int_t binx = hist_puweights_2011->GetXaxis()->FindBin(num_PU_vertices);
-	pu_weight_data=double(hist_puweights_2011->GetBinContent(binx));
-      }
       double pu_weight=1.;
-      
-      if (MC_type == "Summer12" || MC_type == "Fall11") pu_weight=pu_weight_data*weightMC;  
-      */
-
-      // Phys14    
-      double pu_weight, pu_weight_data;
-      if (MC_type == "Phys14") 
-	pu_weight=1., pu_weight_data=1.;
+      if (MC_type == "Fall15"){
+	Int_t binx = puweight->GetXaxis()->FindBin(num_PU_vertices);
+	cout << " bin x= " << binx << " " << puweight->GetBinContent(binx) << endl;	
+	pu_weight=double(puweight->GetBinContent(binx));
+	
+      }      
+       
  
       hPUvertices_ReWeighted->Fill(num_PU_vertices,weight*pu_weight);
-      cout << "Pileup interations and data weight is= " << num_PU_vertices << " " << pu_weight_data 
-      	   << " and with MC reweight= " << weightMC 
-      	   << " and final weight= " << pu_weight << endl;
-      
-      //       double pu_weight=1.;
-      //       if (MC_type == "Summer12" || MC_type == "Fall11")  {
-      // 	pu_weight=LumiWeights_.weight( npT );
-      //       }
-      //       hPUvertices_ReWeighted->Fill(num_PU_vertices,weight*pu_weight);
-      //       cout << "Pileup interations and weight is= " << num_PU_vertices << " " << pu_weight
-      // 	   << " and with MC reweight= " << weightMC 
-      // 	   << " and final weight= " << weight*pu_weight << endl;
+      cout << "Pileup interations and weight is= " << num_PU_vertices << " " << " and weight= " << pu_weight << endl;  
 
       // Changing the weight for pileup
       newweight=weight*pu_weight;
@@ -3900,7 +3834,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    nEvent_4l_w->SetBinContent(20,N_9_2FSR_w);
    
    // write on output root file:
-
+   _filePU->Close();
    theFile->cd();
    //z1tree->Write();
    newtree->Write();
