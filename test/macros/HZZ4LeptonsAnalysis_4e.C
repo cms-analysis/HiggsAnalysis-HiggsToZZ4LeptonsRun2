@@ -1291,7 +1291,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       hSip_loose_e->Fill( max_Sip_loose_e,newweight );
       hIp_loose_e->Fill( max_Ip_loose_e,newweight );
       
-      // Electron Cleaning  -- eles separated from muons (deltaR > 0.05)
+      // Electron Cross Cleaning  -- eles separated from muons (deltaR > 0.05)
       
       for(int e = 0; e < RECO_NELE; ++e)
       	for(int mu = 0; mu < RECO_NMU; ++mu){
@@ -1302,7 +1302,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      && RECOMU_PT[mu] > 5. 
 	      && fabs(RECOMU_ETA[mu]) < 2.4 
 	      && fabs(RECOMU_mubesttrkDxy[mu]) < .5 && fabs(RECOMU_mubesttrkDz[mu]) < 1. 
-	      && fabs(RECOMU_SIP[mu])<4. 
+	      && fabs(RECOMU_SIP[mu])<4.  // TightID + SIP cut
 	      );
 	  else continue;
 	  
@@ -1310,7 +1310,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  
 	  if( deltaR <= 0.05 ){
 	    
-	    if( debug )cout << "Event not passing the HLT trigger paths" << endl;
+	    if( debug )cout << "Electrom not passing the cross cleaning" << endl;
 	    
 	    RECOELE_PT[e]  = -0.01;
 	    RECOELE_ETA[e] = -99.;
@@ -1474,7 +1474,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  
 	  // cleaning
 	  for(int e = 0; e < N_loose_e; ++e){
-  	    if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;
+  	    if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;  // loose ID + SIP cut
 	    double deltaPhi = DELTAPHI( RECOPFPHOT_PHI[i] , RECOELE_scl_Phi[iL_loose_e[e]] ) ;
 	    double deltaEta = fabs( RECOPFPHOT_ETA[i] - RECOELE_scl_Eta[iL_loose_e[e]] );
 	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[i] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[i] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
@@ -1527,7 +1527,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	int  tag_min_deltaR = -1;   // 0: mu  1: ele
 	
 	for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
-	  if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;
+	  if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;  //loose ID + SIP cut
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
@@ -1539,7 +1539,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	}//end loop on muons  
 	
 	for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
-	  if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue;
+	  if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue;  //loose ID + SIP cut
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[l]],2) );
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
@@ -1552,7 +1552,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	
        
 	if( min_deltaR < 0.5 && min_deltaR_ET2<0.012 ){
-	    //iLp_l[ i ] = iL[l_min_deltaR];
 	    if (tag_min_deltaR==0) iLp_l[ i ] = iL_loose_mu[l_min_deltaR];
 	    if (tag_min_deltaR==1) iLp_l[ i ] = iL_loose_e[l_min_deltaR];
 	    iLp_tagEM[ i ] = tag_min_deltaR;
@@ -1584,9 +1583,77 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		  << "\niLp_tagEM[7]: " << iLp_tagEM[7]
 		  << endl ;
 
+      // for(int i=0.;i<Nphotons;i++) {
+      // 	if (iLp_l[i]!=-1 && iLp_tagEM[i]==1) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " attached to an electron with pT= " << RECOELE_PT[iLp_l[i]] << endl;
+      // };
+
+      // Multiple photons associated to the same lepton: the lowest-ΔR(γ,l)/ETγ2 has to be selected.
+      double min_deltaR_ET2=1000;
+
+      for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
+	if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue; //loose ID + SIP cut
+	
+	for( int p = 0; p < Nphotons; ++p ){
+	  if( iLp_l[ p ] == iL_loose_mu[l] && iLp_tagEM[ p ] == 0 )  {
+	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOMU_ETA[iL_loose_mu[l]],2) );
+	    double deltaR_ET2 = deltaR/pow(RECOPFPHOT_PT[iLp[p]],2);
+	    if (deltaR_ET2<min_deltaR_ET2) {
+	      min_deltaR_ET2=deltaR_ET2;
+	      RECOPFPHOT_DR[iLp[p]]=deltaR;
+	    }
+	    else {	     
+	      iLp_l[ p ] = -1;
+	      iLp_tagEM[ p ] = -1;
+	    }
+	  }
+	}	
+      }
+      
+      for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
+	if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue; //loose ID + SIP cut
+	
+	for( int p = 0; p < Nphotons; ++p ){
+	  if( iLp_l[ p ] == iL_loose_e[l] && iLp_tagEM[ p ] == 1 )  {
+	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOELE_ETA[iL_loose_e[l]],2) );
+	    double deltaR_ET2 = deltaR/pow(RECOPFPHOT_PT[iLp[p]],2);
+	    if (deltaR_ET2<min_deltaR_ET2){
+	      min_deltaR_ET2=deltaR_ET2;
+	      RECOPFPHOT_DR[iLp[p]]=deltaR;
+	    }
+	    else {
+	      iLp_l[ p ] = -1;
+	      iLp_tagEM[ p ] = -1;
+	    }
+	  }	  
+	}
+      }
+      
+      if( debug ) cout << "Indeces of loose leptons associated to the photon with lowest DeltaR/ET2: "
+		       << "\niLp_l[0]: " << iLp_l[0]
+		       << "\niLp_l[1]: " << iLp_l[1]
+		       << "\niLp_l[2]: " << iLp_l[2]
+		       << "\niLp_l[3]: " << iLp_l[3]
+		       << "\niLp_l[4]: " << iLp_l[4]
+		       << "\niLp_l[5]: " << iLp_l[5]
+		       << "\niLp_l[6]: " << iLp_l[6]
+		       << "\niLp_l[7]: " << iLp_l[7]
+		       << endl ;
+      
+      if( debug ) cout << "Tag of leptons associated to the photon with lowest DetaR/ET2: (0: mu , 1:ele)"
+		       << "\niLp_tagEM[0]: " << iLp_tagEM[0]
+		       << "\niLp_tagEM[1]: " << iLp_tagEM[1]
+		       << "\niLp_tagEM[2]: " << iLp_tagEM[2]
+		       << "\niLp_tagEM[3]: " << iLp_tagEM[3]
+		       << "\niLp_tagEM[4]: " << iLp_tagEM[4]
+		       << "\niLp_tagEM[5]: " << iLp_tagEM[5]
+		       << "\niLp_tagEM[6]: " << iLp_tagEM[6]
+		       << "\niLp_tagEM[7]: " << iLp_tagEM[7]
+		       << endl ;
+
       for(int i=0.;i<Nphotons;i++) {
-	if (iLp_l[i]!=-1 && iLp_tagEM[i]==1) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " attached to an electron with pT= " << RECOELE_PT[iLp_l[i]] << endl;
-      };
+       	if (iLp_l[i]!=-1 && iLp_tagEM[i]==1) cout << "There is photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " attached to an electron with pT= " << RECOELE_PT[iLp_l[i]] << endl;
+      };           
+      
 
       // Exclude that photon from the isolation cone all leptons in the event passing loose ID + SIP cut if it was in the isolation cone and outside the isolation veto (ΔR>0.01 for muons and (ele->supercluster()->eta() < 1.479 || dR > 0.08) for electrons
 
