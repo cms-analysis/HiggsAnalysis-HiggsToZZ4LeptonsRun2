@@ -21,6 +21,7 @@
 #include "DataFormats/GeometryVector/interface/GlobalVector.h"
 
 #include "DataFormats/Common/interface/AssociationVector.h"
+#include "DataFormats/Common/interface/ValueMap.h"
 
 #include "KaMuCa/Calibration/interface/KalmanMuonCalibrator.h"
 
@@ -42,7 +43,7 @@ HZZ4LeptonsMuonCalibrator::HZZ4LeptonsMuonCalibrator(const edm::ParameterSet& ps
 
   string alias;
   produces<reco::MuonCollection>(); 
-
+  produces<edm::ValueMap<float> >("CorrPtError");
 }
 
 
@@ -61,9 +62,15 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
   // muons
   auto_ptr<reco::MuonCollection> Gmuon( new reco::MuonCollection );
   edm::Handle<edm::View<Muon> > muons;
-  edm::View<reco::Muon>::const_iterator mIter;
-    
+  edm::View<reco::Muon>::const_iterator mIter;    
   iEvent.getByToken(muonLabel, muons);
+
+		 
+  std::vector<float> pterror;
+  pterror.clear();
+
+  auto_ptr<edm::ValueMap<float> > CorrPtErrorMap(new edm::ValueMap<float> ());
+  edm::ValueMap<float>::Filler fillerCorrPtError(*CorrPtErrorMap);	
 
   double corrPt=0.,corrPtError=0.;
   double smearedPt=0., smearedPtError=0.;
@@ -84,10 +91,12 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
       KalmanMuonCalibrator calibrator("MC_76X_13TeV");
       corrPt = calibrator.getCorrectedPt(mIter->pt(), mIter->eta(), mIter->phi(), mIter->charge());
       corrPtError = corrPt * calibrator.getCorrectedError(corrPt, mIter->eta(), mIter->bestTrack()->ptError()/corrPt );
+      // smearedPt = calibrator.smearForSync(corrPt, mIter->eta()); // for synchronization
       smearedPt = calibrator.smear(corrPt, mIter->eta());
       smearedPtError = smearedPt * calibrator.getCorrectedErrorAfterSmearing(smearedPt, mIter->eta(), corrPtError /smearedPt );
     }
     
+    pterror.push_back(smearedPtError);
     cout << "Muon pT= " << calibmu->pt() << " Corrected Muon pT= " << smearedPt << " and pT error= " << smearedPtError << endl;
     reco::Candidate::PolarLorentzVector p4Polar_;
     p4Polar_ = reco::Candidate::PolarLorentzVector(smearedPt, mIter->eta(), mIter->phi(), mIter->mass());
@@ -96,9 +105,12 @@ void HZZ4LeptonsMuonCalibrator::produce(edm::Event& iEvent, const edm::EventSetu
     Gmuon->push_back( *calibmu );
   }
 
+  fillerCorrPtError.insert(muons,pterror.begin(),pterror.end());
+  fillerCorrPtError.fill();
   
   const string iName = "";
   iEvent.put( Gmuon, iName );
+  iEvent.put( CorrPtErrorMap, "CorrPtError");
 
 }
 
