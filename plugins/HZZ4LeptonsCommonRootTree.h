@@ -206,14 +206,11 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     RECOcollNameLLLL          = pset.getParameter<edm::InputTag>("RECOcollNameLLLL");
 
     // electrons and muons tags
-    use2011EA               = pset.getUntrackedParameter<bool>("use2011EA");
+    use2011EA                 = pset.getUntrackedParameter<bool>("use2011EA");
 
  
-    muonTag_              = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("MuonsLabel"));
-    muonMapTag_           = pset.getParameter<edm::InputTag>("MuonsMapLabel");
-    muonTkMapTag_         = pset.getParameter<edm::InputTag>("MuonsTkMapLabel");
-    muonEcalMapTag_       = pset.getParameter<edm::InputTag>("MuonsEcalMapLabel");
-    muonHcalMapTag_       = pset.getParameter<edm::InputTag>("MuonsHcalMapLabel");
+    muonTag_                  = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("MuonsLabel"));
+    muonCorrPtErrorMapTag_    = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsCorrPtErrorMapLabel"));
     
     muonPFTag_                  = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("PFMuonsLabel"));
     muonPFIsoValueChargedAllTag_= consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValueChargedAll"));
@@ -875,7 +872,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
     Tree_->Branch( "RECOMU_mubesttrkDxyError", RECOMU_mubesttrkDxyError, "RECOMU_mubesttrkDxyError[100]/F");
     Tree_->Branch( "RECOMU_mubesttrkDz", RECOMU_mubesttrkDz, "RECOMU_mubesttrkDz[100]/F");
     Tree_->Branch( "RECOMU_mubesttrkDzError", RECOMU_mubesttrkDzError, "RECOMU_mubesttrkDzError[100]/F");
-
+    Tree_->Branch( "RECOMU_mubesttrkPTError", RECOMU_mubesttrkPTError, "RECOMU_mubesttrkPTError[100]/F");
 
     // Geom. Discri.
     Tree_->Branch("ftsigma",        &ftsigma,        "ftsigma[100]/D");
@@ -1812,6 +1809,7 @@ class HZZ4LeptonsCommonRootTree : public edm::EDAnalyzer {
       RECOMU_mubesttrkDz[i]=-999.;
       RECOMU_mubesttrkDzB[i]=-999.;
       RECOMU_mubesttrkDzError[i]=-999.;
+      RECOMU_mubesttrkPTError[i]=-999.;
 
       RECOMU_mutrkCharge[i]=-999.;
       RECOMU_mutrkNHits[i]=-999.;
@@ -3555,19 +3553,9 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     // Muons
     edm::Handle<edm::View<reco::Muon> > MuCandidates;
     iEvent.getByToken(muonTag_, MuCandidates);
-    
-    // Isolation
-    /* edm::Handle<edm::ValueMap<double> > isoTkmumap; */
-/*     iEvent.getByLabel(muonTkMapTag_, isoTkmumap); */
-    
-/*     edm::Handle<edm::ValueMap<double> > isoEcalmumap; */
-/*     iEvent.getByLabel(muonEcalMapTag_, isoEcalmumap); */
-    
-/*     edm::Handle<edm::ValueMap<double> > isoHcalmumap; */
-/*     iEvent.getByLabel(muonHcalMapTag_, isoHcalmumap); */
-    
-    //edm::Handle<edm::ValueMap<double> > isomumap;
-    //iEvent.getByLabel(muonMapTag_, isomumap);
+
+    edm::Handle<edm::ValueMap<float> > corrpterrormumap;
+    iEvent.getByToken(muonCorrPtErrorMapTag_,corrpterrormumap);
     
     // Particle Flow Isolation
     edm::Handle<edm::ValueMap<double> > isoPFChargedAllmumap;
@@ -3855,7 +3843,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 	RECOMU_mubesttrkDz[indexbis]=cand->muonBestTrack()->dz(pVertex);
 	RECOMU_mubesttrkDzB[indexbis]=cand->muonBestTrack()->dz(bs.position());
 	RECOMU_mubesttrkDzError[indexbis]=cand->muonBestTrack()->dzError();
-	
+	//RECOMU_mubesttrkPTError[indexbis]=(*corrpterrormumap)[mutrackref];;
       }
 
       if(cand->globalTrack().isAvailable()){
@@ -3922,6 +3910,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 		  << "  dz="        << RECOMU_mubesttrkDz[indexbis] 
 		  << "  dzError="   << RECOMU_mubesttrkDzError[indexbis]
 		  << "  dzB="       << RECOMU_mubesttrkDzB[indexbis]
+		  << "  PtError="   << RECOMU_mubesttrkPTError[indexbis]
 		  << "  chi2_nodf=" << RECOMU_mutrkChi2PerNdof[indexbis]
 		  << "  charge="    << RECOMU_mutrkCharge[indexbis]
 		  << "  nhits="     << RECOMU_mutrkNHits[indexbis] 
@@ -4964,10 +4953,11 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
   edm::EDGetTokenT<edm::View<reco::GsfElectron> > electronEgmTag_;
   edm::EDGetTokenT<edm::View<reco::Muon> > muonTag_;
 
-  edm::InputTag muonMapTag_;
-  edm::InputTag electronEgmTkMapTag_,muonTkMapTag_;
-  edm::InputTag electronEgmEcalMapTag_,muonEcalMapTag_;
-  edm::InputTag electronEgmHcalMapTag_,muonHcalMapTag_;
+  edm::EDGetTokenT<edm::ValueMap<float> > muonCorrPtErrorMapTag_;
+    
+  edm::InputTag electronEgmTkMapTag_;
+  edm::InputTag electronEgmEcalMapTag_;
+  edm::InputTag electronEgmHcalMapTag_;
   edm::EDGetTokenT<edm::View<reco::GsfElectron> > mvaElectronTag_;
   edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigV0MapTag_,mvaNonTrigV0MapTag_;
 
@@ -5304,6 +5294,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     RECOMU_muInnertrkDz[100],RECOMU_muInnertrkDzError[100],RECOMU_muInnertrkDzB[100],
     RECOMU_mubesttrkDxy[100],RECOMU_mubesttrkDxyError[100],RECOMU_mubesttrkDxyB[100],
     RECOMU_mubesttrkDz[100],RECOMU_mubesttrkDzError[100],RECOMU_mubesttrkDzB[100],
+    RECOMU_mubesttrkPTError[100],
     RECOMU_muInnertrkChi2PerNdof[100],
     RECOMU_muInnertrktrackerLayersWithMeasurement[100],RECOMU_muInnertrkPT[100],RECOMU_muInnertrkPTError[100],
     RECOMU_muInnertrkCharge[100],RECOMU_muInnertrkNHits[100],RECOMU_muInnertrkNPixHits[100],RECOMU_muInnertrkNStripHits[100],

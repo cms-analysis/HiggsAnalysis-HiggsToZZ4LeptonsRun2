@@ -230,12 +230,9 @@ HZZ4LeptonsRootTree::HZZ4LeptonsRootTree( const edm::ParameterSet& pset )
   RECOcollNameLLLL          = pset.getParameter<edm::InputTag>("RECOcollNameLLLL");
 
   // electrons and muons tags
-  use2011EA               = pset.getUntrackedParameter<bool>("use2011EA");
-  muonTag_                = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("MuonsLabel"));
-  muonMapTag_             = pset.getParameter<edm::InputTag>("MuonsMapLabel");
-  muonTkMapTag_           = pset.getParameter<edm::InputTag>("MuonsTkMapLabel");
-  muonEcalMapTag_         = pset.getParameter<edm::InputTag>("MuonsEcalMapLabel");
-  muonHcalMapTag_         = pset.getParameter<edm::InputTag>("MuonsHcalMapLabel");
+  use2011EA                 = pset.getUntrackedParameter<bool>("use2011EA");
+  muonTag_                  = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("MuonsLabel"));
+  muonCorrPtErrorMapTag_    = consumes<edm::ValueMap<float> >(pset.getParameter<edm::InputTag>("MuonsCorrPtErrorMapLabel"));
 
   muonPFTag_                  = consumes<edm::View<reco::Muon> >(pset.getParameter<edm::InputTag>("PFMuonsLabel"));
   muonPFIsoValueChargedAllTag_= consumes<edm::ValueMap<double> >(pset.getParameter<edm::InputTag>("MuonPFIsoValueChargedAll"));
@@ -663,6 +660,7 @@ void HZZ4LeptonsRootTree::beginJob() {
   mytree->Branch("RECOMU_mubesttrkDz",&RECOMU_mubesttrkDz);
   mytree->Branch("RECOMU_mubesttrkDzB",&RECOMU_mubesttrkDzB);
   mytree->Branch("RECOMU_mubesttrkDzError",&RECOMU_mubesttrkDzError);
+  mytree->Branch("RECOMU_mubesttrkPTError",&RECOMU_mubesttrkPTError);
   mytree->Branch("RECOMU_mutrkPT",&RECOMU_mutrkPT);
   mytree->Branch("RECOMU_mutrkPTError",&RECOMU_mutrkPTError);
   //mytree->Branch("RECOMU_mutrkPTError",&RECOMU_mutrkPTError);
@@ -2303,6 +2301,7 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
   RECOMU_mubesttrkDz.clear();
   RECOMU_mubesttrkDzB.clear();
   RECOMU_mubesttrkDzError.clear();
+  RECOMU_mubesttrkPTError.clear();
   
   RECOMU_mutrkPT.clear();
   RECOMU_mutrkPTError.clear();
@@ -2364,7 +2363,10 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
   // Muons
   edm::Handle<edm::View<reco::Muon> > MuCandidates;
   iEvent.getByToken(muonTag_, MuCandidates);
- 
+
+  edm::Handle<edm::ValueMap<float> > corrpterrormumap;
+  iEvent.getByToken(muonCorrPtErrorMapTag_,corrpterrormumap);
+  
   // Vertexing
   // 3D
   edm::Handle<edm::View<reco::Muon> > VertMuCandidates;
@@ -2625,6 +2627,7 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
       RECOMU_mubesttrkDz.push_back(cand->muonBestTrack()->dz(pVertex));
       RECOMU_mubesttrkDzB.push_back(cand->muonBestTrack()->dz(bs.position()));
       RECOMU_mubesttrkDzError.push_back(cand->muonBestTrack()->dzError());
+      //RECOMU_mubesttrkPTError.push_back((*corrpterrormumap)[mutrackref]);
     }
     
     if(cand->globalTrack().isAvailable()){
@@ -2691,6 +2694,7 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
 		  << "  dz="        << RECOMU_mubesttrkDz[indexbis] 
 		  << "  dzError="   << RECOMU_mubesttrkDzError[indexbis]
 		  << "  dzB="       << RECOMU_mubesttrkDzB[indexbis]
+		  << "  PtError="   << RECOMU_mubesttrkPTError[indexbis]
 		  << "  chi2_nodf=" << RECOMU_mutrkChi2PerNdof[indexbis]
 		  << "  charge="    << RECOMU_mutrkCharge[indexbis]
 		  << "  nhits="     << RECOMU_mutrkNHits[indexbis] 

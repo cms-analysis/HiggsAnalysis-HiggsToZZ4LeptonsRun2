@@ -473,6 +473,7 @@ private:
       std::vector<float> RECOMU_mubesttrkDz;
       std::vector<float> RECOMU_mubesttrkDzB;
       std::vector<float> RECOMU_mubesttrkDzError;
+      std::vector<float> RECOMU_mubesttrkPTError;
 
       std::vector<float> RECOMU_mutrkPT;
       std::vector<float> RECOMU_mutrkPTError;
@@ -1133,11 +1134,12 @@ private:
       edm::InputTag clusterCollectionTag_,gsftrackCollection_;
       edm::EDGetTokenT<edm::View<reco::Muon> > muonPFTag_;
       edm::EDGetTokenT<edm::View<reco::Muon> > muonTag_;
+      edm::EDGetTokenT<edm::ValueMap<float> > muonCorrPtErrorMapTag_;
       edm::EDGetTokenT<edm::View<reco::GsfElectron> > electronEgmTag_;
-      edm::InputTag electronMapTag_,muonMapTag_;
-      edm::InputTag electronEgmTkMapTag_,muonTkMapTag_;
-      edm::InputTag electronEgmEcalMapTag_,muonEcalMapTag_;
-      edm::InputTag electronEgmHcalMapTag_,muonHcalMapTag_;
+      edm::InputTag electronMapTag_;
+      edm::InputTag electronEgmTkMapTag_;
+      edm::InputTag electronEgmEcalMapTag_;
+      edm::InputTag electronEgmHcalMapTag_;
       edm::EDGetTokenT<edm::View<reco::GsfElectron> > mvaElectronTag_;
       edm::EDGetTokenT<edm::ValueMap<float> > mvaTrigV0MapTag_,mvaNonTrigV0MapTag_;
       
