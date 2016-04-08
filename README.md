@@ -9,11 +9,9 @@ cp /afs/cern.ch/user/n/ndefilip/public/KalmanMuonCalibrator.cc $CMSSW_BASE/src/K
 git clone https://github.com/tocheng/KinZfitter.git
 git cms-merge-topic -u matteosan1:smearer_76X
 
-Try download: 
-EgammaAnalysis/ElectronTools
-Try:
-cd RecoEgamma/ElectronIdentification/data/Spring15
+cp -r $CMSSW_RELEASE_BASE/src/RecoEgamma/ElectronIdentification .
 
+cd  RecoEgamma/ElectronIdentification/data/Spring15
 cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB1_5_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
 cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EB2_5_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
 cp $CMSSW_RELEASE_BASE/external/${SCRAM_ARCH}/data/RecoEgamma/ElectronIdentification/data/Spring15/EIDmva_EE_5_oldNonTrigSpring15_ConvVarCwoBoolean_TMVA412_FullStatLowPt_PairNegWeightsGlobal_BDT.weights.xml .
