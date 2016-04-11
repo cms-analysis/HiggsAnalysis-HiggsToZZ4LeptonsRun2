@@ -20,7 +20,7 @@ process.load('Configuration/EventContent/EventContent_cff')
 
 # Global tag
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v12', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_RunIIFall15DR76_v1', '')
 
 process.load('HiggsAnalysis.HiggsToZZ4Leptons.bunchSpacingProducer_cfi')
 process.load('RecoMET.METFilters.metFilters_cff')
