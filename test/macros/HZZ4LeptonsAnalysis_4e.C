@@ -1466,7 +1466,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	  if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue;  //loose ID + SIP cut	  
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[l]],2) );
-	  cout << "DeltaR= " << deltaR << " " << deltaR/pow(RECOPFPHOT_PT[iLp[i]],2) << endl;
+	  //cout << "DeltaR= " << deltaR << " " << deltaR/pow(RECOPFPHOT_PT[iLp[i]],2) << endl;
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
 	    min_deltaR = deltaR;
@@ -2242,25 +2242,32 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-	  	  
+
+	  bool matchedZ=false;
+	  for (int k=0;k<Zcandvector.size();k++){
+	    //cout << "min mass value= " << Zcandvector.at(k).massvalue << endl;
+	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
+	  }
+	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied
+	
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
         }
       } // end loop on all couples
       
 
-     if( debug ) cout  << "\n Step 6: mll > 4" 
+      if( debug ) cout  << "\n Step 6: mll > 4" 
       		 << "\n min_mass_2L " << min_mass_2L
 		 << endl; 
      
-     hminMll_6->Fill( min_mass_2L,newweight );
+      hminMll_6->Fill( min_mass_2L,newweight );
 
-     if( min_mass_2L <= 4 ) { 
-       cout << "Not passing the mll>4 cut" << endl;
-       continue ;
-     }
+      if (min_mass_2L!=10000. && min_mass_2L <= 4 ) { 
+	cout << "Not passing the mll>4 cut" << endl;
+	continue ;
+      }
      
-
+      
      // Z1 selection
      double pxZ1 = 0;  //Z1 kinematics
      double pyZ1 = 0;

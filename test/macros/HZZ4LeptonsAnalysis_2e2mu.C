@@ -2440,7 +2440,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           Lepton2qcd.SetPtEtaPhiM(RECOMU_PT[iL[j]], RECOMU_ETA[iL[j]], RECOMU_PHI[iL[j]], 0.105);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-	  cout << "mass= " << mass << endl; 	  
+
+	  bool matchedZ=false;
+	  for (int k=0;k<Zcandvector.size();k++){
+	    //cout << "min mass value= " << Zcandvector.at(k).massvalue << endl;
+	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
+	  }
+	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied	  
+	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
         }
@@ -2482,7 +2489,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-	  cout << "mass= " << mass << endl; 	  
+
+	  bool matchedZ=false;
+	  for (int k=0;k<Zcandvector.size();k++){
+	    //cout << "min mass value= " << Zcandvector.at(k).massvalue << endl;
+	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
+	  }
+	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied	  
+	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
         }
@@ -2524,7 +2538,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-	  cout << "mass= " << mass << endl; 	  
+
+	  bool matchedZ=false;
+	  for (int k=0;k<Zcandvector.size();k++){
+	    //cout << "Min mass value= " << Zcandvector.at(k).massvalue << endl;
+	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
+	  }
+	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied	  
+	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
 	}
@@ -2539,7 +2560,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      
      hminMll_6->Fill( min_mass_2L,newweight );
 
-     if( min_mass_2L <= 4 ) { 
+     if( min_mass_2L!=10000. && min_mass_2L <= 4 ) { 
        cout << "Not passing the mll>4 cut" << endl;
        continue ;
      }
