@@ -2371,33 +2371,33 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       vector<candidateZ> pTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
 
-      for (int i=0;i<cleanedgoodZ.size();i++){
-	leptonspTcleaned.clear();
-	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-	}
-	else cout << "Pair not passing the pT, 20/10 cut" << endl;
-      }
-      
       // for (int i=0;i<cleanedgoodZ.size();i++){
-      //   cout << i << endl;
-      //   for (int j=i+1;j<cleanedgoodZ.size();j++){
-      //     cout << i << " " << j << endl;
-      //          leptonspTcleaned.clear();
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
-      // 	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-      // 	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
-      // 	  }	 
-      //   }
+      // 	leptonspTcleaned.clear();
+      // 	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+      // 	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+      // 	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+      // 	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+      // 	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      // 	}
+      // 	else cout << "Pair not passing the pT, 20/10 cut" << endl;
       // }
+      
+      for (int i=0;i<cleanedgoodZ.size();i++){
+        cout << i << endl;
+        for (int j=i+1;j<cleanedgoodZ.size();j++){
+          //cout << i << " " << j << endl;
+	  leptonspTcleaned.clear();
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
+      	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+      	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+      	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
+      	  }	 
+        }
+      }
       
       cout << "Cleaned Good Z passing pT cuts are " << pTcleanedgoodZ.size() << endl; 
       
@@ -3642,7 +3642,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      
 
      
-     //MELA discriminant - Leoton kinematics already corrected for FSR
+     //MELA discriminant - Lepton kinematics already corrected for FSR
      TLorentzVector L11P4,L12P4,L21P4,L22P4;
      float angle_costheta1,angle_costheta2,angle_Phi,angle_costhetastar,angle_Phi1;
 
@@ -3694,7 +3694,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      //Assigning correct PID numbers
      int L11PID,L12PID,L21PID,L22PID;
 
-     if (Z1tag==1 && Z2tag==0){
+     if (Z1tag==1 && Z2tag==2){
        if (RECOMU_CHARGE[indexleptonfinal[0]] == 1){
 	 L11PID=-13;
 	 L12PID=+13;
@@ -3712,7 +3712,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 L22PID=-11;
        }       
      }    
-     else if (Z1tag==0 && Z2tag==1){
+     else if (Z1tag==2 && Z2tag==1){
        if (RECOELE_CHARGE[indexleptonfinal[0]] == 1){
 	 L11PID=-11;
 	 L12PID=+11;

@@ -2259,33 +2259,33 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       vector<candidateZ> pTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
 
-      for (int i=0;i<cleanedgoodZ.size();i++){
-	leptonspTcleaned.clear();
-	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-	}
-	else cout << "Pair not passing the pT, 20/10 cut" << endl;
-      }
-      
       // for (int i=0;i<cleanedgoodZ.size();i++){
-      //   cout << i << endl;
-      //   for (int j=i+1;j<cleanedgoodZ.size();j++){
-      //     cout << i << " " << j << endl;
-      //          leptonspTcleaned.clear();
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
-      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
-      // 	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-      // 	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
-      // 	  }	 
-      //   }
+      // 	leptonspTcleaned.clear();
+      // 	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+      // 	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+      // 	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+      // 	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+      // 	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      // 	}
+      // 	else cout << "Pair not passing the pT, 20/10 cut" << endl;
       // }
+      
+      for (int i=0;i<cleanedgoodZ.size();i++){
+        cout << i << endl;
+        for (int j=i+1;j<cleanedgoodZ.size();j++){
+          //cout << i << " " << j << endl;
+	  leptonspTcleaned.clear();
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
+      	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
+      	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+      	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+      	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
+      	  }	 
+        }
+      }
       
       cout << "Cleaned Good Z passing pT cuts are " << pTcleanedgoodZ.size() << endl; 
       
