@@ -1593,7 +1593,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
 	    
       for(int i=0.;i<Nphotons;i++) {
-	if (iLp_l[i]==-1) continue;
+	if (iLp[i]==-1) continue;
 	
 	for(int e = 0; e < N_loose_e; ++e){
 	  if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;
@@ -2528,7 +2528,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		       << "\n indexlep1 " << indexlep1Z1
 		       << "\n indexlep2 " << indexlep2Z1
 		       << "\n indexZ1 " << indexZ1 
-		       << "\n Z1 tag (1 for 2mu and 0 for 2e) " << Z1tag
+		       << "\n Z1 tag (1 for 2mu and 2 for 2e) " << Z1tag
 		   
 		       << endl;
 
@@ -2677,9 +2677,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      cout << "Z1 has index= " << indexZ1 << "  Z2 has index= " << indexZ2 << endl;
  
      if (Z1tag==1) cout << "PTs= " << RECOMU_PT[indexlep1Z1] << " " << RECOMU_PT[indexlep2Z1] << " " <<  RECOELE_PT[indexlep1Z2] << " " << RECOELE_PT[indexlep2Z2]<< endl; 
-
-     if (Z1tag==0) cout << "PTs= " << RECOELE_PT[indexlep1Z1] << " " << RECOELE_PT[indexlep2Z1] << " " <<  RECOMU_PT[indexlep1Z2] << " " << RECOMU_PT[indexlep2Z2]<< endl; 
-      
+     if (Z1tag==2) cout << "PTs= " << RECOELE_PT[indexlep1Z1] << " " << RECOELE_PT[indexlep2Z1] << " " <<  RECOMU_PT[indexlep1Z2] << " " << RECOMU_PT[indexlep2Z2]<< endl; 
       
      if (std::isnan(massZ2)) {
        cout << "No Z2 found" << endl;
@@ -2813,19 +2811,19 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       int ipt[4] ;
       double tmp_pt[4];
       if (Z1tag==1) cout << "PTs= " << RECOMU_PT[indexlep1Z1] << " " << RECOMU_PT[indexlep2Z1] << " " <<  RECOELE_PT[indexlep1Z2] << " " << RECOELE_PT[indexlep2Z2]<< endl;
-      if (Z1tag==0) cout << "PTs= " << RECOELE_PT[indexlep1Z1] << " " << RECOELE_PT[indexlep2Z1] << " " <<  RECOELE_PT[indexlep1Z2] << " " << RECOELE_PT[indexlep2Z2]<< endl;
+      if (Z1tag==2) cout << "PTs= " << RECOELE_PT[indexlep1Z1] << " " << RECOELE_PT[indexlep2Z1] << " " <<  RECOMU_PT[indexlep1Z2] << " " << RECOMU_PT[indexlep2Z2]<< endl;
 
       int indexleptonfinal[4]={indexlep1Z1,indexlep2Z1,indexlep1Z2,indexlep2Z2};
       //cout << "PTs= " << RECOMU_PT[indexleptonfinal[0]] << " " << RECOMU_PT[indexleptonfinal[1]] << " " <<  RECOMU_PT[indexleptonfinal[2]] << " " << RECOMU_PT[indexleptonfinal[3]]<< endl;
 
       for(int i = 0; i < 2; ++i){ 
 	if (Z1tag==1) tmp_pt[i] =  RECOMU_PT[indexleptonfinal[i]];
-	if (Z1tag==0) tmp_pt[i] =  RECOELE_PT[indexleptonfinal[i]];
+	if (Z1tag==2) tmp_pt[i] =  RECOELE_PT[indexleptonfinal[i]];
 	cout << tmp_pt[i] << endl;
       }
       for(int i = 2; i < 4; ++i){ 
 	if (Z2tag==1) tmp_pt[i] =  RECOMU_PT[indexleptonfinal[i]];
-	if (Z2tag==0) tmp_pt[i] =  RECOELE_PT[indexleptonfinal[i]];
+	if (Z2tag==2) tmp_pt[i] =  RECOELE_PT[indexleptonfinal[i]];
 	cout << tmp_pt[i] << endl;
       }
       
@@ -2984,12 +2982,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       //hSip_5->Fill( Sip_max,newweight ) ;
       //hIp_5->Fill( Ip_max,newweight ) ;
 
-      // N.B. Update the Isolation values and correct the 4 momenta of leptons for FSR
+      // N.B. Do NOT Update the Isolation values and correct the 4 momenta of leptons for FSR
       for(int i = 0; i < N_good; ++i){
 	int flagFSR=0;
 	int pfsr=-999;
 	
 	for( int p = 0; p < Nphotons; ++p ){
+	  if (iLp[p]==-1) continue;
+	  if (iLp_l[p]==-1) continue;
+	  
 	  cout << "Index of lepton with photon ISR= " << iLp_l[ p ] << " and final lepton index= " << iL[i] << endl;
 	  if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  {
 	    cout << "Muon with pT= " << RECOMU_PT[iL[i]] << " has associated a photon with pT= " << RECOPFPHOT_PT[iLp[p]] <<  endl;
@@ -3018,12 +3019,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	}
       }
       
-      // N.B. Update the Isolation values and correct the 4 momenta of leptons for FSR
+      // N.B. DO NOT Update the Isolation values and correct the 4 momenta of leptons for FSR
       for(int i = 0; i < Ne_good; ++i){
 	int flagFSR=0;
 	int pfsr=-999;
 	
 	for( int p = 0; p < Nphotons; ++p ){
+	  if (iLp[p]==-1) continue;
+	  if (iLp_l[p]==-1) continue;
+	  
 	  cout << "Index of lepton with photon ISR= " << iLp_l[ p ] << " and final lepton index= " << iLe[i] << endl;
 	  if( iLp_l[ p ] == iLe[i] && iLp_tagEM[ p ] == 1 )  {
 	    cout << "Electron with pT= " << RECOELE_PT[iLe[i]] << " has associated a photon with pT= " << RECOPFPHOT_PT[iLp[p]] <<  endl;
@@ -3332,7 +3336,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 
       	 for(int ele = 0; ele < Ne_good; ++ele){
       	   if (fabs(RECOELE_SIP[iLe[ele]])>=4.) continue;
-	   if (RECOELE_PFX_rho_new[iLe[ele]]>=0.5) continue;
+	   if (RECOELE_PFX_rho_new[iLe[ele]]>=0.35) continue;
       	   double deltaR = sqrt( pow(DELTAPHI(RECO_PFJET_PHI[i],RECOELE_PHI[iLe[ele]]),2) + pow(RECO_PFJET_ETA[i] - RECOELE_ETA[iLe[ele]],2));
      	   cout << "1st lepton electron: " << " pT=" << RECOELE_PT[iLe[ele]] <<" deltaR "<< deltaR <<endl;
 	   if (deltaR<0.4){
@@ -3642,17 +3646,18 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      TLorentzVector L11P4,L12P4,L21P4,L22P4;
      float angle_costheta1,angle_costheta2,angle_Phi,angle_costhetastar,angle_Phi1;
 
-     cout << "Final: pT of final leptons from Z1 and Z2 ="
-	  << RECOMU_PT[indexleptonfinal[0]] << " " << RECOMU_PT[indexleptonfinal[1]] << " " << RECOMU_PT[indexleptonfinal[2]] << " " << RECOMU_PT[indexleptonfinal[3]] <<endl;
+     cout << "Final: pT of final leptons from Z1 and Z2 =";
+     if (Z1tag==1) cout << RECOMU_PT[indexleptonfinal[0]] << " " << RECOMU_PT[indexleptonfinal[1]] << " " << RECOELE_PT[indexleptonfinal[2]] << " " << RECOELE_PT[indexleptonfinal[3]] <<endl;
+     if (Z1tag==2) cout << RECOELE_PT[indexleptonfinal[0]] << " " << RECOELE_PT[indexleptonfinal[1]] << " " << RECOMU_PT[indexleptonfinal[2]] << " " << RECOMU_PT[indexleptonfinal[3]] <<endl;
      
-     if (Z1tag==1 && Z2tag==0){
+     if (Z1tag==1 && Z2tag==2){
        L11P4.SetPtEtaPhiM(RECOMU_PT[indexleptonfinal[0]], RECOMU_ETA[indexleptonfinal[0]], RECOMU_PHI[indexleptonfinal[0]], 0.105);
        L12P4.SetPtEtaPhiM(RECOMU_PT[indexleptonfinal[1]], RECOMU_ETA[indexleptonfinal[1]], RECOMU_PHI[indexleptonfinal[1]], 0.105);
        L21P4.SetPtEtaPhiM(RECOELE_PT[indexleptonfinal[2]], RECOELE_ETA[indexleptonfinal[2]], RECOELE_PHI[indexleptonfinal[2]], 0.000511);
        L22P4.SetPtEtaPhiM(RECOELE_PT[indexleptonfinal[3]], RECOELE_ETA[indexleptonfinal[3]], RECOELE_PHI[indexleptonfinal[3]], 0.000511);
      }
 
-     if (Z1tag==0 && Z2tag==1){
+     if (Z1tag==2 && Z2tag==1){
        L11P4.SetPtEtaPhiM(RECOELE_PT[indexleptonfinal[0]], RECOELE_ETA[indexleptonfinal[0]], RECOELE_PHI[indexleptonfinal[0]], 0.000511);
        L12P4.SetPtEtaPhiM(RECOELE_PT[indexleptonfinal[1]], RECOELE_ETA[indexleptonfinal[1]], RECOELE_PHI[indexleptonfinal[1]], 0.000511);
        L21P4.SetPtEtaPhiM(RECOMU_PT[indexleptonfinal[2]], RECOMU_ETA[indexleptonfinal[2]], RECOMU_PHI[indexleptonfinal[2]], 0.105);

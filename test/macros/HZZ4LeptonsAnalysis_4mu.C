@@ -1668,6 +1668,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       double EffectiveArea=-9999.;
 
       for(int i=0.;i<Nphotons;i++) {
+	if (iLp[i]==-1) continue;
 	if (iLp_l[i]==-1) continue;
 	
 	for(int e = 0; e < N_loose_e; ++e){
@@ -3064,7 +3065,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 
       	 for(int ele = 0; ele < Ne_good; ++ele){
       	   if (fabs(RECOELE_SIP[iLe[ele]])>=4.) continue;
-	   if (RECOELE_PFX_rho[iLe[ele]]>=0.5) continue;
+	   if (RECOELE_PFX_rho[iLe[ele]]>=0.35) continue;
       	   double deltaR = sqrt( pow(DELTAPHI(RECO_PFJET_PHI[i],RECOELE_PHI[iLe[ele]]),2) + pow(RECO_PFJET_ETA[i] - RECOELE_ETA[iLe[ele]],2));
      	   cout << "1st lepton electron: " << " pT=" << RECOELE_PT[iLe[ele]] <<" deltaR "<< deltaR <<endl;
 	   if (deltaR<0.4){
