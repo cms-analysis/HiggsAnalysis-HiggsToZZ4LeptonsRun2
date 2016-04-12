@@ -2450,8 +2450,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  // evaluate the mass
 	  double mass;
 
-	  Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[iL[i]], RECOELE_ETA[iL[i]], RECOELE_PHI[iL[i]], 0.000511);
-          Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iL[j]], RECOELE_ETA[iL[j]], RECOELE_PHI[iL[j]], 0.000511);
+	  Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[iLe[i]], RECOELE_ETA[iLe[i]], RECOELE_PHI[iLe[i]], 0.000511);
+          Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
 	  
