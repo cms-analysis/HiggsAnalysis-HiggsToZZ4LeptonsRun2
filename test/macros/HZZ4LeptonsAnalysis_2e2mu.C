@@ -23,8 +23,7 @@
 #include "ZZMatrixElement/MELA/src/computeAngles.h"
 #include "ZZMatrixElement/MELA/src/computeAngles.cc"
 #include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
-
-//#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+#include "KaMuCa/Calibration/interface/KalmanMuonCalibrator.h"
 
 
 using namespace std;
@@ -42,7 +41,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
    // Declare MEM class
    MEMs combinedMEM(13,125,"CTEQ6L");     
- 
+   
+   // MuonCalibrator
+   KalmanMuonCalibrator calibrator("DATA_76X_13TeV");
       
    // BNN
    Char_t datasetChar[500],bnnOUT[500],eventsOUT[500];
@@ -1128,234 +1129,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       N_1_w=N_1_w+newweight;
       
       
-      
-      // **** Step 2: TRIGGER, electron cleaning, lepton selection ****
-      
-      // trigger:
-
-      stringstream ss (stringstream::in | stringstream::out);
-      ss << HLTPathsFired;
-      TString hlt(ss.str());
-      if (debug) cout << ss.str() << endl;
-      
-      if( DATA_type == "2011" &&  MC_type == "NO"){
-	
-	
-        if( out.Contains("DoubleElectron")){
-	  
-          if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	    
-            cout << "This is HLT in data" << endl;
-            cout<<" HLTPathsFired... "<<hlt<<endl;
-          }
-          
-          if(!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&   // OR mu and e trigger
-             !hlt.Contains("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL") 
-             // &&
-             //  !hlt.Contains("HLT_Mu17_Mu8")   &&
-             //!hlt.Contains("HLT_DoubleMu7")   &&
-             //!hlt.Contains("HLT_Mu13_Mu8") &&
-             //!( Run<=167913 && hlt.Contains("HLT_Mu8_Ele17_CaloIdL") ) &&
-             //!( Run>167913 && Run<=180252 && hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL") ) &&
-             //!( Run<=175972 && hlt.Contains("HLT_Mu17_Ele8_CaloIdL") ) &&
-             //!( Run>175972 && Run<=180252 && hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL") ) 
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-            continue;
-          }
-          
-        }
-        else if( out.Contains("DoubleMu") ){
-	  
-          if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	    
-            cout << "This is HLT in data" << endl;
-            cout<<" HLTPathsFired... "<<hlt<<endl;
-          }
-          
-          if(
-             //!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") && // OR mu and e trigger
-             //!hlt.Contains("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL") &&
-             !hlt.Contains("HLT_Mu17_Mu8")   &&
-             !hlt.Contains("HLT_DoubleMu7")   &&
-             !hlt.Contains("HLT_Mu13_Mu8") 
-             // &&
-             //!( Run<=167913 && hlt.Contains("HLT_Mu8_Ele17_CaloIdL") ) &&
-             //!( Run>167913 && Run<=180252 && hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL") ) &&
-             //!( Run<=175972 && hlt.Contains("HLT_Mu17_Ele8_CaloIdL") ) &&
-             //!( Run>175972 && Run<=180252 && hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL") ) 
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-            continue;
-          }
-          if(hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") || 
-             hlt.Contains("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL") 
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger vetos" << endl;
-            continue;
-          }
-          
-          
-          // HLT emulation
-          bool pt_17_emu = 0;
-          int i_17_emu = -1;
-          bool pt_8_emu = 0;
-          
-          for(int i = 0; i < RECO_NMU; ++i){
-            if( RECOMU_PT[i] > 17 && !pt_17_emu ){ pt_17_emu = 1; i_17_emu = i; }
-          }
-          if( !pt_17_emu ) continue;
-          for(int i = 0; i < RECO_NMU; ++i){
-            if( i == i_17_emu ) continue;
-            if( RECOMU_PT[i] > 8 && !pt_8_emu ){ pt_8_emu = 1; }
-          }
-          if( !pt_8_emu ) continue;
-          
-        }
-        else if( out.Contains("MuEG") ){
-          if( debug ){ cout << "\n ** Step 2 (Trigger): 2011 DoubleElectron"<< endl ;
-	    
-            cout << "This is HLT in data" << endl;
-            cout<<" HLTPathsFired... "<<hlt<<endl;
-          }
-          
-          if(
-             //!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") && // OR mu and e trigger
-             //!hlt.Contains("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL") &&
-             //!hlt.Contains("HLT_Mu17_Mu8")   &&
-             //!hlt.Contains("HLT_DoubleMu7")   &&
-             //!hlt.Contains("HLT_Mu13_Mu8")    &&
-             !( Run<=167913 && hlt.Contains("HLT_Mu8_Ele17_CaloIdL") ) &&
-             !( Run>167913 && Run<=180252 && hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL") ) &&
-             !( Run<=175972 && hlt.Contains("HLT_Mu17_Ele8_CaloIdL") ) &&
-             !( Run>175972 && Run<=180252 && hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL") ) 
-             )      {
-            if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-            continue;         
-          }
-          
-          if(hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") || 
-             hlt.Contains("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL") ||
-             hlt.Contains("HLT_Mu17_Mu8")   ||
-             hlt.Contains("HLT_DoubleMu7") ||
-             hlt.Contains("HLT_Mu13_Mu8")  
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger vetos" << endl;
-            continue;
-          }
-          
-        }  
-      }
-      else if( DATA_type == "2012" &&  MC_type == "NO"){
-	
-        if( out.Contains("DoubleElectron")){
-          if( debug ){ cout << "\n ** Step 2 (Trigger): DoubleElectron "<< endl ;
-	    
-            cout << "This is HLT in data" << endl;
-            cout<<" HLTPathsFired... "<<hlt<<endl;
-          }
-          
-          if(!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") 
-             // &&      // OR mu and e trigger
-             //      !hlt.Contains("HLT_Mu17_Mu8")   &&
-             //      !hlt.Contains("HLT_Mu17_TkMu8") &&
-             //      !hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")   &&
-             //      !hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-            continue;
-          }
-          
-        }
-        else if( out.Contains("DoubleMu")){
-          if( debug ){ cout << "\n ** Step 2 (Trigger): DoubleMu "<< endl ;
-	    
-            cout << "This is HLT in data" << endl;
-            cout<<" HLTPathsFired... "<<hlt<<endl;
-          }
-          
-          if(
-             //!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") && // OR mu and e trigger
-             !hlt.Contains("HLT_Mu17_Mu8")   &&
-             !hlt.Contains("HLT_Mu17_TkMu8") 
-             //&&
-             //!hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")   &&
-             //!hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-            continue;
-          }
-          if( hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")
-              ) {
-            if( debug )cout << "Event not passing the HLT trigger vetos" << endl;
-            continue;
-          }
-          
-        }
-        else if( out.Contains("MuEG") ){
-          if( debug ){ cout << "\n ** Step 2 (Trigger): MuEG "<< endl ;
-	    
-            cout << "This is HLT in data" << endl;
-            cout<<" HLTPathsFired... "<<hlt<<endl;
-          }
-          
-          if(
-             //!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") && // OR mu and e trigger
-             //!hlt.Contains("HLT_Mu17_Mu8")   &&
-             //!hlt.Contains("HLT_Mu17_TkMu8") &&
-             !hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")   &&
-             !hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")
-             ) {
-            if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-            continue;
-          }
-          if( hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")
-              || hlt.Contains("HLT_Mu17_Mu8")
-              || hlt.Contains("HLT_Mu17_TkMu8")
-              ) {
-            if( debug )cout << "Event not passing the HLT trigger vetos" << endl;
-            continue;
-          }
-          
-        }
-      }    
-      else if( MC_type == "Fall11" &&  DATA_type == "NO"){
-        if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	  
-          cout << "This is HLT in data" << endl;
-          cout<<" HLTPathsFired... "<<hlt<<endl;
-        }
-	
-        if(!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&     // OR mu and e trigger
-           !hlt.Contains("HLT_Mu17_Mu8")  &&
-           !hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL") &&
-           !hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL") 
-           ) {
-          if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-          continue;
-        }
-	
-      }
-      else if( MC_type == "Summer12" &&  DATA_type == "NO"){
-        if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	  
-          cout << "This is HLT in data" << endl;
-          cout<<" HLTPathsFired... "<<hlt<<endl;
-        }
-	
-        if(!hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&     // OR mu and e trigger
-           !hlt.Contains("HLT_Mu17_Mu8")   &&
-           !hlt.Contains("HLT_Mu17_TkMu8") &&
-           !hlt.Contains("HLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")   &&
-           !hlt.Contains("HLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL")
-           ) {
-          if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-          continue;
-        }
-	
-      }
-      
-      
       // Effective AREA
       bool tag_2011=false;
       if (DATA_type=="2010" || DATA_type=="2011" || MC_type=="Fall11"){
@@ -1820,12 +1593,13 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
 	    
       for(int i=0.;i<Nphotons;i++) {
+	if (iLp_l[i]==-1) continue;
 	
 	for(int e = 0; e < N_loose_e; ++e){
 	  if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
 	  
-	  if( deltaR<=0.4 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.4 is the isolation cone for electrons in 74x -> 0.3 in 76x              
+	  if( deltaR<=0.3 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.4 is the isolation cone for electrons in 74x -> 0.3 in 76x              
 	    if( debug )cout << "Subtracking the photon isolation from the electron isolation value " << endl;
 	    
 	    EffectiveArea=EAele(iL_loose_e[e],tag_2011);
@@ -1914,7 +1688,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  if (fabs(RECOMU_PFX_dB_new[iL[j]])>=0.35) continue;
 	  
 	  if(RECOMU_CHARGE[ iL[j] ] == RECOMU_CHARGE[ iL[i] ]) continue; // opposite charge
-	  
+
+	  cout << "Pairing muons with pT= " << RECOMU_PT[ iL[i] ] << " and " <<  RECOMU_PT[ iL[j] ] << endl;
+		  
 	  // evaluate the mass &
 	  double pxZ, pyZ, pzZ;
 	  double EZ;
@@ -2086,10 +1862,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
         for(int j = i + 1; j < Ne_good; ++j){
 	  if (fabs(RECOELE_SIP[iLe[i]])>=4.) continue; // SIP cut
 	  if (fabs(RECOELE_SIP[iLe[j]])>=4.) continue;
-	  if (fabs(RECOELE_PFX_rho[iLe[i]])>=0.5) continue; // Isolation cut
-	  if (fabs(RECOELE_PFX_rho[iLe[j]])>=0.5) continue;
+	  if (fabs(RECOELE_PFX_rho[iLe[i]])>=0.35) continue; // Isolation cut
+	  if (fabs(RECOELE_PFX_rho[iLe[j]])>=0.35) continue;
 	  
 	  if(RECOELE_CHARGE[ iLe[j] ] == RECOELE_CHARGE[ iLe[i] ]) continue; // opposite charge
+
+	  cout << "Pairing electrons with pT= " << RECOELE_PT[ iLe[i] ] << " and " <<  RECOELE_PT[ iLe[j] ] << endl;
 	  
 	  // evaluate the mass &
 	  double pxZ, pyZ, pzZ;
@@ -2277,6 +2055,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
       for (int index=0; index<Zcandvector.size();index++){
 	if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
+	cout << "Z passing the 12 < mll < 120 cut"<< endl;
 	Zcandisolmassvector.push_back(Zcandvector.at(index));
       };
       
@@ -2284,6 +2063,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	cout << "No ZZ passing the mass cut"<< endl;
 	continue;
       }
+
+      cout << "Number of Z passing the isolation and the 12 << mll < 120 cut is= " << Zcandisolmassvector.size() << endl;
 
       ++N_3b ;  // fill counter
       N_3b_w=N_3b_w+newweight;
@@ -2586,25 +2367,37 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       cout << "Cleaned Good Z passing ghost removal are " << cleanedgoodZ.size() << endl; 
       
       
-      // PT,20/10
+      // PT,20/10 for any di-lepton
       vector<candidateZ> pTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
 
       for (int i=0;i<cleanedgoodZ.size();i++){
-        cout << i << endl;
-        for (int j=i+1;j<cleanedgoodZ.size();j++){
-          cout << i << " " << j << endl;
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
-	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
-	  }	 
-        }
+	leptonspTcleaned.clear();
+	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+	}
+	else cout << "Pair not passing the pT, 20/10 cut" << endl;
       }
+      
+      // for (int i=0;i<cleanedgoodZ.size();i++){
+      //   cout << i << endl;
+      //   for (int j=i+1;j<cleanedgoodZ.size();j++){
+      //     cout << i << " " << j << endl;
+      //          leptonspTcleaned.clear();
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
+      // 	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+      // 	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
+      // 	  }	 
+      //   }
+      // }
       
       cout << "Cleaned Good Z passing pT cuts are " << pTcleanedgoodZ.size() << endl; 
       
@@ -2645,12 +2438,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       for(int i = 0; i < Ne_good; ++i){
 	if (RECOELE_SIP[iLe[i]]>=4.) continue;
-	if (RECOELE_PFX_rho[iLe[i]]>=0.5) continue; // Isolation no-FSR
+	if (RECOELE_PFX_rho[iLe[i]]>=0.35) continue; // Isolation no-FSR
 
 	
         for(int j = i + 1; j < Ne_good; ++j){
 	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
-	  if (RECOELE_PFX_rho[iLe[j]]>=0.5) continue; // Isolation no-FSR
+	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation no-FSR
 	  
 	  if ( RECOELE_CHARGE[iLe[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
 	  

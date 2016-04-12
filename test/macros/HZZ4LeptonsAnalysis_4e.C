@@ -23,6 +23,7 @@
 #include "ZZMatrixElement/MELA/src/computeAngles.h"
 #include "ZZMatrixElement/MELA/src/computeAngles.cc"
 #include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
+#include "KaMuCa/Calibration/interface/KalmanMuonCalibrator.h"
 
 
 
@@ -41,7 +42,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
    // Declare MEM class
    MEMs combinedMEM(13,125,"CTEQ6L");     
- 
+   
+   // MuonCalibrator
+   KalmanMuonCalibrator calibrator("DATA_76X_13TeV");
       
    // BNN
    Char_t datasetChar[500],bnnOUT[500],eventsOUT[500];
@@ -1117,84 +1120,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       ++N_1 ;  // fill counter
       N_1_w=N_1_w+newweight;
       
-      
-      // **** Step 2: TRIGGER, electron cleaning, lepton selection ****
-      
-      // trigger:
-      
-      stringstream ss (stringstream::in | stringstream::out);
-      ss << HLTPathsFired;
-      TString hlt(ss.str());
-      // if (debug) cout << ss.str() << endl;
-      
-     
-      if( DATA_type == "2011" &&  MC_type == "NO"){
-	
-	if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-          
-	  cout << "This is HLT in data" << endl;
-	  cout<<" HLTPathsFired... "<<hlt<<endl;
-	}
-	
-	if(// !hlt.Contains("xxx") &&
-	   !hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&
-	   !hlt.Contains("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL") &&
-	   !hlt.Contains("HLT_TripleEle10_CaloIdL_TrkIdVL")
-	   ) {
-	  if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-	  continue;
-	}
-	
-	
-      }
-      else if( DATA_type == "2012" &&  MC_type == "NO"){
-	if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	  
-	  cout << "This is HLT in data" << endl;
-	  cout<<" HLTPathsFired... "<<hlt<<endl;
-	}
-	
-	if(// !hlt.Contains("xxx") &&
-	   !hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&
-	   !hlt.Contains("HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL")
-	   ) {
-	  if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-	  continue;
-	}
-	
-      }    
-      else if( MC_type == "Fall11" && DATA_type == "NO"){
-	if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	  
-	  cout << "This is HLT in data" << endl;
-	  cout<<" HLTPathsFired... "<<hlt<<endl;
-	}
-	
-	if(// !hlt.Contains("xxx") &&
-	   !hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&
-	   !hlt.Contains("HLT_TripleEle10_CaloIdL_TrkIdVL")
-	   ) {
-	  if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-	  continue;
-	}
-	
-      }
-      else if( MC_type == "Summer12" && DATA_type == "NO"){
-	if( debug ){ cout << "\n ** Step 2 (Trigger): "<< endl ;
-	  
-	  cout << "This is HLT in data" << endl;
-	  cout<<" HLTPathsFired... "<<hlt<<endl;
-	}
-	
-	if(// !hlt.Contains("xxx") &&
-	   !hlt.Contains("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL") &&
-	   !hlt.Contains("HLT_Ele15_Ele8_Ele5_CaloIdL_TrkIdVL")
-	   ) {
-	  if( debug )cout << "Event not passing the HLT trigger paths" << endl;
-	  continue;
-	}
-	
-      }
 
       // Effective AREA
       bool tag_2011=false;
@@ -1661,12 +1586,13 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       cout << "Rho for electron pileup isolation correction is= " << RHO_ele << endl;
       
       for(int i=0.;i<Nphotons;i++) {
+	if (iLp_l[i]==-1) continue;
 	
 	for(int e = 0; e < N_loose_e; ++e){
 	  if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
 	  
-	  if( deltaR<=0.4 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.4 is the isolation cone for electrons in 74x -> 0.3 in 76x              
+	  if( deltaR<=0.3 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.4 is the isolation cone for electrons in 74x -> 0.3 in 76x              
 	    if( debug )cout << "Subtracking the photon isolation from the electron isolation value " << endl;
 	    
 	    EffectiveArea=EAele(iL_loose_e[e],tag_2011);
@@ -1747,10 +1673,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
         for(int j = i + 1; j < Ne_good; ++j){
 	  if (fabs(RECOELE_SIP[iLe[i]])>=4.) continue;
 	  if (fabs(RECOELE_SIP[iLe[j]])>=4.) continue;
-	  if (fabs(RECOELE_PFX_rho[iLe[i]])>=0.5) continue; // Isolation cut
-	  if (fabs(RECOELE_PFX_rho[iLe[j]])>=0.5) continue;
+	  if (fabs(RECOELE_PFX_rho[iLe[i]])>=0.35) continue; // Isolation cut
+	  if (fabs(RECOELE_PFX_rho[iLe[j]])>=0.35) continue;
 	  
 	  if(RECOELE_CHARGE[ iLe[j] ] == RECOELE_CHARGE[ iLe[i] ]) continue; // opposite charge
+
+	  cout << "Pairing electrons with pT= " << RECOELE_PT[ iLe[i] ] << " and " <<  RECOELE_PT[ iLe[j] ] << endl;
 	  
 	  // evaluate the mass &
 	  double pxZ, pyZ, pzZ;
@@ -1931,6 +1859,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
       for (int index=0; index<Zcandvector.size();index++){
 	if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
+	cout << "Z passing the 12 < mll < 120 cut"<< endl;
 	Zcandisolmassvector.push_back(Zcandvector.at(index));
       };
       
@@ -1939,6 +1868,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	continue;
       }
 
+      cout << "Number of Z passing the isolation and the 12 << mll < 120 cut is= " << Zcandisolmassvector.size() << endl;
+      
       ++N_3b ;  // fill counter
       N_3b_w=N_3b_w+newweight;
       
@@ -2240,25 +2171,37 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       cout << "Cleaned Good Z passing ghost removal are " << cleanedgoodZ.size() << endl; 
       
       
-      // PT,20/10
+      // PT,20/10 for any di-lepton
       vector<candidateZ> pTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
 
       for (int i=0;i<cleanedgoodZ.size();i++){
-        cout << i << endl;
-        for (int j=i+1;j<cleanedgoodZ.size();j++){
-          cout << i << " " << j << endl;
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
-	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
-	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
-	  }	 
-        }
+	leptonspTcleaned.clear();
+	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+	}
+	else cout << "Pair not passing the pT, 20/10 cut" << endl;
       }
+      
+      // for (int i=0;i<cleanedgoodZ.size();i++){
+      //   cout << i << endl;
+      //   for (int j=i+1;j<cleanedgoodZ.size();j++){
+      //     cout << i << " " << j << endl;
+      //          leptonspTcleaned.clear();
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
+      // 	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
+      // 	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+      // 	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      // 	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
+      // 	  }	 
+      //   }
+      // }
       
       cout << "Cleaned Good Z passing pT cuts are " << pTcleanedgoodZ.size() << endl; 
       
@@ -2275,11 +2218,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    
       for(int i = 0; i < Ne_good; ++i){
 	if (RECOELE_SIP[iLe[i]]>=4.) continue;
-	if (RECOELE_PFX_rho[iLe[i]]>=0.5) continue; // Isolation cut - noFSR
+	if (RECOELE_PFX_rho[iLe[i]]>=0.35) continue; // Isolation cut - noFSR
 	
         for(int j = i + 1; j < Ne_good; ++j){
 	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
-	  if (RECOELE_PFX_rho[iLe[j]]>=0.5) continue; // Isolation cut - noFSR
+	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation cut - noFSR
 	  
 	  if ( RECOELE_CHARGE[iLe[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
 	  
