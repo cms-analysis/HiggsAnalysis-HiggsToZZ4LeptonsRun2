@@ -942,7 +942,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!(Run==1 && LumiSection==41 && Event==7655)) continue;
+      //if (!(Run==1 && LumiSection==2415 && Event==463640)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -1463,6 +1463,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
 	  if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;  //loose ID + SIP cut
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
+	  cout << "DeltaR= " << deltaR << " " <<  deltaR/pow(RECOPFPHOT_PT[iLp[i]],2) << endl;
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
 	    min_deltaR = deltaR;
@@ -1475,6 +1476,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	  if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue;  //loose ID + SIP cut
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[l]],2) );
+	  cout << "DeltaR= " << deltaR << " " <<  deltaR/pow(RECOPFPHOT_PT[iLp[i]],2) << endl;
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<min_deltaR_ET2) {
 	    min_deltaR = deltaR;
@@ -1483,9 +1485,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  }
 	  
 	}//end loop on electrons  
+
 	
-	
-	if( min_deltaR < 0.5 && min_deltaR_ET2<0.012 ){
+	if( min_deltaR < 0.5 ){
 	  if (tag_min_deltaR==0) iLp_l[ i ] = iL_loose_mu[l_min_deltaR];
 	  if (tag_min_deltaR==1) iLp_l[ i ] = iL_loose_e[l_min_deltaR];
 	  iLp_tagEM[ i ] = tag_min_deltaR;
@@ -2371,16 +2373,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       vector<candidateZ> pTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
 
-      // for (int i=0;i<cleanedgoodZ.size();i++){
-      // 	leptonspTcleaned.clear();
-      // 	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-      // 	leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-      // 	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-      // 	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-      // 	  pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-      // 	}
-      // 	else cout << "Pair not passing the pT, 20/10 cut" << endl;
-      // }
       
       for (int i=0;i<cleanedgoodZ.size();i++){
         cout << i << endl;
@@ -2411,16 +2403,35 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       double min_mass_2L = 10000.;
       TLorentzVector Lepton1qcd,Lepton2qcd,DiLeptonQCD;
-	    
+
+      // mu mu
       for(int i = 0; i < N_good; ++i){
 	if (RECOMU_SIP[iL[i]]>=4.) continue;
 	if (fabs(RECOMU_PFX_dB[iL[i]])>=0.35) continue; // Isolation cut - NO FSR
 
+	bool matched1=false;
+	for (int k=0;k<pTcleanedgoodZ.size();k++){
+	  if (RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt1 || RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt2) {
+	    matched1=true;
+	    break;
+	  }
+	}
+	if (!matched1) continue;
+	
         for(int j = i + 1; j < N_good; ++j){
 	  if (RECOMU_SIP[iL[j]]>=4.) continue;
 	  if (fabs(RECOMU_PFX_dB[iL[j]])>=0.35) continue; // Isolation cut - NO FSR
 		
 	  if ( RECOMU_CHARGE[iL[i]] == RECOMU_CHARGE[iL[j]]) continue; // shoud be OS
+
+	  bool matched2=false;
+	  for (int k=0;k<pTcleanedgoodZ.size();k++){
+	    if (RECOMU_PT[iL[j]]==pTcleanedgoodZ.at(k).pt1 || RECOMU_PT[iL[j]]==pTcleanedgoodZ.at(k).pt2) {
+	      matched2=true;
+	      break;
+	    }
+	  }
+	  if (!matched2) continue;
 	  
 	  // evaluate the mass
 	  double mass;
@@ -2429,21 +2440,38 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           Lepton2qcd.SetPtEtaPhiM(RECOMU_PT[iL[j]], RECOMU_ETA[iL[j]], RECOMU_PHI[iL[j]], 0.105);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-	  	  
+	  cout << "mass= " << mass << endl; 	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
         }
       } // end loop on all couples
       
-      
+      // e e
       for(int i = 0; i < Ne_good; ++i){
 	if (RECOELE_SIP[iLe[i]]>=4.) continue;
 	if (RECOELE_PFX_rho[iLe[i]]>=0.35) continue; // Isolation no-FSR
 
+	bool matched1=false;
+	for (int k=0;k<pTcleanedgoodZ.size();k++){
+	  if (RECOELE_PT[iLe[i]]==pTcleanedgoodZ.at(k).pt1 || RECOELE_PT[iLe[i]]==pTcleanedgoodZ.at(k).pt2) {
+	    matched1=true;
+	    break;
+	  }
+	}
+	if (!matched1) continue;
 	
         for(int j = i + 1; j < Ne_good; ++j){
 	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
 	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation no-FSR
+
+	  bool matched2=false;
+	  for (int k=0;k<pTcleanedgoodZ.size();k++){
+	    if (RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt1 || RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt2) {
+	      matched2=true;
+	      break;
+	    }
+	  }
+	  if (!matched2) continue;	  
 	  
 	  if ( RECOELE_CHARGE[iLe[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
 	  
@@ -2454,13 +2482,56 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-	  
+	  cout << "mass= " << mass << endl; 	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
         }
       } // end loop on all couples
-      
 
+      // emu
+      for(int i = 0; i < N_good; ++i){
+	if (RECOMU_SIP[iL[i]]>=4.) continue;
+	if (fabs(RECOMU_PFX_dB[iL[i]])>=0.35) continue; // Isolation cut - NO FSR
+
+	bool matched1=false;
+	for (int k=0;k<pTcleanedgoodZ.size();k++){
+	  if (RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt1 || RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt2) {
+	    matched1=true;
+	    break;
+	  }
+	}
+	if (!matched1) continue;
+
+	for(int j = i + 1; j < Ne_good; ++j){
+	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
+	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation no-FSR
+	  
+	  bool matched2=false;
+	  for (int k=0;k<pTcleanedgoodZ.size();k++){
+	    if (RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt1 || RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt2) {
+	      matched2=true;
+	      break;
+	    }
+	  }
+	  if (!matched2) continue;
+
+	  if ( RECOMU_CHARGE[iL[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
+	  
+	  // evaluate the mass
+	  double mass;
+	  
+	  Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[iLe[i]], RECOELE_ETA[iLe[i]], RECOELE_PHI[iLe[i]], 0.000511);
+          Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
+          DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
+          mass = DiLeptonQCD.M();
+	  cout << "mass= " << mass << endl; 	  
+	  if( mass < min_mass_2L ) min_mass_2L = mass ;
+	  
+	}
+	
+      }
+      
+      //
 
      if( debug ) cout  << "\n Step 6: mll > 4" 
       		 << "\n min_mass_2L " << min_mass_2L
@@ -2537,6 +2608,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(indexZ1));
 
      for (int i=0;i<pTcleanedgoodZ.size();i++){
+       //cout << "Mass of cleanedgoodZ= " << pTcleanedgoodZ.at(i).massvalue << endl;
        if (pTcleanedgoodZ.at(i).tag==Z1tag) continue; // we want 2e2mu or 2mu2e
        if ( pTcleanedgoodZ.at(i).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept1==indexlep2Z1 ||  
 	    pTcleanedgoodZ.at(i).ilept2==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept2==indexlep2Z1
