@@ -945,7 +945,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
         
-      if (!(Run==1 && LumiSection==2415 && Event==463640)) continue;
+      //if (!(Run==1 && LumiSection==2415 && Event==463640)) continue;
   
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;   
 
@@ -1412,6 +1412,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
         if( debug ) cout << "\n Electron i="<< i <<" properties: "
       		  << "\nRECOELE_PT[i] " << RECOELE_PT[i]
       		  << "\nfabs(RECOELE_ETA[i]) " << fabs(RECOELE_ETA[i])
+		  << "\nfabs(RECOELE_scl_Eta[i]) " << fabs(RECOELE_scl_Eta[i])
       		  << "\nRECOELE_PFX_rho[i] " << RECOELE_PFX_rho[i]
       		  << "\nfabs( RECOELE_SIP[i] ) " << fabs( RECOELE_SIP[i] )
       		  << "\nRECOELE_mvaNonTrigV0[i] " << RECOELE_mvaNonTrigV0[i]
@@ -1541,6 +1542,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR<min_deltaR) { // the closest lepton
+	    cout << "Possible candidate of photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " associated to a muon with pT= " << RECOMU_PT[iL_loose_mu[l]]<< endl;
 	    min_deltaR = deltaR;
 	    l_min_deltaR = l;
 	    tag_min_deltaR = 0;
@@ -1553,6 +1555,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[l]],2) );
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
 	  if( deltaR<min_deltaR) { // the closest lepton
+	    cout << "Possible candidate of photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " associated to an electron with pT= " << RECOELE_PT[iL_loose_e[l]]<< endl;
 	    min_deltaR = deltaR;
 	    l_min_deltaR = l;
 	    tag_min_deltaR = 1;
@@ -1676,7 +1679,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
 	  
 	  if( deltaR<=0.3 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.3 in 76x              
-	    if( debug )cout << "Subtracking the photon isolation from the electron isolation value " << endl;
+	    if( debug )cout << "Subtracting the photon isolation from the electron isolation value " << endl;
 	    
 	    EffectiveArea=EAele(iL_loose_e[e],tag_2011);
 	    RECOELE_PFX_rho_new[iL_loose_e[e]]=
@@ -1692,6 +1695,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
           double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
 
 	  if( deltaR<=0.3 && deltaR>0.01){ // 0.3 is the isolation cone for muons in 76x
+	    if( debug )cout << "Subtracting the photon isolation from the muon isolation value " << endl;
+		    
 	    RECOMU_PFX_dB_new[iL_loose_mu[l]]=
               (RECOMU_PFchHad[iL_loose_mu[l]]+
                max(0.,RECOMU_PFneuHad[iL_loose_mu[l]]+
@@ -1797,7 +1802,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  
 	  
 	  for( int p = 0; p < Nphotons; ++p ){
-	    if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  {  // exit a photon asosciated to a lepton mu
+	    if( iLp_l[ p ] == iL[i] && iLp_tagEM[ p ] == 0 )  {  // exists a photon asosciated to a lepton mu
 	      
 	      // evaluate the mass
 
@@ -1810,15 +1815,13 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      pzZ=DiLepton.Pz();
 	      EZ=DiLepton.E();	      	   
 	      
-	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
-		has_FSR_Z = 1; 
-		pi = p; 
-		++N_FSR_Z;
-		if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
-		massZ=mllp;
-	      }
-	      
+	      has_FSR_Z = 1; 
+	      pi = p; 
+	      ++N_FSR_Z;
+	      if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
+	      massZ=mllp;	      	      
 	    }
+	    
 	    if( iLp_l[ p ] == iL[j] && iLp_tagEM[ p ] == 0 )  { 
 	      
 	      LeptonCorrection.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
@@ -1830,13 +1833,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      pzZ=DiLepton.Pz();
 	      EZ=DiLepton.E();
 	      
-	      if( fabs( mllp - Zmass ) < fabs( massZ - Zmass ) ){
-		pj = p;
-		has_FSR_Z = 1;
-		++N_FSR_Z; 
-		if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
-		massZ=mllp;
-	      }
+	      pj = p;
+	      has_FSR_Z = 1;
+	      ++N_FSR_Z; 
+	      if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
+	      massZ=mllp;	      
 	    }
 	  } // end loop on FSR photons
 	 	  
@@ -1881,11 +1882,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  else{
 	    
 	    if( debug ) cout  << "Z Isolation: "  
-			      << "\n RECOMU_PFX_dB[ iL[i] ] " << RECOMU_PFX_dB[ iL[i] ]
-			      << "\n RECOMU_PFX_dB[ iL[j] ] " << RECOMU_PFX_dB[ iL[j] ]
+			      << "\n RECOMU_PFX_dB_new[ iL[i] ] " << RECOMU_PFX_dB_new[ iL[i] ]
+			      << "\n RECOMU_PFX_dB_new[ iL[j] ] " << RECOMU_PFX_dB_new[ iL[j] ]
 			      << endl;
-	    
-	    //if(  RECOMU_PFX_dB[ iL[i] ] >= 0.35 ||  RECOMU_PFX_dB[ iL[j] ] >= 0.35 ) continue;   // cut on isolation
 	  }
 	  // ** end association of FSR to Z
 	  
@@ -3081,7 +3080,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 
       	 for(int ele = 0; ele < Ne_good; ++ele){
       	   if (fabs(RECOELE_SIP[iLe[ele]])>=4.) continue;
-	   if (RECOELE_PFX_rho[iLe[ele]]>=0.35) continue;
+	   if (RECOELE_PFX_rho_new[iLe[ele]]>=0.35) continue;
       	   double deltaR = sqrt( pow(DELTAPHI(RECO_PFJET_PHI[i],RECOELE_PHI[iLe[ele]]),2) + pow(RECO_PFJET_ETA[i] - RECOELE_ETA[iLe[ele]],2));
      	   cout << "1st lepton electron: " << " pT=" << RECOELE_PT[iLe[ele]] <<" deltaR "<< deltaR <<endl;
 	   if (deltaR<0.4){
