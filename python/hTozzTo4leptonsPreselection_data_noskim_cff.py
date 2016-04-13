@@ -152,7 +152,6 @@ else:
     calibratedElectrons.correctionFile = cms.string(files["76XReReco"])
     calibratedElectrons.isMC = cms.bool(True)
 
-
     # Electron relaxed selection
     from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronSequences_cff import *
     hTozzTo4leptonsElectronSelector=HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsElectronSelector_cfi.hTozzTo4leptonsElectronSelector.clone()
@@ -425,7 +424,7 @@ phPFIsoValueChargedAll03PFId.deposits= cms.VPSet(
             src = cms.InputTag("phPFIsoDepositChargedAll"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('Threshold(0.2)'),
+            vetos = cms.vstring('0.0001','Threshold(0.2)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -751,10 +750,9 @@ from JetMETCorrections.Configuration.CorrectedJetProducersDefault_cff import *
 from JetMETCorrections.Configuration.CorrectedJetProducers_cff import *
 from JetMETCorrections.Configuration.CorrectedJetProducersAllAlgos_cff import *
 
-
 ak4PFJetsCorrection   = cms.EDProducer('CorrectedPFJetProducer',
-    src         = cms.InputTag('hTozzTo4leptonsPFJetSelector'),
-    correctors  = cms.VInputTag('ak4PFCHSL1FastL2L3Corrector')
+    src         = cms.InputTag('hTozzTo4leptonsPFJetSelector'),    
+    correctors  = cms.VInputTag('ak4PFCHSL1FastL2L3Corrector')    
 )
 
 
@@ -879,8 +877,8 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
         hTozzTo4leptonsTipLipToVtxProducer          +
         hTozzTo4leptonsPFJetSelector                +
         ak4PFCHSL1FastL2L3CorrectorChain            +
-        ak4PFJetsCorrection                         +
         ak4PFCHSL1FastL2L3ResidualCorrectorChain    +
+        ak4PFJetsCorrection                         +
         ak4PFJetsCorrectionData                     +
         recoPuJetIdMvaMC                            +
         recoPuJetIdMvaData                          +
