@@ -1819,7 +1819,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      pi = p; 
 	      ++N_FSR_Z;
 	      if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
-	      massZ=mllp;	      	      
+	      massZ=mllp;
+
+	      cout << "Mass Z with FSR= "<< massZ << endl;
+	      
 	    }
 	    
 	    if( iLp_l[ p ] == iL[j] && iLp_tagEM[ p ] == 0 )  { 
@@ -1837,7 +1840,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	      has_FSR_Z = 1;
 	      ++N_FSR_Z; 
 	      if( RECOPFPHOT_PT[iLp[p]] > max_pt_FSR_Z ) max_pt_FSR_Z = RECOPFPHOT_PT[iLp[p]];
-	      massZ=mllp;	      
+	      massZ=mllp;
+
+	      cout << "Mass Z with FSR= "<< massZ << endl;
+
 	    }
 	  } // end loop on FSR photons
 	 	  
@@ -2237,7 +2243,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       cout << "Good Z passing ghost removal are " << goodZ.size() << endl; 
       for (int i=0;i<goodZ.size();i++){
-       	cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;	
+       	//cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;	
        	bool duplicate=false;
        	for (int j=0;j<cleanedgoodZ.size();++j){
        	  if (goodZ.at(i).massvalue == cleanedgoodZ.at(j).massvalue){
@@ -2246,7 +2252,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        	  }
        	}
 	if (!duplicate) {
-	  cout << "Filling the cleaned vector" << endl;
+	  cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;
+	  //cout << "Filling the cleaned vector" << endl;
 	  cleanedgoodZ.push_back(goodZ.at(i));
 	}
       }
@@ -2255,12 +2262,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       
       // PT,20/10 for any di-lepton
-      vector<candidateZ> pTcleanedgoodZ;    
+      vector<candidateZ> firstpTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
 
       
       for (int i=0;i<cleanedgoodZ.size();i++){
-        cout << i << endl;
+        //cout << i << endl;
         for (int j=i+1;j<cleanedgoodZ.size();j++){
           //cout << i << " " << j << endl;
 	  leptonspTcleaned.clear();
@@ -2270,19 +2277,39 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
       	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
       	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-      	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-      	    pTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
+      	    firstpTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
+      	    firstpTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
       	  }	 
         }
       }
-      
-      cout << "Cleaned Good Z passing pT cuts are " << pTcleanedgoodZ.size() << endl; 
-      
-      for (int i=0;i<pTcleanedgoodZ.size();i++){
-	cout << " with masses " << pTcleanedgoodZ.at(i).massvalue << endl;
-      }
-      if (pTcleanedgoodZ.size()==0) continue;
 
+      cout << "Cleaned Good Z passing pT cuts (with duplicates) are " << firstpTcleanedgoodZ.size() << endl; 
+           
+      if (firstpTcleanedgoodZ.size()==0) continue;
+
+      vector<candidateZ> pTcleanedgoodZ;            
+      for (int i=0;i<firstpTcleanedgoodZ.size();i++){
+       	//cout << "Good Z masses are: " << firstpTcleanedgoodZ.at(i).massvalue << endl;	
+       	bool duplicate=false;
+       	for (int j=0;j<pTcleanedgoodZ.size();++j){
+       	  if (firstpTcleanedgoodZ.at(i).massvalue == pTcleanedgoodZ.at(j).massvalue){
+      	    duplicate=true;
+       	    continue;	  
+       	  }
+       	}
+	if (!duplicate) {
+	  cout << "Good Z masses are: " << firstpTcleanedgoodZ.at(i).massvalue << endl;	
+	  //cout << "Filling the cleaned vector" << endl;
+	  pTcleanedgoodZ.push_back(firstpTcleanedgoodZ.at(i));
+	}
+      }
+
+      cout << "Cleaned Good Z passing pT cuts (no duplicates) are " << pTcleanedgoodZ.size() << endl; 
+      for (int i=0;i<pTcleanedgoodZ.size();i++){
+       	cout << " with masses " << pTcleanedgoodZ.at(i).massvalue << endl;
+      }
+      
+     
       // **** Step 6:
       // QCD suppression: mll>4 GeV cut on all OS-SF pairs (4/4)
       
@@ -2406,26 +2433,26 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 		       << endl;
 
 
-     vector<candidateZ> pTcleanedgoodZ_nosharedlept;
-     pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(indexZ1));
+     // vector<candidateZ> pTcleanedgoodZ_nosharedlept;
+     // pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(indexZ1));
 
-     for (int i=0;i<pTcleanedgoodZ.size();i++){
-       if ( pTcleanedgoodZ.at(i).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept1==indexlep2Z1 ||  
-	    pTcleanedgoodZ.at(i).ilept2==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept2==indexlep2Z1
-	    ) continue;
-       pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(i));
-     }
+     // for (int i=0;i<pTcleanedgoodZ.size();i++){
+     //   if ( pTcleanedgoodZ.at(i).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept1==indexlep2Z1 ||  
+     // 	    pTcleanedgoodZ.at(i).ilept2==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept2==indexlep2Z1
+     // 	    ) continue;
+     //   pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(i));
+     // }
 
-     for (int i=0;i<pTcleanedgoodZ_nosharedlept.size();i++){
-       cout << "Z Mass surviving= " << pTcleanedgoodZ_nosharedlept.at(i).massvalue << endl;
-     }
+     // for (int i=0;i<pTcleanedgoodZ_nosharedlept.size();i++){
+     //   cout << "Z Mass surviving= " << pTcleanedgoodZ_nosharedlept.at(i).massvalue << endl;
+     // }
 
-     vector<candidateZ> pTcleanedgoodZ_noZ1;
-     for (int i=0;i<pTcleanedgoodZ.size();i++){
-       if (pTcleanedgoodZ.at(i).massvalue == massZ1 ) continue; 
-       pTcleanedgoodZ_noZ1.push_back(pTcleanedgoodZ.at(i));
-       cout << "Z Mass surviving _ no Z1 " << pTcleanedgoodZ.at(i).massvalue << endl;                                                                              
-     }
+     // vector<candidateZ> pTcleanedgoodZ_noZ1;
+     // for (int i=0;i<pTcleanedgoodZ.size();i++){
+     //   if (pTcleanedgoodZ.at(i).massvalue == massZ1 ) continue; 
+     //   pTcleanedgoodZ_noZ1.push_back(pTcleanedgoodZ.at(i));
+     //   cout << "Z Mass surviving _ no Z1 " << pTcleanedgoodZ.at(i).massvalue << endl;                                                                              
+     // }
 
      // ZZ objects with alternative pairing
      array<int,2> icleanedgoodZs;
@@ -2502,13 +2529,22 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        if (icleanedgoodZsv.at(vindexZZ.at(0)).at(0)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(1); 
        if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);
      }
-     else {     
+     else {
+       cout << "more than one Z2 (couple to the same Z1), choose the one with the highest-pT Z2 leptons" << endl;
        int indexZ2tmp=-999;
        float sumpT=-999.,tmpsumpT=-999.;
        for (int ll=0;ll<vindexZZ.size();ll++){
       	 if (icleanedgoodZsv.at(vindexZZ.at(ll)).at(0)==indexZ1) indexZ2tmp=icleanedgoodZsv.at(vindexZZ.at(ll)).at(1);
 	 if (icleanedgoodZsv.at(vindexZZ.at(ll)).at(1)==indexZ1) indexZ2tmp=icleanedgoodZsv.at(vindexZZ.at(ll)).at(0);
 	 if (indexZ2tmp>=0){
+	 
+	   TLorentzVector LorentzZ1,LorentzZ2,LorentzZZ;
+	   LorentzZ1.SetPxPyPzE(pTcleanedgoodZ.at(indexZ1).pxZ, pTcleanedgoodZ.at(indexZ1).pyZ, pTcleanedgoodZ.at(indexZ1).pzZ, pTcleanedgoodZ.at(indexZ1).EZ);
+	   LorentzZ2.SetPxPyPzE(pTcleanedgoodZ.at(indexZ2tmp).pxZ, pTcleanedgoodZ.at(indexZ2tmp).pyZ, pTcleanedgoodZ.at(indexZ2tmp).pzZ, pTcleanedgoodZ.at(indexZ2tmp).EZ);
+	   LorentzZZ=LorentzZ1+LorentzZ2;
+	   if (LorentzZZ.M()<70.) continue; // cut m4l>70
+	   cout << "Passed m4l>70. cut"<< endl;
+	   
       	   tmpsumpT=
 	     pTcleanedgoodZ.at(indexZ2tmp).pt1+
 	     pTcleanedgoodZ.at(indexZ2tmp).pt2;
@@ -2522,7 +2558,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
      // Z2
      if (indexZ2<0) continue;
-
+     cout << "The highest pT leptons Z2 has mass= " <<  pTcleanedgoodZ.at(indexZ2).massvalue << endl;
+     
      massZ2 = pTcleanedgoodZ.at(indexZ2).massvalue;	 
      pxZ2 = pTcleanedgoodZ.at(indexZ2).pxZ;
      pyZ2 = pTcleanedgoodZ.at(indexZ2).pyZ;
