@@ -89,7 +89,8 @@ void HZZ4LeptonsMuonSelector::produce(edm::Event& iEvent, const edm::EventSetup&
       if ( fabs( mIter->eta() ) > muonEtaMax ) continue;
       if ( mIter->pt() > muonPtMin) Gmuon->push_back( *mIter );   
     }
- 
+
+    cout << "Selected a muon with pT= " << mIter->pt() << endl;
   }
 
   
