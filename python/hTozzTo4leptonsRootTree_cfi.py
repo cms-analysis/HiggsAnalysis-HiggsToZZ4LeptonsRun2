@@ -69,10 +69,7 @@ hTozzTo4leptonsRootTree = cms.EDAnalyzer("HZZ4LeptonsRootTree",
     ElectronsEgmHcalMapLabel = cms.InputTag("eleIsoFromDepsHcalFromTowersOptimized"),
 
     MuonsLabel               = cms.InputTag("hTozzTo4leptonsMuonIsolationProducer"),
-    MuonsMapLabel            = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel"),
-    MuonsTkMapLabel          = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel:Tk"),                         
-    MuonsEcalMapLabel        = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel:Ecal"),
-    MuonsHcalMapLabel        = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel:Hcal"),
+    MuonsCorrPtErrorMapLabel = cms.InputTag("hTozzTo4leptonsMuonCalibrator:CorrPtError"),
 
     # PF muons
     PFMuonsLabel             = cms.InputTag("hTozzTo4leptonsPFtoRECOMuon"),                                           
@@ -94,11 +91,11 @@ hTozzTo4leptonsRootTree = cms.EDAnalyzer("HZZ4LeptonsRootTree",
     PFPhotonsLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton"),                                           
     PFpterrorLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton:ErrorMap"),
 
-    PhotonPFIsoValueChargedAll = cms.InputTag("phPFIsoValueChargedAll03PFId"),
-    PhotonPFIsoValueCharged    = cms.InputTag("phPFIsoValueCharged03PFId"),
-    PhotonPFIsoValueNeutral    = cms.InputTag("phPFIsoValueNeutral03PFId"),
-    PhotonPFIsoValueGamma      = cms.InputTag("phPFIsoValueGamma03PFId"),
-    PhotonPFIsoValuePU         = cms.InputTag("phPFIsoValuePU03PFId"),
+    PhotonPFIsoValueChargedAll = cms.InputTag("phPFIsoValueChargedAll03PFIdPFBRECO"),
+    PhotonPFIsoValueCharged    = cms.InputTag("phPFIsoValueCharged03PFIdPFBRECO"),
+    PhotonPFIsoValueNeutral    = cms.InputTag("phPFIsoValueNeutral03PFIdPFBRECO"),
+    PhotonPFIsoValueGamma      = cms.InputTag("phPFIsoValueGamma03PFIdPFBRECO"),
+    PhotonPFIsoValuePU         = cms.InputTag("phPFIsoValuePU03PFIdPFBRECO"),
                                            
     
     # vertexing w.r.t primary vertex DA
