@@ -1477,6 +1477,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 			 << "\n RECOPFPHOT_PT[i] " << RECOPFPHOT_PT[i]
 			 << "\n fabs(RECOPFPHOT_ETA[i]) " << fabs(RECOPFPHOT_ETA[i])
 			 << "\n RECOPFPHOT_PHI[i] " << RECOPFPHOT_PHI[i]
+			 << "\n RECOPFPHOT_PFchHad[i] " << RECOPFPHOT_PFchHad[i] 
+			 << "\n RECOPFPHOT_PFneuHad[i] " << RECOPFPHOT_PFneuHad[i] 
+			 << "\n RECOPFPHOT_PFphoton[i] " << RECOPFPHOT_PFphoton[i] 
+			 << "\n RECOPFPHOT_PFPUchAllPart[i] "<< RECOPFPHOT_PFPUchAllPart[i] 
 			 << "\n RECOPFPHOT_PFX_rho[i] " << RECOPFPHOT_PFX_rho[i]
 			 << endl ;
 	
@@ -1618,6 +1622,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  }
 	}	
       }
+
+      //
+      min_deltaR_ET2=1000;
       
       for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue; //loose ID + SIP cut

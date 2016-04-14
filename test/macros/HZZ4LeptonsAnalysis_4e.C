@@ -947,7 +947,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      if (!(Run==1 && LumiSection==513 && Event==97009)) continue;
+      //if (!(Run==1 && LumiSection==1076 && Event==208576)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -1235,7 +1235,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  
 	  if( deltaR <= 0.05 ){
 	    
-	    if( debug )cout << "Electrom not passing the cross cleaning" << endl;
+	    if( debug )cout << "Electron not passing the cross cleaning" << endl;
 	    
 	    RECOELE_PT[e]  = -0.01;
 	    RECOELE_ETA[e] = -99.;
@@ -1320,6 +1320,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       		  << "\nfabs(RECOELE_ETA[i]) " << fabs(RECOELE_ETA[i])
 		  << "\nfabs(RECOELE_scl_Eta[i]) " << fabs(RECOELE_scl_Eta[i])
       		  << "\nRECOELE_PFX_rho[i] " << RECOELE_PFX_rho[i]
+			 << "\n chHad= " <<  RECOELE_PFchHad[i]                       
+			 << "\n neuHad= " << RECOELE_PFneuHad[i]                                                                                                                    
+			 << "\n photon= " <<  RECOELE_PFphoton[i]
+                         << "\n PU= " << RECOMU_PFPUchAllPart[i]
       		  << "\nfabs( RECOELE_SIP[i] ) " << fabs( RECOELE_SIP[i] )
       		  << "\nRECOELE_mvaNonTrigV0[i] " << RECOELE_mvaNonTrigV0[i]
 		  << "\nfabs( RECOELE_gsftrack_dxy[i] ) " << fabs( RECOELE_gsftrack_dxy[i] )
@@ -1536,6 +1540,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  }
 	}	
       }
+
+      //
+      min_deltaR_ET2=1000;
       
       for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue; //loose ID + SIP cut

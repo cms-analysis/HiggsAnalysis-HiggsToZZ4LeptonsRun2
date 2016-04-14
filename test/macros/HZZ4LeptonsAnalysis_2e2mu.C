@@ -942,7 +942,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!(Run==1 && LumiSection==2415 && Event==463640)) continue;
+      //if (!(Run==1 && LumiSection==2508 && Event==481290)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -1529,6 +1529,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	
 	for( int p = 0; p < Nphotons; ++p ){
 	  if( iLp_l[ p ] == iL_loose_mu[l] && iLp_tagEM[ p ] == 0 )  {
+	    cout <<  "index muon" << iL_loose_mu[l] << endl;
 	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOMU_ETA[iL_loose_mu[l]],2) );
 	    double deltaR_ET2 = deltaR/pow(RECOPFPHOT_PT[iLp[p]],2);
 	    if (deltaR_ET2<min_deltaR_ET2) {
@@ -1542,12 +1543,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  }
 	}	
       }
+
+      //
+      min_deltaR_ET2=1000;
       
       for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue; //loose ID + SIP cut
 	
 	for( int p = 0; p < Nphotons; ++p ){
 	  if( iLp_l[ p ] == iL_loose_e[l] && iLp_tagEM[ p ] == 1 )  {
+	    cout <<  "index electron" << iL_loose_e[l] << endl;
 	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOELE_ETA[iL_loose_e[l]],2) );
 	    double deltaR_ET2 = deltaR/pow(RECOPFPHOT_PT[iLp[p]],2);
 	    if (deltaR_ET2<min_deltaR_ET2){
