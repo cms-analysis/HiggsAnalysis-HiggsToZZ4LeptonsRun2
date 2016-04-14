@@ -376,7 +376,7 @@ elPFIsoDepositChargedAllPFBRECO.src = cms.InputTag("hTozzTo4leptonsElectronSelec
 elPFIsoDepositNeutralPFBRECO.src    = cms.InputTag("hTozzTo4leptonsElectronSelector")
 elPFIsoDepositGammaPFBRECO.src      = cms.InputTag("hTozzTo4leptonsElectronSelector")
 elPFIsoDepositPUPFBRECO.src         = cms.InputTag("hTozzTo4leptonsElectronSelector")
-
+#elPFIsoValueGamma03PFIdPFBRECO.deposits[0].vetos = cms.vstring('EcalBarrel:ConeVeto(0.)','EcalEndcaps:ConeVeto(0.)')
 
 # Muon PF isolation
 # from CommonTools.ParticleFlow.PFBRECO_cff import *
@@ -389,42 +389,61 @@ muPFIsoDepositPUPFBRECO.src         = cms.InputTag("hTozzTo4leptonsMuonSelector"
 
 # Photon PF
 # from CommonTools.ParticleFlow.PFBRECO_cff import *
-from CommonTools.ParticleFlow.Isolation.pfPhotonIsolation_cff import *
+## from CommonTools.ParticleFlow.Isolation.pfPhotonIsolation_cff import *
+from CommonTools.ParticleFlow.Isolation.photonPFIsolationDepositsPFBRECO_cff import *
 
-phPFIsoDepositCharged.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositCharged.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedHadronsPFBRECO")
+## phPFIsoDepositCharged.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+## phPFIsoDepositCharged.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedHadronsPFBRECO")
 
-phPFIsoDepositChargedAll.src = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositChargedAll.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedParticlesPFBRECO")
+## phPFIsoDepositChargedAll.src = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+## phPFIsoDepositChargedAll.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedParticlesPFBRECO")
 
-phPFIsoDepositNeutral.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositNeutral.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
+## phPFIsoDepositNeutral.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+## phPFIsoDepositNeutral.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
 
-phPFIsoDepositGamma.src      = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositGamma.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
+## phPFIsoDepositGamma.src      = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+## phPFIsoDepositGamma.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
 
-phPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
-phPFIsoDepositPU.ExtractorPSet.inputCandView = cms.InputTag("pfPileUpAllChargedParticlesPFBRECO")
+## phPFIsoDepositPU.src         = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+## phPFIsoDepositPU.ExtractorPSet.inputCandView = cms.InputTag("pfPileUpAllChargedParticlesPFBRECO")
 
-from RecoParticleFlow.PFProducer.photonPFIsolationValues_cff import *
 
-phPFIsoValueCharged03PFId.deposits=cms.VPSet(
+phPFIsoDepositChargedPFBRECO.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositChargedPFBRECO.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedHadronsPFBRECO")
+
+phPFIsoDepositChargedAllPFBRECO.src = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositChargedAllPFBRECO.ExtractorPSet.inputCandView = cms.InputTag("pfAllChargedParticlesPFBRECO")
+
+phPFIsoDepositNeutralPFBRECO.src    = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositNeutralPFBRECO.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
+
+phPFIsoDepositGammaPFBRECO.src      = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositGammaPFBRECO.ExtractorPSet.inputCandView = cms.InputTag("pfAllPhotonsPFBRECO")
+
+phPFIsoDepositPUPFBRECO.src         = cms.InputTag("hTozzTo4leptonsPFfsrPhoton")
+phPFIsoDepositPUPFBRECO.ExtractorPSet.inputCandView = cms.InputTag("pfPileUpAllChargedParticlesPFBRECO")
+
+
+## from RecoParticleFlow.PFProducer.photonPFIsolationValues_cff import *
+from CommonTools.ParticleFlow.Isolation.photonPFIsolationValuesPFBRECO_cff import *
+
+phPFIsoValueCharged03PFIdPFBRECO.deposits=cms.VPSet(
             cms.PSet(
-            src = cms.InputTag("phPFIsoDepositCharged"),
+            src = cms.InputTag("phPFIsoDepositChargedPFBRECO"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('0.0001','Threshold(0.2)'),
+            vetos = cms.vstring('EcalBarrel:ConeVeto(0.0001)','EcalEndcaps:ConeVeto(0.0001)','Threshold(0.2)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
             ))
 
-phPFIsoValueChargedAll03PFId.deposits= cms.VPSet(
+phPFIsoValueChargedAll03PFIdPFBRECO.deposits= cms.VPSet(
             cms.PSet(
-            src = cms.InputTag("phPFIsoDepositChargedAll"),
+            src = cms.InputTag("phPFIsoDepositChargedAllPFBRECO"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('0.0001','Threshold(0.2)'),
+            vetos = cms.vstring('EcalBarrel:ConeVeto(0.0001)','EcalEndcaps:ConeVeto(0.0001)','Threshold(0.2)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -432,36 +451,36 @@ phPFIsoValueChargedAll03PFId.deposits= cms.VPSet(
    )
 
 
-phPFIsoValueNeutral03PFId.deposits = cms.VPSet(
+phPFIsoValueNeutral03PFIdPFBRECO.deposits = cms.VPSet(
             cms.PSet(
-            src = cms.InputTag("phPFIsoDepositNeutral"),
+            src = cms.InputTag("phPFIsoDepositNeutralPFBRECO"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('0.01','Threshold(0.5)'),
+            vetos = cms.vstring('EcalBarrel:ConeVeto(0.01)','EcalEndcaps:ConeVeto(0.01)','Threshold(0.5)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
         )
     )
 
-phPFIsoValueGamma03PFId.deposits = cms.VPSet(
+phPFIsoValueGamma03PFIdPFBRECO.deposits = cms.VPSet(
             cms.PSet(
-            src = cms.InputTag("phPFIsoDepositGamma"),
+            src = cms.InputTag("phPFIsoDepositGammaPFBRECO"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('0.01','Threshold(0.5)'),
+            vetos = cms.vstring('EcalBarrel:ConeVeto(0.01)','EcalEndcaps:ConeVeto(0.0001)','Threshold(0.5)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
       )
    )
 
-phPFIsoValuePU03PFId.deposits= cms.VPSet(
+phPFIsoValuePU03PFIdPFBRECO.deposits= cms.VPSet(
             cms.PSet(
-            src = cms.InputTag("phPFIsoDepositPU"),
+            src = cms.InputTag("phPFIsoDepositPUPFBRECO"),
             deltaR = cms.double(0.3),
             weight = cms.string('1'),
-            vetos = cms.vstring('Threshold(0.2)'),
+            vetos = cms.vstring('EcalBarrel:ConeVeto(0.0001)','EcalEndcaps:ConeVeto(0.0001)','Threshold(0.2)'),
             skipDefaultVeto = cms.bool(True),
             mode = cms.string('sum'),
             PivotCoordinatesForEBEE = cms.bool(True)
@@ -860,7 +879,7 @@ hTozzTo4leptonsSelectionSequenceData = cms.Sequence(
         pfParticleSelectionPFBRECOSequence          + 
         pfElectronIsolationPFBRECOSequence          +      
         muonPFIsolationPFBRECOSequence              +
-        pfPhotonIsolationSequence                   +
+        pfPhotonIsolationPFBRECOSequence                   +
         zToEELooseIsol                              +
         zToMuMuLooseIsol                            +
         hTozzTo4leptonsLooseIsol                    +
