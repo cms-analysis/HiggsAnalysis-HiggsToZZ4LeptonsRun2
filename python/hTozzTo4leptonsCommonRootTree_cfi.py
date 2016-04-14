@@ -69,10 +69,7 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     ElectronsEgmHcalMapLabel = cms.InputTag("eleIsoFromDepsHcalFromTowersOptimized"),
 
     MuonsLabel               = cms.InputTag("hTozzTo4leptonsMuonIsolationProducer"),
-    MuonsMapLabel            = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel"),
-    MuonsTkMapLabel          = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel:Tk"),                         
-    MuonsEcalMapLabel        = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel:Ecal"),
-    MuonsHcalMapLabel        = cms.InputTag("hTozzTo4leptonsMuonIsolationProducerOffsel:Hcal"),
+    MuonsCorrPtErrorMapLabel = cms.InputTag("hTozzTo4leptonsMuonCalibrator:CorrPtError"),
 
     # PF muons
     PFMuonsLabel             = cms.InputTag("hTozzTo4leptonsPFtoRECOMuon"),                                           
@@ -84,21 +81,20 @@ hTozzTo4leptonsCommonRootTree = cms.EDAnalyzer("HZZ4LeptonsCommonRootTree",
     MuonPFIsoValueGamma         = cms.InputTag("muPFIsoValueGamma03PFBRECO"),
     MuonPFIsoValuePU            = cms.InputTag("muPFIsoValuePU03PFBRECO"),
 
-
     ElectronPFIsoValueChargedAll = cms.InputTag("elPFIsoValueChargedAll03PFIdPFBRECO"),
     ElectronPFIsoValueCharged    = cms.InputTag("elPFIsoValueCharged03PFIdPFBRECO"),
     ElectronPFIsoValueNeutral    = cms.InputTag("elPFIsoValueNeutral03PFIdPFBRECO"),
     ElectronPFIsoValueGamma      = cms.InputTag("elPFIsoValueGamma03PFIdPFBRECO"),
     ElectronPFIsoValuePU         = cms.InputTag("elPFIsoValuePU03PFIdPFBRECO"),
-
+    
     PFPhotonsLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton"),                                           
     PFpterrorLabel             = cms.InputTag("hTozzTo4leptonsPFfsrPhoton:ErrorMap"),
 
-    PhotonPFIsoValueChargedAll = cms.InputTag("phPFIsoValueChargedAll03PFId"),
-    PhotonPFIsoValueCharged    = cms.InputTag("phPFIsoValueCharged03PFId"),
-    PhotonPFIsoValueNeutral    = cms.InputTag("phPFIsoValueNeutral03PFId"),
-    PhotonPFIsoValueGamma      = cms.InputTag("phPFIsoValueGamma03PFId"),
-    PhotonPFIsoValuePU         = cms.InputTag("phPFIsoValuePU03PFId"),
+    PhotonPFIsoValueChargedAll = cms.InputTag("phPFIsoValueChargedAll03PFIdPFBRECO"),
+    PhotonPFIsoValueCharged    = cms.InputTag("phPFIsoValueCharged03PFIdPFBRECO"),
+    PhotonPFIsoValueNeutral    = cms.InputTag("phPFIsoValueNeutral03PFIdPFBRECO"),
+    PhotonPFIsoValueGamma      = cms.InputTag("phPFIsoValueGamma03PFIdPFBRECO"),
+    PhotonPFIsoValuePU         = cms.InputTag("phPFIsoValuePU03PFIdPFBRECO"),
                                            
     
     # vertexing w.r.t primary vertex DA
