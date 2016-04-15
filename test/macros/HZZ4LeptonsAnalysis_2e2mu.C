@@ -942,7 +942,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!(Run==1 && LumiSection==2508 && Event==481290)) continue;
+      //if (!(Run==1 && LumiSection==148 && Event==27934)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -2068,7 +2068,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
       for (int index=0; index<Zcandvector.size();index++){
 	if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
-	cout << "Z passing the 12 < mll < 120 cut"<< endl;
+	cout << "Z passing the 12 < mll < 120 cut with mass= " << Zcandvector.at(index).massvalue<< endl;
 	Zcandisolmassvector.push_back(Zcandvector.at(index));
       };
       
@@ -2330,29 +2330,51 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       vector<candidateZ> goodZ;
 
       for (int i=0;i<Zcandisolmassvector.size();i++){
+	cout << "Checking mass i= " << Zcandisolmassvector.at(i).massvalue << endl;
+	cout << "Ghost removal check 0: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(i).phi2 ),2) 
+		  + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(i).eta2,2) ) << endl;
 	if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(i).phi2 ),2) 
 		  + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(i).eta2,2) ) <= 0.02) continue;
+	
+	
 	for (int j=i+1;j<Zcandisolmassvector.size();j++){
+	  cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
+	  cout <<Zcandisolmassvector.at(i).pt1 << " " << Zcandisolmassvector.at(j).pt1 << " " << Zcandisolmassvector.at(j).pt2 << endl;
+	  cout <<Zcandisolmassvector.at(i).pt2 << " " << Zcandisolmassvector.at(j).pt1 << " " << Zcandisolmassvector.at(j).pt2 << endl;
+	  if (Zcandisolmassvector.at(i).pt1==Zcandisolmassvector.at(j).pt1 || Zcandisolmassvector.at(i).pt1==Zcandisolmassvector.at(j).pt2) continue;
+	  if (Zcandisolmassvector.at(i).pt2==Zcandisolmassvector.at(j).pt1 || Zcandisolmassvector.at(i).pt2==Zcandisolmassvector.at(j).pt2) continue;
+	 	  
+	  cout << "Ghost removal check 1: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(j).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(j).eta1-Zcandisolmassvector.at(j).eta2,2) )<< endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(j).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
 		    + pow(Zcandisolmassvector.at(j).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
-
+	  
+	  cout << "Ghost removal check 2: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta1,2) )<< endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi1 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
 
+	  cout << "Ghost removal check 3: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta2,2) ) << endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
 
+	  cout << "Ghost removal check 4: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta1,2) ) << endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi1 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
 
+	  cout << "Ghost removal check 5: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta2,2) ) << endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi2 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
 
-	  cout << "There is a set of 4 leptons passing the ghost removal" << endl;
+	  cout << "There is a set of 4 leptons passing the ghost removal (deltaR > 0.02)" << endl;
 	  goodZ.push_back(Zcandisolmassvector.at(i));
 	  goodZ.push_back(Zcandisolmassvector.at(j));
 	}
       }
+      
       
       if (goodZ.size()==0) {
 	cout << "No ZZ combination passing the cuts  ...exiting " << endl;
@@ -2431,7 +2453,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
 
       // **** Step 6:
-      // QCD suppression: mll>4 GeV cut on all OS-SF pairs (4/4)
+      // QCD suppression: mll>4 GeV cut on all OS- any flavour pairs (4/4)
       
       double min_mass_2L = 10000.;
       TLorentzVector Lepton1qcd,Lepton2qcd,DiLeptonQCD;
@@ -2539,45 +2561,20 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	if (RECOMU_SIP[iL[i]]>=4.) continue;
 	if (fabs(RECOMU_PFX_dB[iL[i]])>=0.35) continue; // Isolation cut - NO FSR
 
-	bool matched1=false;
-	for (int k=0;k<pTcleanedgoodZ.size();k++){
-	  if (RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt1 || RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt2) {
-	    matched1=true;
-	    break;
-	  }
-	}
-	if (!matched1) continue;
-
 	for(int j = i + 1; j < Ne_good; ++j){
 	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
 	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation no-FSR
-	  
-	  bool matched2=false;
-	  for (int k=0;k<pTcleanedgoodZ.size();k++){
-	    if (RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt1 || RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt2) {
-	      matched2=true;
-	      break;
-	    }
-	  }
-	  if (!matched2) continue;
 
 	  if ( RECOMU_CHARGE[iL[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
 	  
 	  // evaluate the mass
 	  double mass;
 	  
-	  Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[iLe[i]], RECOELE_ETA[iLe[i]], RECOELE_PHI[iLe[i]], 0.000511);
+	  Lepton1qcd.SetPtEtaPhiM(RECOMU_PT[iL[i]], RECOMU_ETA[iL[i]], RECOMU_PHI[iL[i]], 0.105);
           Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
           DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
           mass = DiLeptonQCD.M();
-
-	  bool matchedZ=false;
-	  for (int k=0;k<Zcandvector.size();k++){
-	    //cout << "Min mass value= " << Zcandvector.at(k).massvalue << endl;
-	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
-	  }
-	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied	  
-	  
+	 	  
 	  if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  
 	}

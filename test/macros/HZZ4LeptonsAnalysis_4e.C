@@ -947,7 +947,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!(Run==1 && LumiSection==1076 && Event==208576)) continue;
+      //if (!(Run==1 && LumiSection==1565 && Event==300403)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -1872,8 +1872,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       Zcandisolmassvector.clear();
 
       for (int index=0; index<Zcandvector.size();index++){
-	if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
-	cout << "Z passing the 12 < mll < 120 cut"<< endl;
+	if (!(Zcandvector.at(index).massvalue > 12. && Zcandvector.at(index).massvalue < 120.)) continue;
+	cout << "Z passing the 12 < mll < 120 cut with mass= " << Zcandvector.at(index).massvalue<< endl;
 	Zcandisolmassvector.push_back(Zcandvector.at(index));
       };
       
@@ -2135,25 +2135,44 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       vector<candidateZ> goodZ;
 
       for (int i=0;i<Zcandisolmassvector.size();i++){
+	cout << "Checking mass i= " << Zcandisolmassvector.at(i).massvalue << endl;
+	cout << "Ghost removal check 0: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(i).phi2 ),2) 
+		  + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(i).eta2,2) ) << endl;
 	if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(i).phi2 ),2) 
 		  + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(i).eta2,2) ) <= 0.02) continue;
+	
+	
 	for (int j=i+1;j<Zcandisolmassvector.size();j++){
+	  cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
+	  if (Zcandisolmassvector.at(i).ilept1==Zcandisolmassvector.at(j).ilept1 || Zcandisolmassvector.at(i).ilept1==Zcandisolmassvector.at(j).ilept2) continue;
+	  if (Zcandisolmassvector.at(i).ilept2==Zcandisolmassvector.at(j).ilept1 || Zcandisolmassvector.at(i).ilept2==Zcandisolmassvector.at(j).ilept2) continue;
+	  
+	  cout << "Ghost removal check 1: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(j).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(j).eta1-Zcandisolmassvector.at(j).eta2,2) )<< endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(j).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
 		    + pow(Zcandisolmassvector.at(j).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
-
+	  
+	  cout << "Ghost removal check 2: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta1,2) )<< endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi1 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
 
+	  cout << "Ghost removal check 3: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta2,2) ) << endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi1, Zcandisolmassvector.at(j).phi2 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta1-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
 
+	  cout << "Ghost removal check 4: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi1 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta1,2) ) << endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi1 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta1,2) ) <= 0.02) continue;
 
+	  cout << "Ghost removal check 5: deltaR= " << sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi2 ),2) 
+		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta2,2) ) << endl;
 	  if( sqrt( pow( DELTAPHI(Zcandisolmassvector.at(i).phi2, Zcandisolmassvector.at(j).phi2 ),2) 
 		    + pow(Zcandisolmassvector.at(i).eta2-Zcandisolmassvector.at(j).eta2,2) ) <= 0.02) continue;
 
-	  cout << "There is a set of 4 leptons passing the ghost removal" << endl;
+	  cout << "There is a set of 4 leptons passing the ghost removal (deltaR > 0.02)" << endl;
 	  goodZ.push_back(Zcandisolmassvector.at(i));
 	  goodZ.push_back(Zcandisolmassvector.at(j));
 	}
@@ -2381,20 +2400,84 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      vector<std::array<int, 2> > icleanedgoodZsv;
 
      for (int i=0;i<pTcleanedgoodZ.size();i++){
+       
+       
+       float lepton1ch=-999., lepton2ch=-999.;
+       lepton1ch=pTcleanedgoodZ.at(i).charge1;
+       lepton2ch=pTcleanedgoodZ.at(i).charge2;
+
+       TLorentzVector Lepton1,Lepton2,Lepton1Correction,Lepton2Correction;
+       
+       Lepton1.SetPtEtaPhiM(pTcleanedgoodZ.at(i).pt1, pTcleanedgoodZ.at(i).eta1, pTcleanedgoodZ.at(i).phi1, 0.000511);
+       
+       if (pTcleanedgoodZ.at(i).ilept1_FSR) {
+	 for( int p = 0; p < Nphotons; ++p ){
+	   if( iLp_l[ p ] == pTcleanedgoodZ.at(i).ilept1 && iLp_tagEM[ p ] == 1 ){
+	     Lepton1Correction.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	     Lepton1+=Lepton1Correction;
+	   }
+	 }
+       }	 
+       Lepton2.SetPtEtaPhiM(pTcleanedgoodZ.at(i).pt2, pTcleanedgoodZ.at(i).eta2, pTcleanedgoodZ.at(i).phi2, 0.000511);
+       if (pTcleanedgoodZ.at(i).ilept2_FSR) {
+	 for( int p = 0; p < Nphotons; ++p ){
+	   if( iLp_l[ p ] == pTcleanedgoodZ.at(i).ilept2 && iLp_tagEM[ p ] == 1 ){
+	     Lepton2Correction.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	     Lepton2+=Lepton2Correction;
+	   }
+	 }
+       }
+       
+       
        for (int j=i+1;j<pTcleanedgoodZ.size();j++){
-	 float massZa=-999.,massZb=-999.;
+	 float massZa=-999.,massZb=-999.;	 	 
 	 cout << "Masses= " << pTcleanedgoodZ.at(i).massvalue << " " << pTcleanedgoodZ.at(j).massvalue << endl;
-	 if (fabs(pTcleanedgoodZ.at(i).massvalue-Zmass) < fabs(pTcleanedgoodZ.at(j).massvalue-Zmass)) {
-	   massZa=pTcleanedgoodZ.at(i).massvalue;
-	   massZb=pTcleanedgoodZ.at(j).massvalue;
+
+	 float lepton3ch=-999., lepton4ch=-999.;
+	 lepton3ch=pTcleanedgoodZ.at(j).charge1;
+	 lepton4ch=pTcleanedgoodZ.at(j).charge2;
+       
+	 TLorentzVector Lepton3,Lepton4,Lepton3Correction,Lepton4Correction,DiLeptonZa,DiLeptonZb;
+	 Lepton3.SetPtEtaPhiM(pTcleanedgoodZ.at(j).pt1, pTcleanedgoodZ.at(j).eta1, pTcleanedgoodZ.at(j).phi1, 0.000511);
+	 if (pTcleanedgoodZ.at(j).ilept1_FSR) {
+	   for( int p = 0; p < Nphotons; ++p ){
+	     if( iLp_l[ p ] == pTcleanedgoodZ.at(j).ilept1 && iLp_tagEM[ p ] == 1 ){
+	       Lepton3Correction.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	       Lepton3+=Lepton3Correction;
+	     }
+	   }
+	 }	 
+	 Lepton4.SetPtEtaPhiM(pTcleanedgoodZ.at(j).pt2, pTcleanedgoodZ.at(j).eta2, pTcleanedgoodZ.at(j).phi2, 0.000511);
+	 if (pTcleanedgoodZ.at(j).ilept2_FSR) {
+	   for( int p = 0; p < Nphotons; ++p ){
+	     if( iLp_l[ p ] == pTcleanedgoodZ.at(j).ilept2 && iLp_tagEM[ p ] == 1 ){
+	       Lepton4Correction.SetPtEtaPhiM(RECOPFPHOT_PT[iLp[p]],RECOPFPHOT_ETA[iLp[p]],RECOPFPHOT_PHI[iLp[p]],0);
+	       Lepton4+=Lepton4Correction;
+	     }
+	   }
+	 }
+
+	 if (lepton1ch*lepton3ch<0){
+	   DiLeptonZa=Lepton1+Lepton3;
+	   DiLeptonZb=Lepton2+Lepton4;
+	 }  
+	 if (lepton1ch*lepton4ch<0){
+	   DiLeptonZa=Lepton1+Lepton4;
+	   DiLeptonZb=Lepton2+Lepton3;
+	 }
+	 
+	 if (fabs(DiLeptonZa.M()-Zmass) < fabs(DiLeptonZb.M()-Zmass)) {
+	   massZa=DiLeptonZa.M();
+	   massZb=DiLeptonZb.M();
 	 }
 	 else {
-	   massZa=pTcleanedgoodZ.at(j).massvalue;
-	   massZb=pTcleanedgoodZ.at(i).massvalue;
+	   massZa=DiLeptonZb.M();
+	   massZb=DiLeptonZa.M();
 	 }	  
 
-	 if ( fabs(massZa-Zmass) < fabs(massZ1-Zmass) && massZb<12) continue; // exclude those pairs
 	 cout << "mass Za and b= " << massZa << " " << massZb << endl;
+	 if ( fabs(massZa-Zmass) < fabs(massZ1-Zmass) && massZb<12) continue; // exclude the original pairs
+
 	 //	 cout << "i j " << i << " " << j << endl;
 	 icleanedgoodZs={i,j};
 	 icleanedgoodZsv.push_back(icleanedgoodZs);
