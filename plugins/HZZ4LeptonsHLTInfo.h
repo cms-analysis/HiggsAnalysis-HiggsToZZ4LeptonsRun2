@@ -39,7 +39,8 @@ class HZZ4LeptonsHLTInfo : public edm::EDProducer {
 
 
     /// HLT TriggerResults EDProduct
-    edm::InputTag inputTag_;
+    edm::EDGetTokenT<edm::TriggerResults> inputTag_;
+
     /// HLT trigger names
     edm::TriggerNames triggerNames_;
 

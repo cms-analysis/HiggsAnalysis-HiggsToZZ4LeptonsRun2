@@ -36,7 +36,7 @@ HZZ4LeptonsHLTInfo::HZZ4LeptonsHLTInfo(const edm::ParameterSet& iConfig)
 {
   // get names from module parameters, then derive slot numbers
 
-  inputTag_           = iConfig.getParameter<edm::InputTag> ("TriggerResultsTag");
+  inputTag_           = consumes<edm::TriggerResults >(iConfig.getParameter<edm::InputTag> ("TriggerResultsTag"));
   n_                  = 0;
   firstevent_         = true;  
   produces<vector<std::string> >();
@@ -64,7 +64,8 @@ void HZZ4LeptonsHLTInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSet
 
    // get hold of TriggerResults Object
    Handle<TriggerResults> trh;
-   try {iEvent.getByLabel(inputTag_,trh);} catch(...) {;}
+   iEvent.getByToken(inputTag_,trh);
+   
    if (trh.isValid()) {
      if(debug) cout << "TriggerResults found, number of HLT paths: " << trh->size() << endl;
      
