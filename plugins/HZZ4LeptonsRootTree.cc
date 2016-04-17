@@ -2431,16 +2431,17 @@ void HZZ4LeptonsRootTree::fillMuons(const edm::Event& iEvent,const edm::EventSet
   math::XYZPoint pVertex(0., 0., 0.);
   bool pvfound = (PV.size() != 0);
   cout << "pvfound=" << pvfound << endl;
-  if(pvfound){
-    primVertex = PV.front();
-    pVertex = math::XYZPoint(primVertex.position().x(), primVertex.position().y(), primVertex.position().z());
-    //cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
-    /* primVertex.position().x() << " " << */
-    /* 	primVertex.position().y() << " " << */
-    /* 	primVertex.position().z() << endl; */
-    //pVertex.x() << " " <<
-    //pVertex.y() << " " <<
-    //pVertex.z() << endl;
+  if(pvfound){       
+      for(reco::VertexCollection::const_iterator it=PV.begin() ; it!=PV.end() ; ++it){
+	if(!it->isFake() && it->ndof() > 4 && fabs(it->position().z()) <= 24 && fabs(it->position().rho()) <= 2){ 	  	  
+	  pVertex = math::XYZPoint(it->position().x(), it->position().y(), it->position().z());
+	  cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
+	    pVertex.x() << " " <<
+	    pVertex.y() << " " <<
+	    pVertex.z() << endl;
+	  break;
+	}
+      }
   }
 
   // Matching
@@ -2992,16 +2993,17 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
   math::XYZPoint pVertex(0., 0., 0.);
   bool pvfound = (PV.size() != 0);
   cout << "pvfound=" << pvfound << endl;
-  if(pvfound){
-    primVertex = PV.front();
-    pVertex = math::XYZPoint(primVertex.position().x(), primVertex.position().y(), primVertex.position().z());
-    cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
-      /* primVertex.position().x() << " " << */
-      /* 	primVertex.position().y() << " " << */
-      /* 	primVertex.position().z() << endl; */
-      pVertex.x() << " " <<
-      pVertex.y() << " " <<
-      pVertex.z() << endl;
+  if(pvfound){       
+    for(reco::VertexCollection::const_iterator it=PV.begin() ; it!=PV.end() ; ++it){
+      if(!it->isFake() && it->ndof() > 4 && fabs(it->position().z()) <= 24 && fabs(it->position().rho()) <= 2){ 	  	  
+	pVertex = math::XYZPoint(it->position().x(), it->position().y(), it->position().z());
+	cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
+	  pVertex.x() << " " <<
+	  pVertex.y() << " " <<
+	  pVertex.z() << endl;
+	break;
+      }
+    }
   }
   
   

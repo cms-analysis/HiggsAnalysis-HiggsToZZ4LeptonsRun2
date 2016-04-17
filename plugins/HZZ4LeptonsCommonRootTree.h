@@ -3061,19 +3061,18 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     math::XYZPoint pVertex(0., 0., 0.);
     bool pvfound = (PV.size() != 0);
     cout << "pvfound=" << pvfound << endl;
-    if(pvfound){
-      primVertex = PV.front();
-      pVertex = math::XYZPoint(primVertex.position().x(), primVertex.position().y(), primVertex.position().z());
-      cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
-	/* primVertex.position().x() << " " << */
-/* 	primVertex.position().y() << " " << */
-/* 	primVertex.position().z() << endl; */
-	pVertex.x() << " " <<
-	pVertex.y() << " " <<
-	pVertex.z() << endl;
-      
-    }
-
+    if(pvfound){       
+      for(reco::VertexCollection::const_iterator it=PV.begin() ; it!=PV.end() ; ++it){
+	if(!it->isFake() && it->ndof() > 4 && fabs(it->position().z()) <= 24 && fabs(it->position().rho()) <= 2){ 	  	  
+	  pVertex = math::XYZPoint(it->position().x(), it->position().y(), it->position().z());
+	  cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
+	    pVertex.x() << " " <<
+	    pVertex.y() << " " <<
+	    pVertex.z() << endl;
+	  break;
+	}
+      }
+    } 
     
     int index=0;
     RECO_NELE=EleRefs->size();
@@ -3625,17 +3624,17 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     math::XYZPoint pVertex(0., 0., 0.);
     bool pvfound = (PV.size() != 0);
     cout << "pvfound=" << pvfound << endl;
-    if(pvfound){
-      primVertex = PV.front();
-      pVertex = math::XYZPoint(primVertex.position().x(), primVertex.position().y(), primVertex.position().z());
-      cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
-	/* primVertex.position().x() << " " << */
-/* 	primVertex.position().y() << " " << */
-/* 	primVertex.position().z() << endl; */
-	pVertex.x() << " " <<
-	pVertex.y() << " " <<
-	pVertex.z() << endl;
-      
+    if(pvfound){       
+      for(reco::VertexCollection::const_iterator it=PV.begin() ; it!=PV.end() ; ++it){
+	if(!it->isFake() && it->ndof() > 4 && fabs(it->position().z()) <= 24 && fabs(it->position().rho()) <= 2){ 	  	  
+	  pVertex = math::XYZPoint(it->position().x(), it->position().y(), it->position().z());
+	  cout << "P vertex position used for computing dxy and dz for electron and muons is (x,y,z)= " << 
+	    pVertex.x() << " " <<
+	    pVertex.y() << " " <<
+	    pVertex.z() << endl;
+	  break;
+	}
+      }
     }
     
 
@@ -4000,6 +3999,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
       RECOPHOT_ETA[iphot]=cand->eta();
       RECOPHOT_PHI[iphot]=cand->phi();
       RECOPHOT_THETA[iphot]=cand->theta();
+      cout << "Reco Photon with pT= " << RECOPHOT_PT[iphot] << " eta= " << RECOPHOT_ETA[iphot] << " phi= " << RECOPHOT_PHI[iphot] << endl;
       // Matching
       int i=0;
       if (ismyGammas){
@@ -4065,7 +4065,7 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
       double pterr = perr*cand->pt()/cand->p(); 
       RECOPFPHOT_PTError[iphot]=float(pterr);
       
-      cout << "Photon : pT= " << RECOPFPHOT_PT[iphot] << " pTerr= " << RECOPFPHOT_PTError[iphot]<< endl;
+      cout << "PF Photon : pT= " << RECOPFPHOT_PT[iphot] << " pTerr= " << RECOPFPHOT_PTError[iphot]<< endl;
 
       RECOPFPHOT_ETA[iphot]=cand->eta();
       RECOPFPHOT_PHI[iphot]=cand->phi();
@@ -4706,6 +4706,8 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
     edm::Handle<edm::ValueMap<float> > puJetIdMVAData;
     
     if (fillMCTruth == 1){
+      cout << "Using Jet energy collection for MC " << endl;
+
       iEvent.getByToken(jetsTag_, pfjets);
       iEvent.getByToken(jetsMVATag_, pfjetsmva);
       iEvent.getByToken(PuJetMvaMCfullDiscr_,puJetIdMVAMC);
@@ -4716,6 +4718,8 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
       iEvent.getByToken(PuJetMvaDatafullDiscr_,puJetIdMVAData);      
       
     }
+
+
     RECO_PFJET_N = pfjets->size();
     cout << "Number of PFJets in the event= " << RECO_PFJET_N << endl;
     
