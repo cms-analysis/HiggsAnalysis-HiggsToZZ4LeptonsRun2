@@ -88,10 +88,10 @@ from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsPFfsrPhoton_cfi import *
 #from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsHLTAnalysisRootTree_cfi import *
 #from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsHLTAnalysisSequences_cff import *
 
-#from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsHLTInfo_cfi import *
-hTozzTo4leptonsHLTInfo = cms.EDProducer("HZZ4LeptonsHLTInfo",
-  TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
-)
+from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsHLTInfo_cfi import *
+hTozzTo4leptonsHLTInfo.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
+hTozzTo4leptonsHLTInfo.debug = cms.untracked.bool(False)
+
 
 from HiggsAnalysis.HiggsToZZ4Leptons.hTozzTo4leptonsHLTAnalysisFilter_cfi import *
 
