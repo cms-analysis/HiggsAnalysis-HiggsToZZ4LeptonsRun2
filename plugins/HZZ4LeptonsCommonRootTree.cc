@@ -50,7 +50,7 @@ HZZ4LeptonsCommonRootTree::HZZ4LeptonsCommonRootTree(const edm::ParameterSet& ps
 
   theTree_ = new TTree("HZZ4LeptonsAnalysis", "HZZ4Leptons Analysis Tree");
 
-  cout << "This is" << pset.getUntrackedParameter("fileName", std::string()) << endl;
+  //cout << "This is" << pset.getUntrackedParameter("fileName", std::string()) << endl;
 
   // Creating branches
   DefineBranches(theTree_);

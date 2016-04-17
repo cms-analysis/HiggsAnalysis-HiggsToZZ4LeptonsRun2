@@ -74,6 +74,7 @@ void HZZ4LeptonsHLTInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSet
      if (firstevent_) {
        for (unsigned int i=0; i<triggerNames_.size(); i++) {
 	 if(debug) cout << "Found the trigger path= " << triggerNames_.triggerName(i) << endl;
+	 firstevent_=false;
        }
      }
      
@@ -96,8 +97,6 @@ void HZZ4LeptonsHLTInfo::produce(edm::Event& iEvent, const edm::EventSetup& iSet
        }
      }
      
-
-     firstevent_=false;
    }
 
    iEvent.put(HLTPathsFired);     
