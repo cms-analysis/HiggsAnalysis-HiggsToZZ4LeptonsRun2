@@ -942,7 +942,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-      //if (!(Run==1 && LumiSection==148 && Event==27934)) continue;
+      //if (!(Run==1 && LumiSection==1269 && Event==245889)) continue;
 
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
       
@@ -1409,11 +1409,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  
 	  // cleaning
 	  for(int e = 0; e < N_loose_e; ++e){
-  	    if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;  // loose ID + SIP cut
+  	    if (fabs( RECOELE_SIP[iL_loose_e[e]])>=4.) continue;  // loose ID + SIP cut	    
 	    double deltaPhi = DELTAPHI( RECOPFPHOT_PHI[i] , RECOELE_scl_Phi[iL_loose_e[e]] ) ;
 	    double deltaEta = fabs( RECOPFPHOT_ETA[i] - RECOELE_scl_Eta[iL_loose_e[e]] );
 	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[i] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[i] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
-	    
+	    cout << "debug: " << RECOELE_PT[iL_loose_e[e]] << " " << deltaPhi << " " << deltaEta << " " << deltaR << endl;
 	    if( ( fabs(deltaPhi) < 2 && fabs(deltaEta) < 0.05 ) || deltaR <= 0.15 ){		  
 	      if( debug )cout << "Photon not passing the electron cleaning" << endl;	
 	      is_clean = 0;	  
@@ -1523,9 +1523,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
       // Multiple photons associated to the same lepton: the lowest-ΔR(γ,l)/ETγ2 has to be selected.
       double min_deltaR_ET2=1000;
+      int p_min_deltaR_ET2=-1;
 
       for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
 	if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue; //loose ID + SIP cut
+	min_deltaR_ET2=1000;
+	p_min_deltaR_ET2=-1;
 	
 	for( int p = 0; p < Nphotons; ++p ){
 	  if( iLp_l[ p ] == iL_loose_mu[l] && iLp_tagEM[ p ] == 0 )  {
@@ -1535,37 +1538,63 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    if (deltaR_ET2<min_deltaR_ET2) {
 	      min_deltaR_ET2=deltaR_ET2;
 	      RECOPFPHOT_DR[iLp[p]]=deltaR;
-	    }
-	    else {	     
-	      iLp_l[ p ] = -1;
-	      iLp_tagEM[ p ] = -1;
+	      p_min_deltaR_ET2=p;
 	    }
 	  }
-	}	
+	}
+	
+	if (p_min_deltaR_ET2!=-1){
+	  for( int p = 0; p < Nphotons; ++p ){
+	    if( iLp_l[ p ] == iL_loose_mu[l] && iLp_tagEM[ p ] == 0 )  {
+	      if (p!=p_min_deltaR_ET2){
+		iLp_l[ p ] = -1;
+		iLp_tagEM[ p ] = -1;
+	      }
+	    }
+	  }
+	}
+	
       }
 
+   
+      
       //
       min_deltaR_ET2=1000;
+      p_min_deltaR_ET2=-1;
       
       for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
 	if (fabs(RECOELE_SIP[iL_loose_e[l]])>=4.) continue; //loose ID + SIP cut
+	min_deltaR_ET2=1000;
+	p_min_deltaR_ET2=-1;
 	
 	for( int p = 0; p < Nphotons; ++p ){
 	  if( iLp_l[ p ] == iL_loose_e[l] && iLp_tagEM[ p ] == 1 )  {
 	    cout <<  "index electron" << iL_loose_e[l] << endl;
-	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOELE_ETA[iL_loose_e[l]],2) );
+	    double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[p]] , RECOELE_PHI[iL_loose_e[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[p]] - RECOELE_ETA[iL_loose_e[l]],2));
 	    double deltaR_ET2 = deltaR/pow(RECOPFPHOT_PT[iLp[p]],2);
+	    cout << " deltaR_ET2= " << deltaR_ET2 <<endl;
 	    if (deltaR_ET2<min_deltaR_ET2){
 	      min_deltaR_ET2=deltaR_ET2;
 	      RECOPFPHOT_DR[iLp[p]]=deltaR;
-	    }
-	    else {
-	      iLp_l[ p ] = -1;
-	      iLp_tagEM[ p ] = -1;
+	      p_min_deltaR_ET2=p;
+	      cout << " p_min_deltaR_ET2= " << p_min_deltaR_ET2 <<endl;
 	    }
 	  }	  
 	}
-      }
+	
+	if (p_min_deltaR_ET2!=-1){
+	  for( int p = 0; p < Nphotons; ++p ){
+	    if( iLp_l[ p ] == iL_loose_e[l] && iLp_tagEM[ p ] == 1 )  {
+	      if (p!=p_min_deltaR_ET2){
+		iLp_l[ p ] = -1;
+		iLp_tagEM[ p ] = -1;
+	      }
+	    }
+	  }	  
+	}
+	
+      }	
+     
       
       if( debug ) cout << "Indeces of loose leptons associated to the photon with lowest DeltaR/ET2: "
 		       << "\niLp_l[0]: " << iLp_l[0]
@@ -1602,13 +1631,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
 	    
       for(int i=0.;i<Nphotons;i++) {
-	if (iLp[i]==-1) continue;
+	if (iLp_l[i]==-1) continue;
 	
 	for(int e = 0; e < N_loose_e; ++e){
-	  if (fabs( RECOELE_SIP[iL_loose_e[e]]>=4.)) continue;
-	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
-	  
-	  if( deltaR<=0.3 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.4 is the isolation cone for electrons in 74x -> 0.3 in 76x              
+	  if(!( iLp_l[i] == iL_loose_e[e] && iLp_tagEM[i] == 1 ) ) continue;
+	  if (fabs( RECOELE_SIP[iL_loose_e[e]])>=4.) continue;
+	  //double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
+	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[e]],2) );
+	  cout << "deltaR for photon subtraction= " << deltaR << endl;
+	  if( deltaR<=0.3 && (RECOELE_scl_Eta[iL_loose_e[e]]< 1.479 || deltaR>0.08) ){ // 0.3 in 76x              
 	    if( debug )cout << "Subtracting the photon isolation from the electron isolation value " << endl;
 	    
 	    EffectiveArea=EAele(iL_loose_e[e],tag_2011);
@@ -1621,9 +1652,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	} // end loop on ele
 	
 	for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
+	  if(!( iLp_l[i] == iL_loose_mu[l] && iLp_tagEM[i] == 0 ) ) continue;
           if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;
           double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
-	  
+	  cout << "deltaR for photon subtraction= " << deltaR << endl;
 	  if( deltaR<=0.3 && deltaR>0.01){ // 0.3 is the isolation cone for muons in 76x
 	    if( debug )cout << "Subtracting the photon isolation from the muon isolation value " << endl;
 	    
@@ -2326,6 +2358,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       // ++N_4a ;  // fill counter
       // N_4a_w=N_4a_w+newweight;
 
+      // ZZ object pairs
+      array<int,2> isolgoodZs;
+      vector<std::array<int, 2> > isolgoodZsv;
+        
+      
       // Ghost removal delta R > 0.02 
       vector<candidateZ> goodZ;
 
@@ -2338,6 +2375,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	
 	
 	for (int j=i+1;j<Zcandisolmassvector.size();j++){
+	  if (Zcandisolmassvector.at(i).tag==Zcandisolmassvector.at(j).tag) continue;	// select only 2e2mu pairs 
 	  cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
 	  cout <<Zcandisolmassvector.at(i).pt1 << " " << Zcandisolmassvector.at(j).pt1 << " " << Zcandisolmassvector.at(j).pt2 << endl;
 	  cout <<Zcandisolmassvector.at(i).pt2 << " " << Zcandisolmassvector.at(j).pt1 << " " << Zcandisolmassvector.at(j).pt2 << endl;
@@ -2372,464 +2410,349 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  cout << "There is a set of 4 leptons passing the ghost removal (deltaR > 0.02)" << endl;
 	  goodZ.push_back(Zcandisolmassvector.at(i));
 	  goodZ.push_back(Zcandisolmassvector.at(j));
+	  cout << "Filling isolgoodZsv vector " << endl;
+	  isolgoodZs={i,j};
+	  isolgoodZsv.push_back(isolgoodZs);
 	}
-      }
-      
-      
-      if (goodZ.size()==0) {
-	cout << "No ZZ combination passing the cuts  ...exiting " << endl;
-	continue;
       }
 
-      vector<candidateZ> cleanedgoodZ;      
-      
-      cout << "Good Z passing ghost removal are " << goodZ.size() << endl; 
-      for (int i=0;i<goodZ.size();i++){
-       	//cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;	
-       	bool duplicate=false;
-       	for (int j=0;j<cleanedgoodZ.size();++j){
-       	  if (goodZ.at(i).massvalue == cleanedgoodZ.at(j).massvalue){
-      	    duplicate=true;
-       	    continue;	  
-       	  }
-       	}
-	if (!duplicate) {
-	  cout << "Good Z masses are: " << goodZ.at(i).massvalue << endl;
-	  //cout << "Filling the cleaned vector" << endl;
-	  cleanedgoodZ.push_back(goodZ.at(i));
-	}
+      //cout << "Debug ZZ= " << Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(0) ).massvalue << " " << Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(1)).massvalue << endl;
+      if (isolgoodZsv.size()==0) {
+	cout << "No ZZ (2e2mu) combination passing the cuts  ...exiting " << endl;
+	continue;
       }
-      
-      cout << "Cleaned Good Z passing ghost removal are " << cleanedgoodZ.size() << endl; 
       
       
       // PT,20/10 for any di-lepton
       vector<candidateZ> firstpTcleanedgoodZ;    
       vector<float> leptonspTcleaned;
-
       
-      for (int i=0;i<cleanedgoodZ.size();i++){
-        //cout << i << endl;
-        for (int j=i+1;j<cleanedgoodZ.size();j++){
-          //cout << i << " " << j << endl;
-	  leptonspTcleaned.clear();
-      	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt1);
-      	  leptonspTcleaned.push_back(cleanedgoodZ.at(i).pt2);
-      	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt1);
-      	  leptonspTcleaned.push_back(cleanedgoodZ.at(j).pt2);
-      	  std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
-      	  if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
-      	    firstpTcleanedgoodZ.push_back(cleanedgoodZ.at(i));
-      	    firstpTcleanedgoodZ.push_back(cleanedgoodZ.at(j));
-      	  }	 
-        }
-      }
-
-      cout << "Cleaned Good Z passing pT cuts (with duplicates) are " << firstpTcleanedgoodZ.size() << endl; 
-           
-      if (firstpTcleanedgoodZ.size()==0) continue;
-
-      vector<candidateZ> pTcleanedgoodZ;            
-      for (int i=0;i<firstpTcleanedgoodZ.size();i++){
-       	//cout << "Good Z masses are: " << firstpTcleanedgoodZ.at(i).massvalue << endl;	
-       	bool duplicate=false;
-       	for (int j=0;j<pTcleanedgoodZ.size();++j){
-       	  if (firstpTcleanedgoodZ.at(i).massvalue == pTcleanedgoodZ.at(j).massvalue){
-      	    duplicate=true;
-       	    continue;	  
-       	  }
-       	}
-	if (!duplicate) {
-	  cout << "Good Z masses are: " << firstpTcleanedgoodZ.at(i).massvalue << endl;	
-	  //cout << "Filling the cleaned vector" << endl;
-	  pTcleanedgoodZ.push_back(firstpTcleanedgoodZ.at(i));
-	}
-      }
-
-      cout << "Cleaned Good Z passing pT cuts (no duplicates) are " << pTcleanedgoodZ.size() << endl; 
-      for (int i=0;i<pTcleanedgoodZ.size();i++){
-       	cout << " with masses " << pTcleanedgoodZ.at(i).massvalue << endl;
+      array<int,2> ileptonspTcleanedgoodZs;
+      vector<std::array<int, 2> > ileptonspTcleanedgoodZsv;
+      
+      // PT,20/10 for any di-lepton      
+      for (int l=0;l<isolgoodZsv.size();l++){
+	leptonspTcleaned.clear();	
+	leptonspTcleaned.push_back(Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(0) ).pt1);
+	leptonspTcleaned.push_back(Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(0) ).pt2);
+	leptonspTcleaned.push_back(Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(1) ).pt1);
+	leptonspTcleaned.push_back(Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(1) ).pt2);
+	std::sort(leptonspTcleaned.rbegin(),leptonspTcleaned.rend());
+	
+	if (leptonspTcleaned.at(0)>20. && leptonspTcleaned.at(1)>10.) {
+	  firstpTcleanedgoodZ.push_back(Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(0) ));
+	  firstpTcleanedgoodZ.push_back(Zcandisolmassvector.at( (isolgoodZsv.at(0)).at(1) ));
+	  ileptonspTcleanedgoodZs={ (isolgoodZsv.at(l)).at(0), (isolgoodZsv.at(l)).at(1)};
+	  ileptonspTcleanedgoodZsv.push_back(ileptonspTcleanedgoodZs);
+	}	 	
       }
       
+      cout << "Cleaned Good ZZ passing pT cuts are " << ileptonspTcleanedgoodZsv.size() << endl;            
+      if (ileptonspTcleanedgoodZsv.size()==0) continue;
+
 
       // **** Step 6:
       // QCD suppression: mll>4 GeV cut on all OS- any flavour pairs (4/4)
       
       double min_mass_2L = 10000.;
       TLorentzVector Lepton1qcd,Lepton2qcd,DiLeptonQCD;
+      vector<int> ileptonsmumu,ileptonsee,ileptonsemu;
 
-      // mu mu
-      for(int i = 0; i < N_good; ++i){
-	if (RECOMU_SIP[iL[i]]>=4.) continue;
-	if (fabs(RECOMU_PFX_dB[iL[i]])>=0.35) continue; // Isolation cut - NO FSR
-
-	bool matched1=false;
-	for (int k=0;k<pTcleanedgoodZ.size();k++){
-	  if (RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt1 || RECOMU_PT[iL[i]]==pTcleanedgoodZ.at(k).pt2) {
-	    matched1=true;
-	    break;
-	  }
-	}
-	if (!matched1) continue;
-	
-        for(int j = i + 1; j < N_good; ++j){
-	  if (RECOMU_SIP[iL[j]]>=4.) continue;
-	  if (fabs(RECOMU_PFX_dB[iL[j]])>=0.35) continue; // Isolation cut - NO FSR
-		
-	  if ( RECOMU_CHARGE[iL[i]] == RECOMU_CHARGE[iL[j]]) continue; // shoud be OS
-
-	  bool matched2=false;
-	  for (int k=0;k<pTcleanedgoodZ.size();k++){
-	    if (RECOMU_PT[iL[j]]==pTcleanedgoodZ.at(k).pt1 || RECOMU_PT[iL[j]]==pTcleanedgoodZ.at(k).pt2) {
-	      matched2=true;
-	      break;
-	    }
-	  }
-	  if (!matched2) continue;
-	  
-	  // evaluate the mass
-	  double mass;
-
-	  Lepton1qcd.SetPtEtaPhiM(RECOMU_PT[iL[i]], RECOMU_ETA[iL[i]], RECOMU_PHI[iL[i]], 0.105);
-          Lepton2qcd.SetPtEtaPhiM(RECOMU_PT[iL[j]], RECOMU_ETA[iL[j]], RECOMU_PHI[iL[j]], 0.105);
-          DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
-          mass = DiLeptonQCD.M();
-
-	  bool matchedZ=false;
-	  for (int k=0;k<Zcandvector.size();k++){
-	    //cout << "min mass value= " << Zcandvector.at(k).massvalue << endl;
-	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
-	  }
-	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied	  
-	  
-	  if( mass < min_mass_2L ) min_mass_2L = mass ;
-	  
-        }
-      } // end loop on all couples
+      array<int,2> iqcdcleanedgoodZs;
+      vector<std::array<int, 2> > iqcdcleanedgoodZsv;
+      vector<candidateZ> pTcleanedgoodZ; 
       
-      // e e
-      for(int i = 0; i < Ne_good; ++i){
-	if (RECOELE_SIP[iLe[i]]>=4.) continue;
-	if (RECOELE_PFX_rho[iLe[i]]>=0.35) continue; // Isolation no-FSR
+      for (int l=0;l<ileptonspTcleanedgoodZsv.size();l++){
+	cout << "checking masses for QCD suppression= " 
+	     << Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)).massvalue << " and " 
+	     << Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(1)).massvalue
+	     << endl;
+	min_mass_2L = 10000.;
+	ileptonsmumu.clear();
+	ileptonsee.clear();
+	ileptonsemu.clear();
+	
+	if (Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)).tag==1){	  
+	  ileptonsmumu.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)).ilept1);
+	  ileptonsmumu.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)).ilept2);
+	  ileptonsee.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(1)).ilept1);
+	  ileptonsee.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(1)).ilept2);
+	}
+	else if (goodZ.at(ileptonspTcleanedgoodZsv.at(l).at(0)).tag==2){
+	  cout << "Checking ee pairs for QCD rejection" << endl;
+	  ileptonsee.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)).ilept1);
+	  ileptonsee.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)).ilept2);
+	  ileptonsmumu.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(1)).ilept1);
+	  ileptonsmumu.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(1)).ilept2);
+	}
 
-	bool matched1=false;
-	for (int k=0;k<pTcleanedgoodZ.size();k++){
-	  if (RECOELE_PT[iLe[i]]==pTcleanedgoodZ.at(k).pt1 || RECOELE_PT[iLe[i]]==pTcleanedgoodZ.at(k).pt2) {
-	    matched1=true;
-	    break;
+	double mass;
+	
+	// mumu
+	cout << "Checking mumu pairs for QCD rejection" << endl;
+	Lepton1qcd.SetPtEtaPhiM(RECOMU_PT[ileptonsmumu.at(0)], RECOMU_ETA[ileptonsmumu.at(0)], RECOMU_PHI[ileptonsmumu.at(0)], 0.105);
+	Lepton2qcd.SetPtEtaPhiM(RECOMU_PT[ileptonsmumu.at(1)], RECOMU_ETA[ileptonsmumu.at(1)], RECOMU_PHI[ileptonsmumu.at(1)], 0.105);
+	DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
+	mass = DiLeptonQCD.M();
+	cout << "Mass of mumu for QCD rejection= " << mass << endl;
+	if( mass < min_mass_2L ) min_mass_2L = mass ;	
+
+	// ee	
+	cout << "Checking ee pairs for QCD rejection" << endl;       
+	Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[ileptonsee.at(0)], RECOELE_ETA[ileptonsee.at(0)], RECOELE_PHI[ileptonsee.at(0)], 0.000511);
+	Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[ileptonsee.at(1)], RECOELE_ETA[ileptonsee.at(1)], RECOELE_PHI[ileptonsee.at(1)], 0.000511);
+	DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
+	mass = DiLeptonQCD.M();
+	cout << "Mass of ee for QCD rejection= " << mass << endl;
+	if( mass < min_mass_2L ) min_mass_2L = mass ;	  
+	
+
+	//emu
+	cout << "Checking emu pairs for QCD rejection" << endl;
+
+	for (int i=0;i<2;i++){ 
+	  for (int j=0;j<2;j++){
+	    
+	    if ( RECOMU_CHARGE[ileptonsmumu.at(i)] == RECOELE_CHARGE[ileptonsee.at(j)] ) continue; // shoud be OS	  
+	    // evaluate the mass
+	    double mass;
+	    
+	    Lepton1qcd.SetPtEtaPhiM(RECOMU_PT[ileptonsmumu.at(i)], RECOMU_ETA[ileptonsmumu.at(i)], RECOMU_PHI[ileptonsmumu.at(i)], 0.105);
+	    Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[ileptonsee.at(j)], RECOELE_ETA[ileptonsee.at(j)], RECOELE_PHI[ileptonsee.at(j)], 0.000511);
+	    DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
+	    mass = DiLeptonQCD.M();
+	    cout << "Mass of emu for QCD rejection= " << mass << endl;
+	    if( mass < min_mass_2L ) min_mass_2L = mass ;
 	  }
 	}
-	if (!matched1) continue;
-	
-        for(int j = i + 1; j < Ne_good; ++j){
-	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
-	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation no-FSR
 
-	  bool matched2=false;
-	  for (int k=0;k<pTcleanedgoodZ.size();k++){
-	    if (RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt1 || RECOELE_PT[iLe[j]]==pTcleanedgoodZ.at(k).pt2) {
-	      matched2=true;
-	      break;
-	    }
-	  }
-	  if (!matched2) continue;	  
+	hminMll_6->Fill( min_mass_2L,newweight );
+	if( min_mass_2L <= 4 ) { 
+	  cout << "Not passing the mll>4 cut" << endl;
+	  continue ;
+	}
+	else {
+	  pTcleanedgoodZ.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(0)));
+	  pTcleanedgoodZ.push_back(Zcandisolmassvector.at( (ileptonspTcleanedgoodZsv.at(l)).at(1)));
 	  
-	  if ( RECOELE_CHARGE[iLe[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
-	  
-	  // evaluate the mass
-	  double mass;
-
-	  Lepton1qcd.SetPtEtaPhiM(RECOELE_PT[iLe[i]], RECOELE_ETA[iLe[i]], RECOELE_PHI[iLe[i]], 0.000511);
-          Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
-          DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
-          mass = DiLeptonQCD.M();
-
-	  bool matchedZ=false;
-	  for (int k=0;k<Zcandvector.size();k++){
-	    //cout << "min mass value= " << Zcandvector.at(k).massvalue << endl;
-	    if (fabs(mass-Zcandvector.at(k).massvalue)<0.001) matchedZ=true;
-	  }
-	  if (matchedZ) continue; // since mll>12, ghost cleaning and pT cuts for those pairs are applied	  
-	  
-	  if( mass < min_mass_2L ) min_mass_2L = mass ;
-	  
-        }
-      } // end loop on all couples
-
-      // emu
-      for(int i = 0; i < N_good; ++i){
-	if (RECOMU_SIP[iL[i]]>=4.) continue;
-	if (fabs(RECOMU_PFX_dB[iL[i]])>=0.35) continue; // Isolation cut - NO FSR
-
-	for(int j = i + 1; j < Ne_good; ++j){
-	  if (RECOELE_SIP[iLe[j]]>=4.) continue;
-	  if (RECOELE_PFX_rho[iLe[j]]>=0.35) continue; // Isolation no-FSR
-
-	  if ( RECOMU_CHARGE[iL[i]] == RECOELE_CHARGE[iLe[j]]) continue; // shoud be OS
-	  
-	  // evaluate the mass
-	  double mass;
-	  
-	  Lepton1qcd.SetPtEtaPhiM(RECOMU_PT[iL[i]], RECOMU_ETA[iL[i]], RECOMU_PHI[iL[i]], 0.105);
-          Lepton2qcd.SetPtEtaPhiM(RECOELE_PT[iLe[j]], RECOELE_ETA[iLe[j]], RECOELE_PHI[iLe[j]], 0.000511);
-          DiLeptonQCD=Lepton1qcd+Lepton2qcd;       
-          mass = DiLeptonQCD.M();
-	 	  
-	  if( mass < min_mass_2L ) min_mass_2L = mass ;
-	  
+	  iqcdcleanedgoodZs={ileptonspTcleanedgoodZsv.at(l).at(0),ileptonspTcleanedgoodZsv.at(l).at(1)};
+	  iqcdcleanedgoodZsv.push_back(iqcdcleanedgoodZs);
 	}
 	
       }
+            
       
-      //
-
-     if( debug ) cout  << "\n Step 6: mll > 4" 
-      		 << "\n min_mass_2L " << min_mass_2L
-		 << endl; 
-     
-     hminMll_6->Fill( min_mass_2L,newweight );
-
-     if( min_mass_2L!=10000. && min_mass_2L <= 4 ) { 
-       cout << "Not passing the mll>4 cut" << endl;
-       continue ;
-     }
-     
-
-     // Z1 selection
-     double pxZ1 = 0;  //Z1 kinematics
-     double pyZ1 = 0;
-     double pzZ1 = 0;
-     double ptZ1 = 0;
-     double EZ1 = 0;
-     double Y_Z1 = -9;
-     double massZ1 = 0;
-     double massZ1_noFSR = 0;
-     double sum_ptZ1 = 0.;
-     int indexlep1Z1 = -1;
-     int indexlep2Z1 = -1;
-     int indexZ1= -1;
-     int Z1tag=-999;
-    
-     // Choice of Z1 as the closest to the Z mass
-     for (int i=0;i<pTcleanedgoodZ.size();++i){
-       
-       if( fabs(pTcleanedgoodZ.at(i).massvalue - Zmass) < fabs(massZ1 - Zmass) ){
-	 
-	 massZ1 = pTcleanedgoodZ.at(i).massvalue;
-	 indexZ1=i;
-	 
-	 pxZ1 = pTcleanedgoodZ.at(i).pxZ;
-	 pyZ1 = pTcleanedgoodZ.at(i).pyZ;
-	 pzZ1 = pTcleanedgoodZ.at(i).pzZ;
-	 EZ1  = pTcleanedgoodZ.at(i).EZ;
-	 
-	 ptZ1 = sqrt( pxZ1*pxZ1 + pyZ1*pyZ1 );
-	 sum_ptZ1 = pTcleanedgoodZ.at(i).pt1+pTcleanedgoodZ.at(i).pt2;
-	 
-	 Y_Z1 = 0.5 * log ( (EZ1 + pzZ1)/(EZ1 - pzZ1) );
-	 indexlep1Z1=pTcleanedgoodZ.at(i).ilept1;
-	 indexlep2Z1=pTcleanedgoodZ.at(i).ilept2;
-	 Z1tag=pTcleanedgoodZ.at(i).tag;
-       }
-     }
-
-     if (massZ1 < 40.) {
-       cout << "The mass of Z1 is < 40 GeV...exiting" << endl;
-       continue;
-     } 
-     
-     if( debug ) cout  << "\n Final Z1 properties: "
-		       << "\n pxZ1 " << pxZ1
-		       << "\n pyZ1 " << pyZ1
-		       << "\n pzZ1 " << pzZ1
-		       << "\n ptZ1 " << ptZ1
-		       << "\n EZ1 "  << EZ1
-		       << "\n Y_Z1 " << Y_Z1
-		       << "\n massZ1 " << massZ1
-		       << "\n indexlep1 " << indexlep1Z1
-		       << "\n indexlep2 " << indexlep2Z1
-		       << "\n indexZ1 " << indexZ1 
-		       << "\n Z1 tag (1 for 2mu and 2 for 2e) " << Z1tag
-		   
-		       << endl;
-
-
-     // vector<candidateZ> pTcleanedgoodZ_nosharedlept;
-     // pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(indexZ1));
-
-     // for (int i=0;i<pTcleanedgoodZ.size();i++){
-     //   //cout << "Mass of cleanedgoodZ= " << pTcleanedgoodZ.at(i).massvalue << endl;
-     //   if (pTcleanedgoodZ.at(i).tag==Z1tag) continue; // we want 2e2mu or 2mu2e
-     //   if ( pTcleanedgoodZ.at(i).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept1==indexlep2Z1 ||  
-     // 	    pTcleanedgoodZ.at(i).ilept2==indexlep1Z1 || pTcleanedgoodZ.at(i).ilept2==indexlep2Z1
-     // 	    ) continue;
-     //   pTcleanedgoodZ_nosharedlept.push_back(pTcleanedgoodZ.at(i));
-     // }
-
-     // for (int i=0;i<pTcleanedgoodZ_nosharedlept.size();i++){
-     //   cout << "Z Mass surviving= " << pTcleanedgoodZ_nosharedlept.at(i).massvalue << endl;
-     // }
-
-     // vector<candidateZ> pTcleanedgoodZ_noZ1;
-     // for (int i=0;i<pTcleanedgoodZ.size();i++){
-     //   if (pTcleanedgoodZ.at(i).massvalue == massZ1 ) continue; 
-     //   if (pTcleanedgoodZ.at(i).tag==Z1tag) continue; // we want 2e2mu or 2mu2e
-     //   pTcleanedgoodZ_noZ1.push_back(pTcleanedgoodZ.at(i));
-     //   cout << "Z Mass surviving _ no Z1 " << pTcleanedgoodZ.at(i).massvalue << endl;                                                                              
-     // }
-
-     // ZZ objects with alternative pairing
-     array<int,2> icleanedgoodZs;
-     vector<std::array<int, 2> > icleanedgoodZsv;
-
-     for (int i=0;i<pTcleanedgoodZ.size();i++){
-       for (int j=i+1;j<pTcleanedgoodZ.size();j++){
-	 if (pTcleanedgoodZ.at(j).tag==pTcleanedgoodZ.at(i).tag) continue; // we want 2e2mu or 2mu2e
-	 float massZa=-999.,massZb=-999.;
-	 cout << "Masses= " << pTcleanedgoodZ.at(i).massvalue << " " << pTcleanedgoodZ.at(j).massvalue << endl;
-	 if (fabs(pTcleanedgoodZ.at(i).massvalue-Zmass) < fabs(pTcleanedgoodZ.at(j).massvalue-Zmass)) {
-	   massZa=pTcleanedgoodZ.at(i).massvalue;
-	   massZb=pTcleanedgoodZ.at(j).massvalue;
-	 }
-	 else {
-	   massZa=pTcleanedgoodZ.at(j).massvalue;
-	   massZb=pTcleanedgoodZ.at(i).massvalue;
-	 }	  
-
-	 if ( fabs(massZa-Zmass) < fabs(massZ1-Zmass) && massZb<12) continue; // exclude those pairs
-	 cout << "mass Za and b= " << massZa << " " << massZb << endl;
-	 //	 cout << "i j " << i << " " << j << endl;
-	 icleanedgoodZs={i,j};
-	 icleanedgoodZsv.push_back(icleanedgoodZs);
-       }
-     }
-
-     cout << "How many ZZ objects are present? " << icleanedgoodZsv.size() << endl;
-     if (icleanedgoodZsv.size()==0) continue;
-
-     // // sort Z by mass value                                                                                                                
-     // struct SortCandByClosestToZ {                                                                                                          
-     //   bool operator()( candidateZ c1, candidateZ c2) {                                                                                     
-     //          return (fabs(c1.massvalue - Zmass) < fabs(c2.massvalue - Zmass));                                                             
-     //   }                                                                                                                                    
-     // };                                                                                                                                     
-     // std::sort(vcandZ2.begin(),vcandZ2.end(),SortCandByClosestToZ());                                                                       
-
-     double pxZ2 = 0;  //Z2 kinematics                                                                                                         
-     double pyZ2 = 0;
-     double pzZ2 = 0;
-     double ptZ2 = 0;
-     double EZ2 = 0;
-     double Y_Z2 = -9;
-     double massZ2 = 0;
-     double massZ2_noFSR = 0;
-     double sum_ptZ2 = 0.;
-     int indexlep1Z2=-1;
-     int indexlep2Z2=-1;
-     int indexZ2=-1;
-     int Z2tag=-999;
-     
-     // identify pairs  Z1+Z2s
-     vector<int> vindexZZ;
-     for (int l=0;l<icleanedgoodZsv.size();l++){
-       cout << "Z+Z pairs with masses/indices: " 
-	    << pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).massvalue << " and index " << icleanedgoodZsv.at(l).at(0) << " " 
-	    << pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).massvalue << " and index " << icleanedgoodZsv.at(l).at(1) << endl;
-
-       if ( (icleanedgoodZsv.at(l).at(0)==indexZ1 
-	     //&&  
-	     //!(pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept2==indexlep1Z1 || 
-	     //  pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept1==indexlep2Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept2==indexlep2Z1)
+      // Z1 selection
+      double pxZ1 = 0;  //Z1 kinematics
+      double pyZ1 = 0;
+      double pzZ1 = 0;
+      double ptZ1 = 0;
+      double EZ1 = 0;
+      double Y_Z1 = -9;
+      double massZ1 = 0;
+      double massZ1_noFSR = 0;
+      double sum_ptZ1 = 0.;
+      int indexlep1Z1 = -1;
+      int indexlep2Z1 = -1;
+      int indexZ1= -1;
+      int Z1tag=-999;
+      
+      // Choice of Z1 as the closest to the Z mass
+      for (int i=0;i<pTcleanedgoodZ.size();++i){
+	
+	if( fabs(pTcleanedgoodZ.at(i).massvalue - Zmass) < fabs(massZ1 - Zmass) ){
+	  
+	  massZ1 = pTcleanedgoodZ.at(i).massvalue;
+	  indexZ1=i;
+	  
+	  pxZ1 = pTcleanedgoodZ.at(i).pxZ;
+	  pyZ1 = pTcleanedgoodZ.at(i).pyZ;
+	  pzZ1 = pTcleanedgoodZ.at(i).pzZ;
+	  EZ1  = pTcleanedgoodZ.at(i).EZ;
+	  
+	  ptZ1 = sqrt( pxZ1*pxZ1 + pyZ1*pyZ1 );
+	  sum_ptZ1 = pTcleanedgoodZ.at(i).pt1+pTcleanedgoodZ.at(i).pt2;
+	  
+	  Y_Z1 = 0.5 * log ( (EZ1 + pzZ1)/(EZ1 - pzZ1) );
+	  indexlep1Z1=pTcleanedgoodZ.at(i).ilept1;
+	  indexlep2Z1=pTcleanedgoodZ.at(i).ilept2;
+	  Z1tag=pTcleanedgoodZ.at(i).tag;
+	}
+      }
+      
+      if (massZ1 < 40.) {
+	cout << "The mass of Z1 is < 40 GeV...exiting" << endl;
+	continue;
+      } 
+      
+      if( debug ) cout  << "\n Final Z1 properties: "
+			<< "\n pxZ1 " << pxZ1
+			<< "\n pyZ1 " << pyZ1
+			<< "\n pzZ1 " << pzZ1
+			<< "\n ptZ1 " << ptZ1
+			<< "\n EZ1 "  << EZ1
+			<< "\n Y_Z1 " << Y_Z1
+			<< "\n massZ1 " << massZ1
+			<< "\n indexlep1 " << indexlep1Z1
+			<< "\n indexlep2 " << indexlep2Z1
+			<< "\n indexZ1 " << indexZ1 
+			<< "\n Z1 tag (1 for 2mu and 2 for 2e) " << Z1tag
+		    
+			<< endl;
+      
+      
+      // ZZ objects with alternative pairing
+      array<int,2> icleanedgoodZs;
+      vector<std::array<int, 2> > icleanedgoodZsv;
+      
+      for (int i=0;i<pTcleanedgoodZ.size();i++){
+	for (int j=i+1;j<pTcleanedgoodZ.size();j++){
+	  if (pTcleanedgoodZ.at(j).tag==pTcleanedgoodZ.at(i).tag) continue; // we want 2e2mu or 2mu2e
+	  float massZa=-999.,massZb=-999.;
+	  cout << "Masses= " << pTcleanedgoodZ.at(i).massvalue << " " << pTcleanedgoodZ.at(j).massvalue << endl;
+	  if (fabs(pTcleanedgoodZ.at(i).massvalue-Zmass) < fabs(pTcleanedgoodZ.at(j).massvalue-Zmass)) {
+	    massZa=pTcleanedgoodZ.at(i).massvalue;
+	    massZb=pTcleanedgoodZ.at(j).massvalue;
+	  }
+	  else {
+	    massZa=pTcleanedgoodZ.at(j).massvalue;
+	    massZb=pTcleanedgoodZ.at(i).massvalue;
+	  }	  
+	  
+	  //  if ( fabs(massZa-Zmass) < fabs(massZ1-Zmass) && massZb<12) continue; // exclude those pairs   smart cut non needed for 2e2mu
+	  cout << "mass Za and b= " << massZa << " " << massZb << endl;
+	  //	 cout << "i j " << i << " " << j << endl;
+	  icleanedgoodZs={i,j};
+	  icleanedgoodZsv.push_back(icleanedgoodZs);
+	}
+      }
+      
+      cout << "How many ZZ objects are present? " << icleanedgoodZsv.size() << endl;
+      if (icleanedgoodZsv.size()==0) continue;
+      
+      // // sort Z by mass value                                                                                                                
+      // struct SortCandByClosestToZ {                                                                                                          
+      //   bool operator()( candidateZ c1, candidateZ c2) {                                                                                     
+      //          return (fabs(c1.massvalue - Zmass) < fabs(c2.massvalue - Zmass));                                                             
+      //   }                                                                                                                                    
+      // };                                                                                                                                     
+      // std::sort(vcandZ2.begin(),vcandZ2.end(),SortCandByClosestToZ());                                                                       
+      
+      double pxZ2 = 0;  //Z2 kinematics                                                                                                         
+      double pyZ2 = 0;
+      double pzZ2 = 0;
+      double ptZ2 = 0;
+      double EZ2 = 0;
+      double Y_Z2 = -9;
+      double massZ2 = 0;
+      double massZ2_noFSR = 0;
+      double sum_ptZ2 = 0.;
+      int indexlep1Z2=-1;
+      int indexlep2Z2=-1;
+      int indexZ2=-1;
+      int Z2tag=-999;
+      
+      // identify pairs  Z1+Z2s
+      vector<int> vindexZZ;
+      for (int l=0;l<icleanedgoodZsv.size();l++){
+	cout << "Z+Z pairs with masses/indices: " 
+	     << pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).massvalue << " and index " << icleanedgoodZsv.at(l).at(0) << " " 
+	     << pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).massvalue << " and index " << icleanedgoodZsv.at(l).at(1) << endl;
+	
+	if ( (icleanedgoodZsv.at(l).at(0)==indexZ1 
+	      //&&  
+	      //!(pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept2==indexlep1Z1 || 
+	      //  pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept1==indexlep2Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).ilept2==indexlep2Z1)
+	      ) 
+	     || 
+	     (icleanedgoodZsv.at(l).at(1)==indexZ1 
+	      //&& 
+	      //!(pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept2==indexlep1Z1 ||
+	      //  pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept1==indexlep2Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept2==indexlep2Z1)
+	      )
 	     ) 
-	    || 
-	    (icleanedgoodZsv.at(l).at(1)==indexZ1 
-	     //&& 
-	     //!(pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept1==indexlep1Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept2==indexlep1Z1 ||
-	     //  pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept1==indexlep2Z1 || pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).ilept2==indexlep2Z1)
-	     )
-	    ) 
-	 {
-	   cout << "Found a Z1 + X  pair with no lepton shared with masses= " << pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).massvalue << " " <<  pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).massvalue << endl;
-	   vindexZZ.push_back(l);
-	 }
-     }
-
-     cout << "How many Z1+Z2s objects are present? " << vindexZZ.size() << endl;
-       
-     // If more than one Z2 (couple to the same Z1), choose the one with the highest-pT Z2 leptons
-     if (vindexZZ.size()==1){
-       cout << "Just one Z1+Z2 pair" << endl;
-       if (icleanedgoodZsv.at(vindexZZ.at(0)).at(0)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(1); 
-       if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);
-     }
-     else {
-       cout << "more than one Z2 (couple to the same Z1), choose the one with the highest-pT Z2 leptons" << endl;
-       int indexZ2tmp=-999;
-       float sumpT=-999.,tmpsumpT=-999.;
-       for (int ll=0;ll<vindexZZ.size();ll++){
-      	 if (icleanedgoodZsv.at(vindexZZ.at(ll)).at(0)==indexZ1) indexZ2tmp=icleanedgoodZsv.at(vindexZZ.at(ll)).at(1);
-	 if (icleanedgoodZsv.at(vindexZZ.at(ll)).at(1)==indexZ1) indexZ2tmp=icleanedgoodZsv.at(vindexZZ.at(ll)).at(0);
-	 if (indexZ2tmp>=0){
-
-	   TLorentzVector LorentzZ1,LorentzZ2,LorentzZZ;
-	   LorentzZ1.SetPxPyPzE(pTcleanedgoodZ.at(indexZ1).pxZ, pTcleanedgoodZ.at(indexZ1).pyZ, pTcleanedgoodZ.at(indexZ1).pzZ, pTcleanedgoodZ.at(indexZ1).EZ);
-	   LorentzZ2.SetPxPyPzE(pTcleanedgoodZ.at(indexZ2tmp).pxZ, pTcleanedgoodZ.at(indexZ2tmp).pyZ, pTcleanedgoodZ.at(indexZ2tmp).pzZ, pTcleanedgoodZ.at(indexZ2tmp).EZ);
-	   LorentzZZ=LorentzZ1+LorentzZ2;
-	   if (LorentzZZ.M()<70.) continue; // cut m4l>70
-	   cout << "Passed m4l>70. cut"<< endl;
-	   
-      	   tmpsumpT=
-	     pTcleanedgoodZ.at(indexZ2tmp).pt1+
-	     pTcleanedgoodZ.at(indexZ2tmp).pt2;
-	   if (tmpsumpT>sumpT) {
-	     sumpT=tmpsumpT;
-	     indexZ2=indexZ2tmp;
-	   }
-	 }       
-       }
-     }
-
-     // Z2
-     if (indexZ2<0) continue;
-     cout << "The highest pT leptons Z2 has mass= " <<  pTcleanedgoodZ.at(indexZ2).massvalue << endl;
+	  {
+	    cout << "Found a Z1 + X  pair with no lepton shared with masses= " << pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(0)).massvalue << " " <<  pTcleanedgoodZ.at(icleanedgoodZsv.at(l).at(1)).massvalue << endl;
+	    vindexZZ.push_back(l);
+	  }
+      }
       
-     massZ2 = pTcleanedgoodZ.at(indexZ2).massvalue;	 
-     pxZ2 = pTcleanedgoodZ.at(indexZ2).pxZ;
-     pyZ2 = pTcleanedgoodZ.at(indexZ2).pyZ;
-     pzZ2 = pTcleanedgoodZ.at(indexZ2).pzZ;
-     EZ2  = pTcleanedgoodZ.at(indexZ2).EZ;	 
-     ptZ2 = sqrt( pxZ2*pxZ2 + pyZ2*pyZ2 );
-     sum_ptZ2 = pTcleanedgoodZ.at(indexZ2).pt1+pTcleanedgoodZ.at(indexZ2).pt2;	 
-     Y_Z2 = 0.5 * log ( (EZ2 + pzZ2)/(EZ2 - pzZ2) );
-     indexlep1Z2=pTcleanedgoodZ.at(indexZ2).ilept1;
-     indexlep2Z2=pTcleanedgoodZ.at(indexZ2).ilept2;
-     Z2tag=pTcleanedgoodZ.at(indexZ2).tag;
-
-     // Z1 and Z2 final 
-     cout << "Z1 has index= " << indexZ1 << "  Z2 has index= " << indexZ2 << endl;
- 
-     if (Z1tag==1) cout << "PTs= " << RECOMU_PT[indexlep1Z1] << " " << RECOMU_PT[indexlep2Z1] << " " <<  RECOELE_PT[indexlep1Z2] << " " << RECOELE_PT[indexlep2Z2]<< endl; 
-     if (Z1tag==2) cout << "PTs= " << RECOELE_PT[indexlep1Z1] << " " << RECOELE_PT[indexlep2Z1] << " " <<  RECOMU_PT[indexlep1Z2] << " " << RECOMU_PT[indexlep2Z2]<< endl; 
+      cout << "How many Z1+Z2s objects are present? " << vindexZZ.size() << endl;
       
-     if (std::isnan(massZ2)) {
-       cout << "No Z2 found" << endl;
-       continue; 
-     }
-     else {
-     if( debug ) cout  << "\n Final Z2 properties: "  
-		       << "\n pxZ2 " << pxZ2
-		       << "\n pyZ2 " << pyZ2
-		       << "\n pzZ2 " << pzZ2
-		       << "\n ptZ2 " << ptZ2
-		       << "\n EZ2 "  << EZ2
-		       << "\n Y_Z2 " << Y_Z2
-		       << "\n massZ2 " << massZ2
-		       << "\n indexlep1_Z2 " << indexlep1Z2
-		       << "\n indexlep2_Z2 " << indexlep2Z2
-		       << endl;
-     }
-
-     if( debug && has_FSR_Z2) {
+      // If more than one Z2 (couple to the same Z1), choose the one with the highest-pT Z2 leptons
+      if (vindexZZ.size()==1){
+	cout << "Just one Z1+Z2 pair" << endl;
+	if (icleanedgoodZsv.at(vindexZZ.at(0)).at(0)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(1); 
+	if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);
+      }
+      else {
+	cout << "more than one Z2 (couple to the same Z1), choose the one with the highest-pT Z2 leptons" << endl;
+	int indexZ2tmp=-999;
+	float sumpT=-999.,tmpsumpT=-999.;
+	for (int ll=0;ll<vindexZZ.size();ll++){
+	  if (icleanedgoodZsv.at(vindexZZ.at(ll)).at(0)==indexZ1) indexZ2tmp=icleanedgoodZsv.at(vindexZZ.at(ll)).at(1);
+	  if (icleanedgoodZsv.at(vindexZZ.at(ll)).at(1)==indexZ1) indexZ2tmp=icleanedgoodZsv.at(vindexZZ.at(ll)).at(0);
+	  if (indexZ2tmp>=0){
+	    
+	    TLorentzVector LorentzZ1,LorentzZ2,LorentzZZ;
+	    LorentzZ1.SetPxPyPzE(pTcleanedgoodZ.at(indexZ1).pxZ, pTcleanedgoodZ.at(indexZ1).pyZ, pTcleanedgoodZ.at(indexZ1).pzZ, pTcleanedgoodZ.at(indexZ1).EZ);
+	    LorentzZ2.SetPxPyPzE(pTcleanedgoodZ.at(indexZ2tmp).pxZ, pTcleanedgoodZ.at(indexZ2tmp).pyZ, pTcleanedgoodZ.at(indexZ2tmp).pzZ, pTcleanedgoodZ.at(indexZ2tmp).EZ);
+	    LorentzZZ=LorentzZ1+LorentzZ2;
+	    if (LorentzZZ.M()<70.) continue; // cut m4l>70
+	    cout << "Passed m4l>70. cut"<< endl;
+	    
+	    tmpsumpT=
+	      pTcleanedgoodZ.at(indexZ2tmp).pt1+
+	      pTcleanedgoodZ.at(indexZ2tmp).pt2;
+	    if (tmpsumpT>sumpT) {
+	      sumpT=tmpsumpT;
+	      indexZ2=indexZ2tmp;
+	    }
+	  }       
+	}
+      }
+      
+      // Z2
+      if (indexZ2<0) continue;
+      cout << "The highest pT leptons Z2 has mass= " <<  pTcleanedgoodZ.at(indexZ2).massvalue << endl;
+      
+      massZ2 = pTcleanedgoodZ.at(indexZ2).massvalue;	 
+      pxZ2 = pTcleanedgoodZ.at(indexZ2).pxZ;
+      pyZ2 = pTcleanedgoodZ.at(indexZ2).pyZ;
+      pzZ2 = pTcleanedgoodZ.at(indexZ2).pzZ;
+      EZ2  = pTcleanedgoodZ.at(indexZ2).EZ;	 
+      ptZ2 = sqrt( pxZ2*pxZ2 + pyZ2*pyZ2 );
+      sum_ptZ2 = pTcleanedgoodZ.at(indexZ2).pt1+pTcleanedgoodZ.at(indexZ2).pt2;	 
+      Y_Z2 = 0.5 * log ( (EZ2 + pzZ2)/(EZ2 - pzZ2) );
+      indexlep1Z2=pTcleanedgoodZ.at(indexZ2).ilept1;
+      indexlep2Z2=pTcleanedgoodZ.at(indexZ2).ilept2;
+      Z2tag=pTcleanedgoodZ.at(indexZ2).tag;
+      
+      // Z1 and Z2 final 
+      cout << "Z1 has index= " << indexZ1 << "  Z2 has index= " << indexZ2 << endl;
+      
+      if (Z1tag==1) cout << "PTs= " << RECOMU_PT[indexlep1Z1] << " " << RECOMU_PT[indexlep2Z1] << " " <<  RECOELE_PT[indexlep1Z2] << " " << RECOELE_PT[indexlep2Z2]<< endl; 
+      if (Z1tag==2) cout << "PTs= " << RECOELE_PT[indexlep1Z1] << " " << RECOELE_PT[indexlep2Z1] << " " <<  RECOMU_PT[indexlep1Z2] << " " << RECOMU_PT[indexlep2Z2]<< endl; 
+      
+      if (std::isnan(massZ2)) {
+	cout << "No Z2 found" << endl;
+	continue; 
+      }
+      else {
+	if( debug ) cout  << "\n Final Z2 properties: "  
+			  << "\n pxZ2 " << pxZ2
+			  << "\n pyZ2 " << pyZ2
+			  << "\n pzZ2 " << pzZ2
+			  << "\n ptZ2 " << ptZ2
+			  << "\n EZ2 "  << EZ2
+			  << "\n Y_Z2 " << Y_Z2
+			  << "\n massZ2 " << massZ2
+			  << "\n indexlep1_Z2 " << indexlep1Z2
+			  << "\n indexlep2_Z2 " << indexlep2Z2
+			  << endl;
+      }
+      
+      if( debug && has_FSR_Z2) {
       	cout  << " Z2 has FSR! " << endl;
      	if (Z1tag==1) {
 	  cout  << "  pi " << pi2 << " --> index: " << iLp[pi2] << " associated lepton: " << iLp_l[pi2] << " (= "<< iL[i2]<<" ? )  tag: " << iLp_tagEM[pi2] << endl;
