@@ -106,8 +106,8 @@ HZZ4LeptonsIpToVtxProducer::HZZ4LeptonsIpToVtxProducer(const edm::ParameterSet& 
   offlineBeamSpot_                                                = consumes<reco::BeamSpot>(pset.getParameter<edm::InputTag>("BeamSpotLabel"));  
   useBeamSpot_                                                    = pset.getParameter<bool>("useBeamSpot");
 
-	// PG and FRC 06-07-11
-	debug	=	pset.getUntrackedParameter<bool> ("debug", false);
+  // PG and FRC 06-07-11
+  debug	=	pset.getUntrackedParameter<bool> ("debug");
   
   //
   string alias;
@@ -184,25 +184,26 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
   iEvent.getByToken(vertexTag_,recoPVCollection);
   //
   reco::Vertex primVertex;
+  GlobalPoint pVertex(0., 0., 0.);
+  Basic3DVector<double> pVertexErr(0.,0.,0.);
+  
   bool pvfound = (recoPVCollection->size() != 0);
 
-  if (pvfound)
-    {
-     PrimaryVertexSorter pvs;
-     vector<reco::Vertex> sortedList = pvs.sortedList(*(recoPVCollection.product()) );
-     primVertex = (sortedList.front());
-    } else {
-            //creating a dummy PV
-            reco::Vertex::Point p(0,0,0);  
-  	    reco::Vertex::Error e;
-	    e(0,0) = 0.0015*0.0015;
-  	    e(1,1) = 0.0015*0.0015;
-  	    e(2,2) = 15.*15.;
-  	    primVertex = reco::Vertex(p,e,1,1,1);
-    }
-  //
-  GlobalPoint pVertex(primVertex.position().x(),primVertex.position().y(),primVertex.position().z());
-  Basic3DVector<double> pVertexErr(primVertex.xError(),primVertex.yError(),primVertex.zError());
+  if (pvfound){
+    for(reco::VertexCollection::const_iterator it=recoPVCollection->begin() ; it!=recoPVCollection->end() ; ++it){
+      //      if (it==recoPVCollection->begin()){
+      if(!it->isFake() && it->ndof() > 4 && fabs(it->position().z()) <= 24 && fabs(it->position().rho()) <= 2){
+	primVertex=*it;
+	pVertex = GlobalPoint(it->position().x(), it->position().y(), it->position().z());
+	pVertexErr = Basic3DVector<double>(it->xError(),it->yError(),it->zError());
+	cout << "P vertex position used for computing SIP for electron and muons is (x,y,z)= " << 
+	  pVertex.x() << " " <<
+	  pVertex.y() << " " <<
+	  pVertex.z() << endl;
+	break;
+      }
+    }     
+  }
 
   //
   /////////////////////////////////////////////
@@ -233,46 +234,41 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
     std::vector<float> sigmu(nmu),valuemu(nmu),errormu(nmu);
     unsigned int indexmu=0;	
     for (edm::View<reco::Muon>::const_iterator muCand = muCandidates->begin(); muCand != muCandidates->end(); ++muCand){
-      mutrack = muCand->get<TrackRef>();
-      if (mutrack.isNull()){
-	 if(debug) cout <<"tracker trackref is null since muon is STA" << endl;
-         mutrack=muCand->get<TrackRef,reco::StandAloneMuonTag>();
-        }  
-      //
-      ///////////////////////////////////////////////////////////////
-      //------  with GLB muons from TrackCollection was working with:
-      //
-      //for (unsigned int trk=0;trk<muCandidates->size();++trk)
-      //   {
-      //    mutrack = reco::TrackRef(muCandidates,trk) ;
-      ////////////////////////////////////////////////////////////////
-      //
+      edm::Ref<edm::View<reco::Muon> > muonBaseRef(muCandidates,indexmu); 
+      reco::TrackRef innerTrack = muonBaseRef->innerTrack();
+      reco::TrackRef globalTrack= muonBaseRef->globalTrack();
+      reco::TrackRef bestTrack  = muonBaseRef->muonBestTrack();
+      reco::TrackRef mutrack = innerTrack;
+      // Make sure the collection it points to is there
+      if ( bestTrack.isNonnull() && bestTrack.isAvailable() ) mutrack = bestTrack;
+      
+      if (! (mutrack.isNonnull() && mutrack.isAvailable() )) {	
+	if(debug) cout <<"tracker trackref is null since muon is STA" << endl;
+	mutrack=muCand->get<TrackRef,reco::StandAloneMuonTag>();
+      }  
+      //      
       mutranstrack = trackBuilder->build( mutrack ) ;
       //  
 
-      TrajectoryStateOnSurface muTSOS;
-      if (useBeamSpot_==true){ 
-	//muTSOS = mutranstrack.stateOnSurface(BSVertex);
-	muTSOS = IPTools::transverseExtrapolate(mutranstrack.impactPointState(), BSVertex, mutranstrack.field());
-	
-
-      } 
-      else {
-	//muTSOS = mutranstrack.stateOnSurface(pVertex);
-	muTSOS = IPTools::transverseExtrapolate(mutranstrack.impactPointState(), pVertex, mutranstrack.field());
-      }
+      // TrajectoryStateOnSurface muTSOS;
+      // if (useBeamSpot_==true){ 
+      // 	muTSOS = IPTools::transverseExtrapolate(mutranstrack.impactPointState(), BSVertex, mutranstrack.field());	
+      // } 
+      // else {
+      // 	muTSOS = IPTools::transverseExtrapolate(mutranstrack.impactPointState(), pVertex, mutranstrack.field());
+      // }
 
       //
-      if (muTSOS.isValid()){
+      //if (muTSOS.isValid()){
 	std::pair<bool,Measurement1D> muIPpair;
 	
 	if (useBeamSpot_==true){ 		  
-	  //muIPpair = IPTools::signedImpactParameter3D(mutranstrack, muTSOS.globalDirection(), BSprimVertex);
-	  muIPpair = IPTools::absoluteImpactParameter3D(mutranstrack, BSprimVertex);
+	  //muIPpair = IPTools::absoluteImpactParameter3D(mutranstrack, BSprimVertex);
+	  muIPpair = IPTools::signedImpactParameter3D(mutranstrack,GlobalVector(mutrack->px(),mutrack->py(),mutrack->pz()),BSprimVertex);
 	} 
 	else {	 
-	  //muIPpair = IPTools::signedImpactParameter3D(mutranstrack, muTSOS.globalDirection(), primVertex);
-	  muIPpair = IPTools::absoluteImpactParameter3D(mutranstrack, primVertex);
+	  //muIPpair = IPTools::absoluteImpactParameter3D(mutranstrack, primVertex);
+	  muIPpair = IPTools::signedImpactParameter3D(mutranstrack,GlobalVector(mutrack->px(),mutrack->py(),mutrack->pz()),primVertex);	  
 	}
 	//
 	if (muIPpair.first){
@@ -284,7 +280,7 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
 	  valuemu[indexmu]=float(muValue3D);
 	  errormu[indexmu]=float(muError3D);
 	} 	       
-      }
+	//}
       //
       indexmu++;
     } //-- muon loop closed
@@ -315,25 +311,29 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
     for (edm::View<reco::GsfElectron>::const_iterator eleCand = eleCandidates->begin(); eleCand != eleCandidates->end(); ++eleCand){
 
       eletrack = eleCand->get<GsfTrackRef>();
-      eletranstrack = trackBuilder->build( eletrack ) ;
 
-      TrajectoryStateOnSurface eleTSOS;
+      if ( eletrack.isNonnull() && eletrack.isAvailable() ) 
+	eletranstrack = trackBuilder->build( eletrack ) ;
 
-      if (useBeamSpot_==true){ 
-	eleTSOS = IPTools::transverseExtrapolate(eletranstrack.impactPointState(), BSVertex, eletranstrack.field());
-      } 
-      else {
-	eleTSOS = IPTools::transverseExtrapolate(eletranstrack.impactPointState(), pVertex, eletranstrack.field());
-      }
+      // TrajectoryStateOnSurface eleTSOS;
+
+      // if (useBeamSpot_==true){ 
+      // 	eleTSOS = IPTools::transverseExtrapolate(eletranstrack.impactPointState(), BSVertex, eletranstrack.field());
+      // } 
+      // else {
+      // 	eleTSOS = IPTools::transverseExtrapolate(eletranstrack.impactPointState(), pVertex, eletranstrack.field());
+      // }
 
 
-      if (eleTSOS.isValid()){
+      //if (eleTSOS.isValid()){
 	std::pair<bool,Measurement1D> eleIPpair;
 	if (useBeamSpot_==true){ 
-	  eleIPpair = IPTools::signedImpactParameter3D(eletranstrack, eleTSOS.globalDirection(), BSprimVertex); 
+	  //eleIPpair = IPTools::signedImpactParameter3D(eletranstrack, eleTSOS.globalDirection(), BSprimVertex);
+	  eleIPpair = IPTools::signedImpactParameter3D(eletranstrack,GlobalVector(eletrack->px(),eletrack->py(),eletrack->pz()),BSprimVertex);
 	}
 	else {
-	  eleIPpair = IPTools::signedImpactParameter3D(eletranstrack, eleTSOS.globalDirection(), primVertex);
+	  //eleIPpair = IPTools::signedImpactParameter3D(eletranstrack, eleTSOS.globalDirection(), primVertex);
+	  eleIPpair = IPTools::signedImpactParameter3D(eletranstrack,GlobalVector(eletrack->px(),eletrack->py(),eletrack->pz()),primVertex);
 	}
 	//
 	if (eleIPpair.first){
@@ -345,7 +345,7 @@ void HZZ4LeptonsIpToVtxProducer::produce(edm::Event& iEvent, const edm::EventSet
 	  valueele[indexele]=float(eleValue3D);
 	  errorele[indexele]=float(eleError3D);
 	} 	
-      }            
+	//}            
       indexele++;
     } //-- ele loop closed
       
