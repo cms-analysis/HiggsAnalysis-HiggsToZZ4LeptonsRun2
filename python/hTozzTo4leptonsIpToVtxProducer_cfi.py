@@ -11,7 +11,8 @@ hTozzTo4leptonsIpToVtxProducer = cms.EDProducer("HZZ4LeptonsIpToVtxProducer",
     VertexLabel = cms.InputTag("offlinePrimaryVertices"),
     BeamSpotLabel  = cms.InputTag("offlineBeamSpot"),
     useBeamSpot = cms.bool(False),
-    decaychannel = cms.string('2e2mu')
+    decaychannel = cms.string('2e2mu'),
+    debug = cms.untracked.bool(True)  
 )
 
 
