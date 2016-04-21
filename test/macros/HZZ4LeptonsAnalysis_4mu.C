@@ -945,7 +945,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
         
-      //if (!(Run==1 && LumiSection==526 && Event==100888)) continue;
+      //if (!(Run==1 && LumiSection==1342 && Event==257626)) continue;
       
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;   
 
@@ -1536,7 +1536,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       for( int i = 0 ; i < 30 ; ++i ) RECOPFPHOT_DR[i] = -999; 
 
       for( int i = 0; i < Nphotons; ++i ){
-	
+
+	cout <<  RECOPFPHOT_PT[iLp[i]] << endl;
 	double min_deltaR = 1000;
 	int  l_min_deltaR = -1;
 	int  tag_min_deltaR = -1;   // 0: mu  1: ele
@@ -1545,13 +1546,13 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	  if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue; //loose ID + SIP cut	  
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
 	  if(!(deltaR < 0.5 && deltaR/pow(RECOPFPHOT_PT[iLp[i]],2)<0.012) ) continue;
+	  //cout << "DeltaR= " << deltaR << endl;
 	  if( deltaR<min_deltaR) { // the closest lepton
 	    cout << "Possible candidate of photon with pT= " << RECOPFPHOT_PT[iLp[i]] << " associated to a muon with pT= " << RECOMU_PT[iL_loose_mu[l]]<< endl;
 	    min_deltaR = deltaR;
 	    l_min_deltaR = l;
 	    tag_min_deltaR = 0;
-	  }
-	  
+	  }	  
 	}//end loop on muons  
 	
 	for(int l = 0; l < N_loose_e; ++l){ // loop on electrons
@@ -1713,7 +1714,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	if (iLp_l[i]==-1) continue;
 	
 	for(int e = 0; e < N_loose_e; ++e){
-	  if(!( iLp_l[i] == iL_loose_e[e] && iLp_tagEM[i] == 1 ) ) continue;
+	  //if(!( iLp_l[i] == iL_loose_e[e] && iLp_tagEM[i] == 1 ) ) continue; // subtracting the photon contribution from all the leptons 
 	  if (fabs( RECOELE_SIP[iL_loose_e[e]])>=4.) continue;
 	  //double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_scl_Phi[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_scl_Eta[iL_loose_e[e]],2) );
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOELE_PHI[iL_loose_e[e]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOELE_ETA[iL_loose_e[e]],2) );          cout << "deltaR for photon subtraction= " << deltaR << endl;
@@ -1730,7 +1731,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	} // end loop on ele
 	
 	for(int l = 0; l < N_loose_mu; ++l){ // loop on muons
-	  if(!( iLp_l[i] == iL_loose_mu[l] && iLp_tagEM[i] == 0 ) ) continue;
+	  //if(!( iLp_l[i] == iL_loose_mu[l] && iLp_tagEM[i] == 0 ) ) continue;  // subtracting the photon contribution from all the leptons 
           if (fabs(RECOMU_SIP[iL_loose_mu[l]])>=4.) continue;
           double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI[iLp[i]] , RECOMU_PHI[iL_loose_mu[l]] ),2) + pow(RECOPFPHOT_ETA[iLp[i]] - RECOMU_ETA[iL_loose_mu[l]],2) );
 	  cout << "deltaR for photon subtraction= " << deltaR << endl;
