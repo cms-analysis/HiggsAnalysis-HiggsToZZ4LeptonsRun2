@@ -9,13 +9,13 @@ mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/histodir
 workdir=${PWD}
 echo "Running HtoZZto4Leptons Analysis with executables RunHZZ4LeptonsAnalysis"
 source /cmshome/nicola/slc6/logincms_cvmfs_slc6.sh
-export SCRAM_ARCH=slc6_amd64_gcc481
-exedir=`echo /cmshome/nicola/slc6/MonoHiggs/Analysis13TeV/CMSSW_7_2_0/src/HiggsAnalysis/HiggsToZZ4Leptons/test/macros/FSR2012/INCLUSIVE_MACROS`
+export SCRAM_ARCH=slc6_amd64_gcc491
+exedir=`echo /cmshome/nicola/slc6/MonoHiggs/Analysis13TeV/Sync13TeV/CMSSW_7_6_3_patch2/src/HiggsAnalysis/HiggsToZZ4Leptons/test/macros`
 export LD_LIBRARY_PATH=${melalibdir}:$LD_LIBRARY_PATH
 cd ${exedir}
 eval `scramv1 runtime -sh`
 
-melalibdir=${CMSSW_BASE}/lib/slc6_amd64_gcc481/
+melalibdir=${CMSSW_BASE}/lib/slc6_amd64_gcc491/
 export LD_LIBRARY_PATH=${melalibdir}:$LD_LIBRARY_PATH
 
 if [ -d "/home/tmp/defilip/$$" ]; then
