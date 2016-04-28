@@ -19,6 +19,7 @@
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsMuonCalibrator.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsMuonSelector.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsElectronIsolationProducerEgamma.h>
+#include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsElectronIsolationTest.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsMuonIsolationProducerMu.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsCommonPreselection.h>
 #include <HiggsAnalysis/HiggsToZZ4Leptons/plugins/HZZ4LeptonsCommonPreselectionFilter.h>
@@ -59,6 +60,7 @@ DEFINE_FWK_MODULE(HZZ4LeptonsPFfsrPhoton);
 DEFINE_FWK_MODULE(HZZ4LeptonsMuonCalibrator);
 DEFINE_FWK_MODULE(HZZ4LeptonsMuonSelector);
 DEFINE_FWK_MODULE(HZZ4LeptonsElectronIsolationProducerEgamma);
+DEFINE_FWK_MODULE(HZZ4LeptonsElectronIsolationTest);
 DEFINE_FWK_MODULE(HZZ4LeptonsMuonIsolationProducerMu);
 DEFINE_FWK_MODULE(HZZ4LeptonsCommonPreselection);
 DEFINE_FWK_MODULE(HZZ4LeptonsCommonPreselectionFilter);
