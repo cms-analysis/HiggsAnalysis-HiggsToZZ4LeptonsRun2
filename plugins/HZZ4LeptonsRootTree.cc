@@ -3108,11 +3108,11 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
 			   (eletrackref->dr03HcalTowerSumEt())/eletrackref->pt());
     
     // PF isolation
-    RECOELE_PFchAllPart.push_back((*isoPFChargedAllelemap)[eletrackref]);
-    RECOELE_PFchHad.push_back((*isoPFChargedelemap)[eletrackref]);
-    RECOELE_PFneuHad.push_back((*isoPFNeutralelemap)[eletrackref]);
-    RECOELE_PFphoton.push_back((*isoPFGammaelemap)[eletrackref]);
-    RECOELE_PFPUchAllPart.push_back((*isoPFPUelemap)[eletrackref]);
+    //RECOELE_PFchAllPart.push_back((*isoPFChargedAllelemap)[eletrackref]);
+    //RECOELE_PFchHad.push_back((*isoPFChargedelemap)[eletrackref]);
+    //RECOELE_PFneuHad.push_back((*isoPFNeutralelemap)[eletrackref]);
+    //RECOELE_PFphoton.push_back((*isoPFGammaelemap)[eletrackref]);
+    //RECOELE_PFPUchAllPart.push_back((*isoPFPUelemap)[eletrackref]);
     RECOELE_PFX_dB.push_back(((*isoPFChargedelemap)[eletrackref] + max((*isoPFGammaelemap)[eletrackref]+(*isoPFNeutralelemap)[eletrackref]-0.5*(*isoPFPUelemap)[eletrackref],0.0))/eletrackref->pt());  
 
     
@@ -3142,10 +3142,23 @@ void HZZ4LeptonsRootTree::fillElectrons(const edm::Event& iEvent, const edm::Eve
         if (fabs(sclRef->eta()) >= 2.2   && fabs(sclRef->eta()) < 2.3 )   EffectiveArea = 0.1903;
         if (fabs(sclRef->eta()) >= 2.3   && fabs(sclRef->eta()) < 2.4 )   EffectiveArea = 0.2243;
         if (fabs(sclRef->eta()) >= 2.4   && fabs(sclRef->eta()) < 5.0  )  EffectiveArea = 0.2687;
-
-
     }
-    RECOELE_PFX_rho.push_back(((*isoPFChargedelemap)[eletrackref]+ max( ((*isoPFNeutralelemap)[eletrackref]+(*isoPFGammaelemap)[eletrackref]- max(RHO_ele,0.0)*EffectiveArea),0.0))/cand->p4().pt()); 
+
+    //RECOELE_PFX_rho.push_back(((*isoPFChargedelemap)[eletrackref]+ max( ((*isoPFNeutralelemap)[eletrackref]+(*isoPFGammaelemap)[eletrackref]- max(RHO_ele,0.0)*EffectiveArea),0.0))/cand->p4().pt()); 
+
+    RECOELE_PFX_rho.push_back((cand->pfIsolationVariables().sumChargedHadronPt+
+			       std::max(
+					cand->pfIsolationVariables().sumPhotonEt+
+					cand->pfIsolationVariables().sumNeutralHadronEt-
+					max(RHO_ele,0.0)*EffectiveArea,
+					0.0)
+			       )/cand->p4().pt());
+    
+    RECOELE_PFchHad.push_back(cand->pfIsolationVariables().sumChargedHadronPt);
+    RECOELE_PFneuHad.push_back(cand->pfIsolationVariables().sumNeutralHadronEt);
+    RECOELE_PFphoton.push_back(cand->pfIsolationVariables().sumPhotonEt);
+    //RECOELE_PFsumPUPt.push_back(cand->pfIsolationVariables().sumPUPt);                                                                                                             
+    RECOELE_PFPUchAllPart.push_back(cand->pfIsolationVariables().sumPUPt);
        
     // Vertexing DA
     RECOELE_SIP.push_back((*vertexelemap)[eletrackrefv]);

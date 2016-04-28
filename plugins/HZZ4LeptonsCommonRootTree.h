@@ -3226,10 +3226,10 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
 
 
       // PF isolation
-      RECOELE_PFchAllPart[index]      =  (*isoPFChargedAllelemap)[eletrackref];
-      RECOELE_PFchHad[index]          =  (*isoPFChargedelemap)[eletrackref];
-      RECOELE_PFneuHad[index]         =  (*isoPFNeutralelemap)[eletrackref];
-      RECOELE_PFphoton[index]         =  (*isoPFGammaelemap)[eletrackref];
+      //RECOELE_PFchAllPart[index]      =  (*isoPFChargedAllelemap)[eletrackref];
+      //RECOELE_PFchHad[index]          =  (*isoPFChargedelemap)[eletrackref];
+      //RECOELE_PFneuHad[index]         =  (*isoPFNeutralelemap)[eletrackref];
+      //RECOELE_PFphoton[index]         =  (*isoPFGammaelemap)[eletrackref];
       RECOELE_PFPUchAllPart[index]    =  (*isoPFPUelemap)[eletrackref];
 
       RECOELE_PFX_dB[index]           =  (RECOELE_PFchHad[index] + max(RECOELE_PFphoton[index]+RECOELE_PFneuHad[index]-0.5*RECOELE_PFPUchAllPart[index],0.))/eletrackref->pt();
@@ -3263,16 +3263,24 @@ mcIter->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->mother(0)->status
       }
 
 
-      RECOELE_PFX_rho[index]=(RECOELE_PFchHad[index]+
-			      max( (RECOELE_PFneuHad[index]+RECOELE_PFphoton[index]-max(RHO_ele,0.0)*EffectiveArea),0.0) )/cand->p4().pt(); 
-      
+      //RECOELE_PFX_rho[index]=(RECOELE_PFchHad[index]+
+      //		      max( (RECOELE_PFneuHad[index]+RECOELE_PFphoton[index]-max(RHO_ele,0.0)*EffectiveArea),0.0) )/cand->p4().pt(); 
 
-      //  RECOELE_PFchHad[index]  = (cand->PflowIsolationVariables().chargedHadronIso);
-      /*  RECOELE_PFneuHad[index] = (cand->PflowIsolationVariables().neutralHadronIso); */
-      /*       RECOELE_PFphoton[index] = (cand->PflowIsolationVariables().photonIso); */
-      /*       // RECOELE_PFsumPUPt[index]= (cand->PflowIsolationVariables().sumPUPt); */
-      /*       RECOELE_PFX_dB[index]=(RECOELE_PFchHad[index]+max(0.,RECOELE_PFneuHad[index]+RECOELE_PFphoton[index]-0.5*RECOELE_PFsumPUPt[index]))/cand->p4().pt(); */
-      
+      RECOELE_PFX_rho[index]= (cand->pfIsolationVariables().sumChargedHadronPt+
+			       std::max(
+					cand->pfIsolationVariables().sumPhotonEt+
+					cand->pfIsolationVariables().sumNeutralHadronEt-
+					max(RHO_ele,0.0)*EffectiveArea,
+					0.0)
+			       )/cand->p4().pt();
+
+      RECOELE_PFchHad[index]  = (cand->pfIsolationVariables().sumChargedHadronPt);
+      RECOELE_PFneuHad[index] = (cand->pfIsolationVariables().sumNeutralHadronEt); 
+      RECOELE_PFphoton[index] = (cand->pfIsolationVariables().sumPhotonEt); 
+      //RECOELE_PFsumPUPt[index]= (cand->pfIsolationVariables().sumPUPt); 
+      RECOELE_PFPUchAllPart[index]=(cand->pfIsolationVariables().sumPUPt);   
+
+      /*       RECOELE_PFX_dB[index]=(RECOELE_PFchHad[index]+max(0.,RECOELE_PFneuHad[index]+RECOELE_PFphoton[index]-0.5*RECOELE_PFsumPUPt[index]))/cand->p4().pt(); */      
       /*       float EffectiveArea=0.; */
       /*       if (fabs(RECOELE_ETA[index]) >= 0.0 && fabs(RECOELE_ETA[index]) < 1.0 ) EffectiveArea = 0.132; */
       /*       if (fabs(RECOELE_ETA[index]) >= 1.0 && fabs(RECOELE_ETA[index]) < 1.5 ) EffectiveArea = 0.120; */
