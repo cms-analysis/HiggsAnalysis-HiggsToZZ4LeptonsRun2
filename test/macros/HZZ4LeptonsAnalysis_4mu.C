@@ -957,12 +957,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
       newweight=weight;
       cout << "Starting weight= " << newweight << endl;
-
-      // Weight for MCNLO samples
-      if( datasetName.Contains("amcatnlo")) {      
-	cout << "Reweighting sample of amcatnlo with weight= " << MC_weighting << endl;
-	weight=weight*MC_weighting;
-      }
       
       // pileup reweighting 2015
       hPUvertices->Fill(num_PU_vertices,weight);
@@ -971,18 +965,23 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (MC_type == "Fall15"){
 	Int_t binx = puweight->GetXaxis()->FindBin(num_PU_vertices);
 	cout << " bin x= " << binx << " " << puweight->GetBinContent(binx) << endl;	
-	pu_weight=double(puweight->GetBinContent(binx));
-	
+	pu_weight=double(puweight->GetBinContent(binx));	
       }      
-       
- 
+      
       hPUvertices_ReWeighted->Fill(num_PU_vertices,weight*pu_weight);
       cout << "Pileup interations and weight is= " << num_PU_vertices << " " << " and weight= " << pu_weight << endl;  
-
+      
       // Changing the weight for pileup
       newweight=weight*pu_weight;
       cout << "Starting weight + pileup = " << newweight << endl;
-                 
+            
+      // Weight for MCNLO samples                                                                                                                                     
+      if( datasetName.Contains("amcatnlo")) {
+        cout << "Reweighting sample of amcatnlo with weight= " << MC_weighting << endl;
+        newweight=weight*pu_weight*MC_weighting;
+      }
+
+          
       float pFill[11];for(int pf=0;pf<11;pf++)pFill[11]=-999.;
 
       // ** Step 0:
@@ -1385,7 +1384,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       N_2_w=N_2_w+newweight;
 
       // Define a new isolation array to allocate the contribution of photons
-      float RECOMU_PFX_dB_new[100],RECOELE_PFX_rho_new[100];
+      //float RECOMU_PFX_dB_new[100],RECOELE_PFX_rho_new[100];
       for (int i=0;i<100;i++){
 	RECOMU_PFX_dB_new[i]=RECOMU_PFX_dB[i];
 	RECOELE_PFX_rho_new[i]=RECOELE_PFX_rho[i];

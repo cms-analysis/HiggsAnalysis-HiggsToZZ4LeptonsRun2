@@ -1089,6 +1089,7 @@ public :
    double EAele(int ,bool );
    double masserror( std::vector<TLorentzVector> Lep, std::vector<double> pterr );
    void printmubnn(int i);
+   float RECOMU_PFX_dB_new[100],RECOELE_PFX_rho_new[100];
 };
 
 #endif
@@ -1712,7 +1713,7 @@ void HZZ4LeptonsAnalysis::printmubnn(int i){
                 << RECOMU_ETA[i] << " "  
                 << RECOMU_PHI[i] << " "  
                 << RECOMU_CHARGE[i] << " "
-                << RECOMU_PFX_dB[i] << " "
+                << RECOMU_PFX_dB_new[i] << " "
                 << RECOMU_SIP[i] << " ";
 }
 
