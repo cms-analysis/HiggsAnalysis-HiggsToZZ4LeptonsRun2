@@ -3461,8 +3461,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      f_lept4_pfx = RECOMU_PFX_dB_new[indexleptonfinal[3]];
      f_lept4_sip = RECOMU_SIP[indexleptonfinal[3]];
      //    f_lept4_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[3]];
-     //     f_iso_max = Iso_max;
-     //f_sip_max = Sip_max;
+     //    f_iso_max = Iso_max;
+     //    f_sip_max = Sip_max;
      f_Z1mass = massZ1;
      f_Z2mass = massZ2;
      f_angle_costhetastar = -99.;
@@ -3475,17 +3475,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      f_mass4l = mass4l;
      f_mass4lErr = massErr;
      f_njets_pass = njets_pass;
-     f_deltajj = deltajj;
-     f_massjj = massjj;
-     f_D_jet = D_jet;
+     f_deltajj = -999.;
+     f_massjj = -999.;
+     f_D_jet = -999.;
      
      
-     if (njets_pass>=1) {
-       f_jet1_pt = RECO_PFJET_PT[jet1];
-       f_jet1_eta = RECO_PFJET_ETA[jet1];
-       f_jet1_phi = RECO_PFJET_PHI[jet1];
-       f_jet1_e = RECO_PFJET_ET[jet1];
-     } else {
+     if (njets_pass<1) {
        f_jet1_pt = -999;
        f_jet1_eta = -999;
        f_jet1_phi = -999;
@@ -3495,16 +3490,25 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        f_jet2_phi = -999;
        f_jet2_e = -999;
      }
-     if (njets_pass>=2) {
+     else if (njets_pass==1) { // store the highest pT jets passing the criteria
+       f_jet1_pt = RECO_PFJET_PT[jet1];
+       f_jet1_eta = RECO_PFJET_ETA[jet1];
+       f_jet1_phi = RECO_PFJET_PHI[jet1];
+       f_jet1_e = RECO_PFJET_ET[jet1];
+     }
+     else if (njets_pass>=2) { // store the second highest pT jets passing the criteria
        f_jet2_pt = RECO_PFJET_PT[jet2];
        f_jet2_eta = RECO_PFJET_ETA[jet2];
        f_jet2_phi = RECO_PFJET_PHI[jet2];
        f_jet2_e = RECO_PFJET_ET[jet2];
-     } else {
-       f_jet2_pt = -999;
-       f_jet2_eta = -999;
-       f_jet2_phi = -999;
-       f_jet2_e = -999;
+
+       TLorentzVector JET1new,JET2new,mJJnew;
+       JET1new.SetPtEtaPhiE(RECO_PFJET_PT[jet1],RECO_PFJET_ETA[jet1],RECO_PFJET_PHI[jet1],RECO_PFJET_ET[jet1]*TMath::CosH(RECO_PFJET_ETA[jet1]));
+       JET2new.SetPtEtaPhiE(RECO_PFJET_PT[jet2],RECO_PFJET_ETA[jet2],RECO_PFJET_PHI[jet2],RECO_PFJET_ET[jet2]*TMath::CosH(RECO_PFJET_ETA[jet2]));
+       mJJnew=JET1new+JET2new;
+       f_deltajj = fabs(JET1new.Eta()-JET2new.Eta());
+       f_massjj = mJJnew.M();
+       f_D_jet =0.18*fabs(JET1new.Eta()-JET2new.Eta())+1.92E-4*mJJnew.M();
      }
      
 
@@ -3647,8 +3651,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        
               
        f_int_weight = w;
-       f_Z1mass = massofZ1;
-       f_Z2mass = massofZ2;
+       //f_Z1mass = massofZ1;
+       //f_Z2mass = massofZ2;
        f_angle_costhetastar = angle_costhetastar;
        f_angle_costheta1 = angle_costheta1;
        f_angle_costheta2 = angle_costheta2;
