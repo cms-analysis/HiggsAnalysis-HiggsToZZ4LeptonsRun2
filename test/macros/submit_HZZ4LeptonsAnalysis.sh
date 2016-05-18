@@ -3,8 +3,8 @@
 echo "Processing on " `hostname` "at " `date` 
 
 mkdir -p /home/tmp/defilip/$$
-mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/jobdir
-mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/histodir
+mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/76X/jobdir
+mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/76X/histodir
 
 workdir=${PWD}
 echo "Running HtoZZto4Leptons Analysis with executables RunHZZ4LeptonsAnalysis"
@@ -15,7 +15,7 @@ export LD_LIBRARY_PATH=${melalibdir}:$LD_LIBRARY_PATH
 cd ${exedir}
 eval `scramv1 runtime -sh`
 
-melalibdir=${CMSSW_BASE}/lib/slc6_amd64_gcc491/
+melalibdir=${CMSSW_BASE}/lib/slc6_amd64_gcc493/
 export LD_LIBRARY_PATH=${melalibdir}:$LD_LIBRARY_PATH
 
 if [ -d "/home/tmp/defilip/$$" ]; then
@@ -59,14 +59,16 @@ cp ${exedir}/puProfile_Data_8TeV.root .
 cp ${exedir}/ebeOverallCorrections.LegacyPaper.42x.root .
 cp ${exedir}/ebeOverallCorrections.Legacy2013.v0.root .
 
-savedir=`echo /lustre/cms/store/user/defilip/MonoHiggs/histodir`
+cp ${exedir}/pileup_MC_Data_76x_50ns_25ns_silver.root .
+
+savedir=`echo /lustre/cms/store/user/defilip/MonoHiggs/76X/histodir`
 
 echo "Working dir is $workdir"
 echo "Executable dir is $exedir"
 echo "Saving dir is $savedir"
 
 ${exedir}/RunReferenceAnalysis ${exedir}/sig_input_h150.txt 1 ${exedir}/bkg_input.txt 1 ${exedir}/data_input.txt 1 Bari year mc >& ${workdir}/HZZ4LeptonsAnalysis_log
-cp -f ${workdir}/HZZ4LeptonsAnalysis_log /lustre/cms/store/user/defilip/MonoHiggs/jobdir/HZZ4LeptonsAnalysis_log
+cp -f ${workdir}/HZZ4LeptonsAnalysis_log /lustre/cms/store/user/defilip/MonoHiggs/76X/jobdir/HZZ4LeptonsAnalysis_log
 cp -f ${workdir}/output.root    ${savedir}/.
 cp -f ${workdir}/output_bnn.txt ${savedir}/.
 cp -f ${workdir}/output_bnn.root ${savedir}/.

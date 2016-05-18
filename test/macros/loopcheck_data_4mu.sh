@@ -23,6 +23,8 @@ SDESY="DESY";
 n=0;
 m=0;
 
+mkdir -p jobs4mu;
+
 echo "Reading data_input_4mu_$2_AN.txt file"
 
 cp data_input_4mu_$2_AN.txt data_input.txt

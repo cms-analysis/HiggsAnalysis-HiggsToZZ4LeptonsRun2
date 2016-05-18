@@ -71,7 +71,7 @@ int main (int argc, char ** argv){
     
     for(int i=0;i<ndata && itera==true;i++){
       
-      string name= "roottree_leptons_";
+      string name= "roottree_leptons_crab_";
       name.append(datasamples[i]);
       name.append(".root");
       TString dirInput;
@@ -99,6 +99,10 @@ int main (int argc, char ** argv){
         else if ( name.find("2012A")<38 || name.find("2012B")<38 || name.find("2012C")<38 || name.find("2012D")<38 ){
 	  dirInput="/lustre/cms/store/user/defilip/Data2012_paper_step_analysis_merged";	  
 	}
+        else if ( name.find("2015")<38){
+          //dirInput="/lustre/cms/store/user/dburns/MonoHiggs/Data2015_MonoHiggs_13TeV_merged";
+          dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged";
+        }
       }
 
       cout << "Input directory is:" << dirInput<< endl;
