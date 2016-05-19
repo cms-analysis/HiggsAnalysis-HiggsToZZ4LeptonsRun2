@@ -1722,7 +1722,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       int pj1 = -1;
       
       bool has_FSR_Z1 = 0;
-      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;;
+      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;
 
       for(int i = 0; i < N_good; ++i){
         for(int j = i + 1; j < N_good; ++j){
@@ -3622,35 +3622,70 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      f_event = Event;
      f_lumi = LumiSection;
 
-     // f_lept1_pt = RECOMU_PT[indexleptonfinal[0]] ;
-     // f_lept1_eta = RECOMU_ETA[indexleptonfinal[0]] ;
-     // f_lept1_phi = RECOMU_PHI[indexleptonfinal[0]];
-     // f_lept1_charge = RECOMU_CHARGE[indexleptonfinal[0]];
-     // f_lept1_pfx = RECOMU_PFX_dB_new[indexleptonfinal[0]];
-     // f_lept1_sip = RECOMU_SIP[indexleptonfinal[0]];
-     // //    f_lept1_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[0]];
-     // f_lept2_pt = RECOMU_PT[indexleptonfinal[1]] ;
-     // f_lept2_eta = RECOMU_ETA[indexleptonfinal[1]] ;
-     // f_lept2_phi = RECOMU_PHI[indexleptonfinal[1]];
-     // f_lept2_charge = RECOMU_CHARGE[indexleptonfinal[1]];
-     // f_lept2_pfx = RECOMU_PFX_dB_new[indexleptonfinal[1]];
-     // f_lept2_sip = RECOMU_SIP[indexleptonfinal[1]];
-     // //    f_lept2_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[1]];
-     // f_lept3_pt = RECOMU_PT[indexleptonfinal[2]] ;
-     // f_lept3_eta = RECOMU_ETA[indexleptonfinal[2]] ;
-     // f_lept3_phi = RECOMU_PHI[indexleptonfinal[2]];
-     // f_lept3_charge = RECOMU_CHARGE[indexleptonfinal[2]];
-     // f_lept3_pfx = RECOMU_PFX_dB_new[indexleptonfinal[2]];
-     // f_lept3_sip = RECOMU_SIP[indexleptonfinal[2]];
-     // //    f_lept3_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[2]];
-     // f_lept4_pt = RECOMU_PT[indexleptonfinal[3]] ;
-     // f_lept4_eta = RECOMU_ETA[indexleptonfinal[3]] ;
-     // f_lept4_phi = RECOMU_PHI[indexleptonfinal[3]];
-     // f_lept4_charge = RECOMU_CHARGE[indexleptonfinal[3]];
-     // f_lept4_pfx = RECOMU_PFX_dB_new[indexleptonfinal[3]];
-     // f_lept4_sip = RECOMU_SIP[indexleptonfinal[3]];
-     //    f_lept4_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[3]];
-     //     f_iso_max = Iso_max;
+     if (Z1tag==1){
+       f_lept1_pt  = RECOMU_PT[indexleptonfinal[0]] ;
+       f_lept1_eta = RECOMU_ETA[indexleptonfinal[0]] ;
+       f_lept1_phi = RECOMU_PHI[indexleptonfinal[0]];
+       f_lept1_charge = RECOMU_CHARGE[indexleptonfinal[0]];
+       f_lept1_pfx = RECOMU_PFX_dB_new[indexleptonfinal[0]];
+       f_lept1_sip = RECOMU_SIP[indexleptonfinal[0]];
+       //    f_lept1_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[0]];
+       f_lept2_pt  = RECOMU_PT[indexleptonfinal[1]] ;
+       f_lept2_eta = RECOMU_ETA[indexleptonfinal[1]] ;
+       f_lept2_phi = RECOMU_PHI[indexleptonfinal[1]];
+       f_lept2_charge = RECOMU_CHARGE[indexleptonfinal[1]];
+       f_lept2_pfx = RECOMU_PFX_dB_new[indexleptonfinal[1]];
+       f_lept2_sip = RECOMU_SIP[indexleptonfinal[1]];
+       //    f_lept2_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[1]];
+       f_lept3_pt  = RECOELE_PT[indexleptonfinal[2]] ;
+       f_lept3_eta = RECOELE_ETA[indexleptonfinal[2]] ;
+       f_lept3_phi = RECOELE_PHI[indexleptonfinal[2]];
+       f_lept3_charge = RECOELE_CHARGE[indexleptonfinal[2]];
+       f_lept3_pfx = RECOELE_PFX_rho_new[indexleptonfinal[2]];
+       f_lept3_sip = RECOELE_SIP[indexleptonfinal[2]];
+       f_lept3_mvaid = RECOELE_mvaNonTrigV0[indexleptonfinal[2]];
+
+       f_lept4_pt  = RECOELE_PT[indexleptonfinal[3]] ;
+       f_lept4_eta = RECOELE_ETA[indexleptonfinal[3]] ;
+       f_lept4_phi = RECOELE_PHI[indexleptonfinal[3]];
+       f_lept4_charge = RECOELE_CHARGE[indexleptonfinal[3]];
+       f_lept4_pfx = RECOELE_PFX_rho_new[indexleptonfinal[3]];
+       f_lept4_sip = RECOELE_SIP[indexleptonfinal[3]];
+       f_lept4_mvaid = RECOELE_mvaNonTrigV0[indexleptonfinal[3]];
+     }
+     else if (Z1tag==2) {
+       f_lept1_pt = RECOELE_PT[indexleptonfinal[0]] ;
+       f_lept1_eta = RECOELE_ETA[indexleptonfinal[0]] ;
+       f_lept1_phi = RECOELE_PHI[indexleptonfinal[0]];
+       f_lept1_charge = RECOELE_CHARGE[indexleptonfinal[0]];
+       f_lept1_pfx = RECOELE_PFX_rho_new[indexleptonfinal[0]];
+       f_lept1_sip = RECOELE_SIP[indexleptonfinal[0]];
+       f_lept1_mvaid = RECOELE_mvaNonTrigV0[indexleptonfinal[0]];
+       f_lept2_pt = RECOELE_PT[indexleptonfinal[1]] ;
+       f_lept2_eta = RECOELE_ETA[indexleptonfinal[1]] ;
+       f_lept2_phi = RECOELE_PHI[indexleptonfinal[1]];
+       f_lept2_charge = RECOELE_CHARGE[indexleptonfinal[1]];
+       f_lept2_pfx = RECOELE_PFX_rho_new[indexleptonfinal[1]];
+       f_lept2_sip = RECOELE_SIP[indexleptonfinal[1]];
+       f_lept2_mvaid = RECOELE_mvaNonTrigV0[indexleptonfinal[1]];
+
+       f_lept3_pt = RECOMU_PT[indexleptonfinal[2]] ;
+       f_lept3_eta = RECOMU_ETA[indexleptonfinal[2]] ;
+       f_lept3_phi = RECOMU_PHI[indexleptonfinal[2]];
+       f_lept3_charge = RECOMU_CHARGE[indexleptonfinal[2]];
+       f_lept3_pfx = RECOMU_PFX_dB_new[indexleptonfinal[2]];
+       f_lept3_sip = RECOMU_SIP[indexleptonfinal[2]];
+       //    f_lept3_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[2]];
+       f_lept4_pt = RECOMU_PT[indexleptonfinal[3]] ;
+       f_lept4_eta = RECOMU_ETA[indexleptonfinal[3]] ;
+       f_lept4_phi = RECOMU_PHI[indexleptonfinal[3]];
+       f_lept4_charge = RECOMU_CHARGE[indexleptonfinal[3]];
+       f_lept4_pfx = RECOMU_PFX_dB_new[indexleptonfinal[3]];
+       f_lept4_sip = RECOMU_SIP[indexleptonfinal[3]];
+       //    f_lept4_mvaid = RECOMU_mvaNonTrigV0[indexleptonfinal[3]];
+     }
+     
+     //f_iso_max = Iso_max;
      //f_sip_max = Sip_max;
      f_Z1mass = massZ1;
      f_Z2mass = massZ2;

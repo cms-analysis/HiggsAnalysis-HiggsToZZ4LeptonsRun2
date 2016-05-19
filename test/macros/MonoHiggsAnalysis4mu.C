@@ -936,13 +936,11 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
-     if (jentry >10) break;
+     //if (jentry >10) break;
      
      nb = fChain->GetEntry(jentry);   nbytes += nb;
 
-     //if (!(Run==1 && Event==2503 && LumiSection==1)) continue;
-     //if (!(Event==1888)) continue;
-     //if (!(Run==1 && Event==109809 && LumiSection==1099)) continue;
+     //if (!(Run==1 && LumiSection==2591 && Event==497247)) continue;
      
      if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;
      
@@ -1514,16 +1512,19 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
 
 	// cleaning
 	for(int e = 0; e < N_loose_e; ++e){
-	  if (fabs( RECOELE_SIP->at(iL_loose_e[e])>=4.)) continue; // loose ID + SIP cut
+	  if (fabs( RECOELE_SIP->at(iL_loose_e[e]))>=4.) continue; // loose ID + SIP cut
 	  double deltaPhi = DELTAPHI( RECOPFPHOT_PHI->at(i) , RECOELE_scl_Phi->at(iL_loose_e[e]) ) ;
 	  double deltaEta = fabs( RECOPFPHOT_ETA->at(i) - RECOELE_scl_Eta->at(iL_loose_e[e]) );
 	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI->at(i) , RECOELE_scl_Phi->at(iL_loose_e[e]) ),2) + pow(RECOPFPHOT_ETA->at(i) - RECOELE_scl_Eta->at(iL_loose_e[e]),2) );
-
-	  if( ( fabs(deltaPhi) < 2 && fabs(deltaEta) < 0.05 ) || deltaR <= 0.15 ){
-	    if( debug )cout << "Photon not passing the electron cleaning" << endl;
-	    is_clean = 0;
+	  
+	  if( ( fabs(deltaPhi) < 2 && fabs(deltaEta) < 0.05 ) || deltaR <= 0.15 ){		  
+	    if( debug )cout << "Photon not passing the electron cleaning" << endl;	
+	    is_clean = 0;	  
+	    
 	  }
-	} // end loop on eles
+	} // end loop on eles		       
+
+	
 
 	if( !is_clean ) continue ;
 
@@ -1914,11 +1915,15 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
 	  }
 	  
 	} // end loop on FSR photons
-
-	//if( has_FSR_Z ) debug = 1;
-
+	
+	// if( has_FSR_Z ) output_txt  
+	// 			   << " Debug: RUN " << Run
+	// 			   << " EVENT " << Event
+	// 			   << " LumiSection " << LumiSection
+	// 			   << " massZ with FSR " << massZ << endl;
+	
 	if( debug && has_FSR_Z) {
-	  cout << " Z has FSR! " << endl;
+	  cout  << " Z has FSR! and mass " << massZ << endl;
 	  cout << " N_FSR_Z " << N_FSR_Z << endl;
 	  cout << " max_pt of photon FSR_Z " << max_pt_FSR_Z << endl;
 	  if( pi > -1 ) cout << " pi " << pi << " --> index photon: " << iLp[pi] << " associated lepton: " << iLp_l[pi] << " (= "<< iL[i]<<" ? ) tag: " << iLp_tagEM[pi] << endl;
@@ -2012,10 +2017,10 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
     vector<candidateZ> Zcandisolmassvector;
     Zcandisolmassvector.clear();
     
-    for (int index=0; index<Zcandisolvector.size();index++){
-      if (!(Zcandisolvector.at(index).massvalue > 12 && Zcandisolvector.at(index).massvalue < 120)) continue;
+    for (int index=0; index<Zcandvector.size();index++){
+      if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
       cout << "Z passing the 12 < mll < 120 cut with mass= " << Zcandvector.at(index).massvalue<< endl;
-      Zcandisolmassvector.push_back(Zcandisolvector.at(index));
+      Zcandisolmassvector.push_back(Zcandvector.at(index));
     };
     
     if (Zcandisolmassvector.size()<2) {
@@ -2424,7 +2429,7 @@ cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
   if (vindexZZ.size()==1){
     cout << "Just one Z1+Z2 pair" << endl;
     if (icleanedgoodZsv.at(vindexZZ.at(0)).at(0)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(1);
-    if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);;
+    if (icleanedgoodZsv.at(vindexZZ.at(0)).at(1)==indexZ1) indexZ2=icleanedgoodZsv.at(vindexZZ.at(0)).at(0);
   }
   else {
     cout << "more than one Z2 (couple to the same Z1), choose the one with the highest-pT Z2 leptons" << endl;
@@ -3006,7 +3011,7 @@ cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
   int n_bjets=0;
   int index_bjets[2]={-999,-999};
 
-  for (unsigned i=0; i < cSV_nb->size(); i++){
+  for (unsigned i=0; i < cSV_nb; i++){
     if (cSV_BTagJet_DISCR->at(i) > 0.8){ // 76x
       if(cSV_BTagJet_PT->at(i)>30. && fabs(cSV_BTagJet_ETA->at(i))<4.7 ) cout << "Found a bjet (pT>30 and |eta|<2.4) with pT= " << cSV_BTagJet_PT->at(i) << endl;
       n_bjets++;
@@ -3056,7 +3061,7 @@ cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
   int n_match_bjets=0;
   for(int i=0;i<RECO_PFJET_N;i++){
     if (jetfail[i]!=0) continue;
-    for (unsigned j=0; j < cSV_nb->size(); j++){
+    for (unsigned j=0; j < cSV_nb; j++){
       if (cSV_BTagJet_PT->at(j)==RECO_PFJET_PT->at(i) && cSV_BTagJet_DISCR->at(j)>0.8 && cSV_BTagJet_PT->at(j)>30. && fabs(cSV_BTagJet_ETA->at(j))<4.7) {
 	//if (cSV_BTagJet_DISCR->at(j)>0.814 && cSV_BTagJet_PT->at(j)>30. && fabs(cSV_BTagJet_ETA->at(j))<4.7) {
 	n_match_bjets++;
@@ -3074,14 +3079,15 @@ cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
 
   for(int j=0;j<RECO_PFJET_N;j++){
     if (jetfail[j]!=0) continue;
+    cout << "ptjet= " << RECO_PFJET_PT->at(j) << " eta= " << fabs(RECO_PFJET_ETA->at(j)) << endl;
     if(RECO_PFJET_PT->at(j)>40. && fabs(RECO_PFJET_ETA->at(j))<2.4){
-      //cout << "Possible jet for VH categories with pT= " << RECO_PFJET_PT->at(j) << endl;
+      cout << "Possible jet for VH categories with pT= " << RECO_PFJET_PT->at(j) << endl;
       for (int k=j+1;k<RECO_PFJET_N; k++){
 	if (jetfail[k]!=0) continue;
-	if(RECO_PFJET_PT->at(j)>40. && fabs(RECO_PFJET_ETA->at(j))<2.4){
-	 
+	cout << "Possible jet for VH categories with pT= " << RECO_PFJET_PT->at(k) << endl;
+	if(RECO_PFJET_PT->at(k)>40. && fabs(RECO_PFJET_ETA->at(k))<2.4){
 	  JET1_VH.SetPtEtaPhiE(RECO_PFJET_PT->at(j),RECO_PFJET_ETA->at(j),RECO_PFJET_PHI->at(j),RECO_PFJET_ET->at(j)*TMath::CosH(RECO_PFJET_ETA->at(j)));
-	  JET2_VH.SetPtEtaPhiE(RECO_PFJET_PT->at(k),RECO_PFJET_ETA->at(j),RECO_PFJET_PHI->at(k),RECO_PFJET_ET->at(k)*TMath::CosH(RECO_PFJET_ETA->at(k)));
+	  JET2_VH.SetPtEtaPhiE(RECO_PFJET_PT->at(k),RECO_PFJET_ETA->at(k),RECO_PFJET_PHI->at(k),RECO_PFJET_ET->at(k)*TMath::CosH(RECO_PFJET_ETA->at(k)));
 	  mJJ_VH=JET1_VH+JET2_VH;
 	  
 	  if (mJJ_VH.M()>60. && mJJ_VH.M()<120.) {
@@ -3096,6 +3102,7 @@ cout << "Checking mass j= " << Zcandisolmassvector.at(j).massvalue << endl;
       }
     }
   }
+  cout << "Number of jets for VH category " << n_jets_mjj_VH << endl;
 
  // Categorization
   int category=-999;

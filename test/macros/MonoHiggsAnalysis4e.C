@@ -1381,18 +1381,19 @@ void MonoHiggsAnalysis4e::Loop(Char_t *output)
 
         bool is_clean = 1;
 
-        // cleaning
-        for(int e = 0; e < N_loose_e; ++e){
-          if (fabs( RECOELE_SIP->at(iL_loose_e[e])>=4.)) continue;  // loose ID + SIP cut
-          double deltaPhi = DELTAPHI( RECOPFPHOT_PHI->at(i) , RECOELE_scl_Phi->at(iL_loose_e[e]) ) ;
-          double deltaEta = fabs( RECOPFPHOT_ETA->at(i) - RECOELE_scl_Eta->at(iL_loose_e[e]) );
-          double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI->at(i) , RECOELE_scl_Phi->at(iL_loose_e[e]) ),2) + pow(RECOPFPHOT_ETA->at(i) - RECOELE_scl_Eta->at(iL_loose_e[e]),2) );
-
-          if( ( fabs(deltaPhi) < 2 && fabs(deltaEta) < 0.05 ) || deltaR <= 0.15 ){
-            if( debug )cout << "Photon not passing the electron cleaning" << endl;
-            is_clean = 0;
-          }
-        } // end loop on eles
+	// cleaning
+	for(int e = 0; e < N_loose_e; ++e){
+	  if (fabs( RECOELE_SIP->at(iL_loose_e[e]))>=4.) continue; // loose ID + SIP cut
+	  double deltaPhi = DELTAPHI( RECOPFPHOT_PHI->at(i) , RECOELE_scl_Phi->at(iL_loose_e[e]) ) ;
+	  double deltaEta = fabs( RECOPFPHOT_ETA->at(i) - RECOELE_scl_Eta->at(iL_loose_e[e]) );
+	  double deltaR = sqrt( pow( DELTAPHI( RECOPFPHOT_PHI->at(i) , RECOELE_scl_Phi->at(iL_loose_e[e]) ),2) + pow(RECOPFPHOT_ETA->at(i) - RECOELE_scl_Eta->at(iL_loose_e[e]),2) );
+	  
+	  if( ( fabs(deltaPhi) < 2 && fabs(deltaEta) < 0.05 ) || deltaR <= 0.15 ){		  
+	    if( debug )cout << "Photon not passing the electron cleaning" << endl;	
+	    is_clean = 0;	  
+	    
+	  }
+	} // end loop on eles	       
 
         if( !is_clean ) continue ;
 
@@ -1885,6 +1886,7 @@ void MonoHiggsAnalysis4e::Loop(Char_t *output)
       
       for (int index=0; index<Zcandvector.size();index++){
 	if (!(Zcandvector.at(index).massvalue > 12 && Zcandvector.at(index).massvalue < 120)) continue;
+	cout << "Z passing the 12 < mll < 120 cut with mass= " << Zcandvector.at(index).massvalue<< endl;
 	Zcandisolmassvector.push_back(Zcandvector.at(index));
       };
       
@@ -3117,7 +3119,7 @@ void MonoHiggsAnalysis4e::Loop(Char_t *output)
     int n_bjets=0;
     int index_bjets[2]={-999,-999};
 
-    for (unsigned i=0; i < cSV_nb->size(); i++){
+    for (unsigned i=0; i < cSV_nb; i++){
       if (cSV_BTagJet_DISCR->at(i) > 0.8){ // 76x
 	
 	if(cSV_BTagJet_PT->at(i)>30. && fabs(cSV_BTagJet_ETA->at(i))<4.7 ) cout << "Found a bjet (pT>30 and |eta|<2.4) with pT= " << cSV_BTagJet_PT->at(i) << endl;
@@ -3171,7 +3173,7 @@ void MonoHiggsAnalysis4e::Loop(Char_t *output)
     int n_match_bjets=0;
     for(int i=0;i<RECO_PFJET_N;i++){
       if (jetfail[i]!=0) continue;
-      for (unsigned j=0; j < cSV_nb->size(); j++){
+      for (unsigned j=0; j < cSV_nb; j++){
 	if (cSV_BTagJet_PT->at(j)==RECO_PFJET_PT->at(i) && cSV_BTagJet_DISCR->at(j)>0.89 && cSV_BTagJet_PT->at(j)>30. && fabs(cSV_BTagJet_ETA->at(j))<4.7) {
 	  //if (cSV_BTagJet_DISCR->at(j)>0.89 && cSV_BTagJet_PT->at(j)>30. && fabs(cSV_BTagJet_ETA->at(j))<4.7) {
 	  n_match_bjets++;
@@ -3194,7 +3196,6 @@ void MonoHiggsAnalysis4e::Loop(Char_t *output)
 	for (int k=j+1;k<RECO_PFJET_N; k++){
 	  if (jetfail[k]!=0) continue;
 	  if(RECO_PFJET_PT->at(k)>40. && fabs(RECO_PFJET_ETA->at(k))<2.4){
-
 	    JET1_VH.SetPtEtaPhiE(RECO_PFJET_PT->at(j),RECO_PFJET_ETA->at(j),RECO_PFJET_PHI->at(j),RECO_PFJET_ET->at(j)*TMath::CosH(RECO_PFJET_ETA->at(j)));
 	    JET2_VH.SetPtEtaPhiE(RECO_PFJET_PT->at(k),RECO_PFJET_ETA->at(k),RECO_PFJET_PHI->at(k),RECO_PFJET_ET->at(k)*TMath::CosH(RECO_PFJET_ETA->at(k)));
 	    mJJ_VH=JET1_VH+JET2_VH;

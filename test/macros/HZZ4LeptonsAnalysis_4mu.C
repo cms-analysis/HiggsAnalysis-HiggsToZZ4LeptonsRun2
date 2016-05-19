@@ -945,7 +945,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
         
-      //if (!(Run==1 && LumiSection==1342 && Event==257626)) continue;
+      //if (!(Run==1 && LumiSection==2591 && Event==497247)) continue;
       
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;   
 
@@ -1796,7 +1796,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       int pj1 = -1;
       
       bool has_FSR_Z1 = 0;
-      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;;
+      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;
 
       for(int i = 0; i < N_good; ++i){
         for(int j = i + 1; j < N_good; ++j){
@@ -1887,7 +1887,11 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    }
 	  } // end loop on FSR photons
 	 	  
-	  //if( has_FSR_Z ) debug = 1;
+	  // if( has_FSR_Z ) output_txt 
+	  // 			     << " Debug: RUN " << Run
+	  // 			     << " EVENT " << Event
+	  // 			     << " LumiSection " << LumiSection
+	  // 			     << " massZ with FSR " << massZ << endl;
 	  
 	  if( debug && has_FSR_Z) {
 	    cout  << " Z has FSR! and mass " << massZ << endl;
@@ -3325,10 +3329,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      
      for(int j=0;j<RECO_PFJET_N;j++){
         if (jetfail[j]!=0) continue;
+	 cout << "ptjet= " << RECO_PFJET_PT[j] << " eta= " << fabs(RECO_PFJET_ETA[j]) << endl;
         if(RECO_PFJET_PT[j]>40. && fabs(RECO_PFJET_ETA[j])<2.4){
-	  //cout << "Possible jet for VH categories with pT= " << RECO_PFJET_PT[j] << endl;
+	 cout << "Possible jet for VH categories with pT= " << RECO_PFJET_PT[j] << endl;
 	 for (int k=j+1;k<RECO_PFJET_N; k++){
 	   if (jetfail[k]!=0) continue;
+	   cout << "Possible jet for VH categories with pT= " << RECO_PFJET_PT[k] << endl;
 	   if(RECO_PFJET_PT[k]>40. && fabs(RECO_PFJET_ETA[k])<2.4){	     
 	     JET1_VH.SetPtEtaPhiE(RECO_PFJET_PT[j],RECO_PFJET_ETA[j],RECO_PFJET_PHI[j],RECO_PFJET_ET[j]*TMath::CosH(RECO_PFJET_ETA[j]));
 	     JET2_VH.SetPtEtaPhiE(RECO_PFJET_PT[k],RECO_PFJET_ETA[k],RECO_PFJET_PHI[k],RECO_PFJET_ET[k]*TMath::CosH(RECO_PFJET_ETA[k]));
@@ -3346,7 +3352,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 }
 	}
      }	
-     
+
+     cout << "Number of jets for VH category " << n_jets_mjj_VH << endl;
+
      // Categorization
      int category=-999;
 

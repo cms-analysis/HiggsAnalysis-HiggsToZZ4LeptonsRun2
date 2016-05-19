@@ -1716,7 +1716,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       int pj1 = -1;
       
       bool has_FSR_Z1 = 0;
-      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;;
+      TLorentzVector Lepton1,Lepton2,DiLepton,LeptonCorrection;
 
       for(int i = 0; i < Ne_good; ++i){
         for(int j = i + 1; j < Ne_good; ++j){
