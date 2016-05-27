@@ -58,7 +58,7 @@ int main (int argc, char ** argv){
   // running on each signal and all bkg
   for(int i=0;i<signlines;i++){
 
-    string name= "roottree_leptons_"+sigsamples[i]+".root";
+    string name= "roottree_leptons_Fall15_"+sigsamples[i]+".root";
     TString dirInput;
     if (site.find("CERN")<5){
       if (mcconf.find("Fall11")<5) dirInput="/castor/cern.ch/user/n/ndefilip/Paper/MCFall11";    // to run at CERN
@@ -81,6 +81,9 @@ int main (int argc, char ** argv){
     }
     else if (mcconf.find("Phys14")<5){
        dirInput="/lustre/cms/store/user/defilip/MonoHiggs/Phys14_720_merged";  
+    }
+    else if (mcconf.find("Fall15")<5){
+       dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Signal_MonoHiggs_76X_merged";  
     }
 
     TString sigFile=name;
