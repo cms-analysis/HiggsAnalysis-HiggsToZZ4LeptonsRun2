@@ -856,7 +856,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    // Add branches to output rootuple 
    Float_t f_weight, f_int_weight, f_pu_weight, f_eff_weight, f_lept1_pt, f_lept1_eta, f_lept1_phi, f_lept1_charge, f_lept1_pfx, f_lept1_sip, f_lept1_mvaid, f_lept2_pt, f_lept2_eta, f_lept2_phi, f_lept2_charge, f_lept2_pfx, f_lept2_sip, f_lept2_mvaid, f_lept3_pt, f_lept3_eta, f_lept3_phi, f_lept3_charge, f_lept3_pfx, f_lept3_sip, f_lept3_mvaid, f_lept4_pt, f_lept4_eta, f_lept4_phi, f_lept4_charge, f_lept4_pfx, f_lept4_sip, f_lept4_mvaid, f_iso_max, f_sip_max, f_Z1mass, f_Z2mass, f_angle_costhetastar, f_angle_costheta1, f_angle_costheta2, f_angle_phi, f_angle_phistar1, f_eta4l, f_pt4l, f_mass4l, f_mass4lErr, f_njets_pass, f_deltajj, f_massjj, f_D_jet, f_jet1_pt, f_jet1_eta, f_jet1_phi, f_jet1_e, f_jet2_pt, f_jet2_eta, f_jet2_phi, f_jet2_e;
    Float_t f_D_bkg_kin,f_D_bkg,f_D_gg,f_D_g4,f_Djet_VAJHU; 
-
+   Float_t f_pfmet;
+ 
    Int_t f_run, f_lumi, f_event;
    
    TBranch *b_run= newtree->Branch("f_run", &f_run,"f_run/I");
@@ -921,7 +922,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    TBranch *b_D_gg= newtree->Branch("f_D_gg", &f_D_gg,"f_D_gg/F");
    TBranch *b_D_g4= newtree->Branch("f_D_g4", &f_D_g4,"f_D_g4/F");
    TBranch *b_Djet_VAJHU= newtree->Branch("f_Djet_VAJHU", &f_Djet_VAJHU,"f_Djet_VAJHU/F");
-
+   TBranch *b_pfmet= newtree->Branch("f_pfmet", &f_pfmet,"f_pfmet/F");
+    
    float newweight=1.;
    
    // New tree with clone of events passing the final selection
@@ -3734,7 +3736,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        f_D_jet =0.18*fabs(JET1new.Eta()-JET2new.Eta())+1.92E-4*mJJnew.M();
      }
        
-     
+     f_pfmet=RECO_PFMET;
 
      
      //MELA discriminant - Lepton kinematics already corrected for FSR
