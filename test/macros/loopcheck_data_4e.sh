@@ -27,6 +27,8 @@ SDESY="DESY";
 n=0;
 m=0;
 
+mkdir jobs4e;
+
 echo "Reading data_input_4e_$2_AN.txt file"
 
 cp data_input_4e_$2_AN.txt data_input.txt

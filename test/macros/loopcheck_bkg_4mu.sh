@@ -72,7 +72,7 @@ while [ $n -lt ${nlines} ]; do
       qsub submit_ReferenceAnalysis_bkg_${samplename}_4mu.sh   
   else
       echo "Submitting jobs via PBS"    
-      # qsub -q local submit_ReferenceAnalysis_bkg_${samplename}_4mu.sh
+      qsub -q local submit_ReferenceAnalysis_bkg_${samplename}_4mu.sh
   fi
   cd ..
 done 
