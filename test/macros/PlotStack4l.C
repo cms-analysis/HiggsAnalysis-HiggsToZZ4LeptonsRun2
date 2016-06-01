@@ -74,7 +74,7 @@ PlotStack4l::PlotStack4l(){
   //LoadLib.Load("/cmshome/nicola/slc6/MonoHiggs/Analysis13TeV/CMSSW_7_2_0/lib/slc6_amd64_gcc481/libHiggsHiggs_CS_and_Width.so");
   //getMassWindow(500.);
     
-  inputfile="filelist_4mu_2015_Spring15_25ns_AN_Bari.txt";
+  inputfile="filelist_4mu_2015_Fall15_25ns_AN_Bari.txt";
 
   setSamplesNames4l(); 
   cout << "\t Analysing samples for " << whichchannel << " analysis" << endl; 
@@ -124,12 +124,12 @@ PlotStack4l::PlotStack4l(){
   // After full selection
   //std::string histolabel = "hM4l_7"; // 4l mass after full selection but m4l > 70
 
-  //std::string histolabel = "hM4l_8"; // 4l mass after full selection
+  std::string histolabel = "hM4l_8"; // 4l mass after full selection
   //std::string histolabel = "hM4l_9"; // 4l mass after full selection
 
   //std::string histolabel = "hM4l_8_100_800"; // 4l mass in the range [100,800] after full selection
 
-  std::string histolabel = "hMZ1_8"; // Z1 mass after full selection
+  //std::string histolabel = "hMZ1_8"; // Z1 mass after full selection
   //std::string histolabel = "hMZ2_8"; // Z2 mass after full selection
 
   //std::string histolabel = "hMZ1_noFSR_8"; // Z1 mass after full selection without FSR recovery

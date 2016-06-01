@@ -71,7 +71,7 @@ int main (int argc, char ** argv){
     
     for(int i=0;i<ndata && itera==true;i++){
       
-      string name= "roottree_leptons_";
+      string name= "roottree_leptons_crab_";
       name.append(datasamples[i]);
       name.append(".root");
       TString dirInput;
@@ -89,16 +89,15 @@ int main (int argc, char ** argv){
         dirInput="dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/cmsdas/2014/HZZ4lExercise/data/2012";
       }
       else {
-        cout << name.find("Mu_") << " " << name.find("EG_") << " " << name.find("Electron_") << endl;
-        if ( name.find("Mu_")<18 || name.find("EG_")<18  || (name.find("Electron_")<18 && name.find("2010B")<85 ) ) {
-	  dirInput="/lustre/cms/store/user/ndefilip/Data2010_merged";	  
-	}
-	else if ( name.find("2011")<38 ) {
+	if ( name.find("2011")<38 ) {
 	  dirInput="/lustre/cms/store/user/defilip/Data2011_paper_step_analysis_merged";	
 	}
         else if ( name.find("2012A")<38 || name.find("2012B")<38 || name.find("2012C")<38 || name.find("2012D")<38 ){
 	  dirInput="/lustre/cms/store/user/defilip/Data2012_paper_step_analysis_merged";	  
 	}
+        else if ( name.find("2015")<100){
+          dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged";
+        }
       }
 
       cout << "Input directory is:" << dirInput<< endl;
