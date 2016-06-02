@@ -74,7 +74,7 @@ PlotStack4l::PlotStack4l(){
   //LoadLib.Load("/cmshome/nicola/slc6/MonoHiggs/Analysis13TeV/CMSSW_7_2_0/lib/slc6_amd64_gcc481/libHiggsHiggs_CS_and_Width.so");
   //getMassWindow(500.);
     
-  inputfile="filelist_4mu_2015_Fall15_25ns_AN_Bari.txt";
+  inputfile="filelist_4mu_2015_Fall15_AN_Bari.txt";
 
   setSamplesNames4l(); 
   cout << "\t Analysing samples for " << whichchannel << " analysis" << endl; 
@@ -122,9 +122,9 @@ PlotStack4l::PlotStack4l(){
 
 
   // After full selection
-  //std::string histolabel = "hM4l_7"; // 4l mass after full selection but m4l > 70
+  std::string histolabel = "hM4l_7"; // 4l mass after full selection but m4l > 70
 
-  std::string histolabel = "hM4l_8"; // 4l mass after full selection
+  //std::string histolabel = "hM4l_8"; // 4l mass after full selection
   //std::string histolabel = "hM4l_9"; // 4l mass after full selection
 
   //std::string histolabel = "hM4l_8_100_800"; // 4l mass in the range [100,800] after full selection
@@ -1905,49 +1905,31 @@ void PlotStack4l::setSamplesNames4l()
     
     // DATA  
     
-    //cout << inputfilename.find("_Mu_") << endl;
-    if(inputfilename.find("_Mu_")<53 && inputfilename.find("Run2010A")<85){
-      Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("Mu - 2010A");
-      Vxsectiondata.push_back(1.); //pb
-    }
-    
-    if(inputfilename.find("_Mu_")<53 && inputfilename.find("Run2010B")<85){
-      Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("Mu - 2010B");
-      Vxsectiondata.push_back(1.); //pb
-    }      
-    
+   
     if(inputfilename.find("_DoubleMuon_")<200){ // as many times as it occurs in the input file
       Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("DoubleMuon - 2015");
+      Vlabeldata.push_back("Double Muon - 2015");
       Vxsectiondata.push_back(1.); //pb
     }  
-    
-    if(inputfilename.find("_EG_")<53 && inputfilename.find("Run2010A")<85){
+             
+    if(inputfilename.find("_DoubleEG_")<200){ // as many times as it occurs in the input file
       Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("EG - 2010A");
+      Vlabeldata.push_back("Double EGamma - 2015");
       Vxsectiondata.push_back(1.); //pb
-    }
+    }   
     
-    if(inputfilename.find("_Electron_")<53 && inputfilename.find("Run2010B")<85){
+    if(inputfilename.find("_SingleElectron_")<200){ // as many times as it occurs in the input file
       Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("EG - 2010B");
+      Vlabeldata.push_back("Single Electron - 2015");
       Vxsectiondata.push_back(1.); //pb
-    }      
+    }    
     
-    if(inputfilename.find("_DoubleElectron_")<200){ // as many times as it occurs in the input file
+    if(inputfilename.find("_MuonEG_")<200){ // as many times as it occurs in the input file
       Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("DoubleElectron - 2011");
+      Vlabeldata.push_back("Muon EGamma - 2015");
       Vxsectiondata.push_back(1.); //pb
-    }      
-    
-    if((whichchannel=="2e2#mu" || whichchannel=="4l") && inputfilename.find("_MuEG_")<200){ // as many times as it occurs in the input file
-      Vdatasetnamedata.push_back(inputfilename);
-      Vlabeldata.push_back("MuEG - 2012");
-      Vxsectiondata.push_back(1.); //pb
-    }  
-
+    }    
+       
 
     //Z+X from data
     if(inputfilename.find("Z+X")<85){

@@ -53,7 +53,7 @@ int main (int argc, char ** argv){
     lumifb=19712./1000.;
     if (dataconf.find("2012_postICHEP")<15) lumifb=12200./1000.;
   }
-  if (mcconf.find("Phys14")<5) lumifb=300000./1000.;
+  if (mcconf.find("Fall15")<5) lumifb=2.8;
 
   // running on each signal and all bkg
   for(int i=0;i<signlines;i++){
