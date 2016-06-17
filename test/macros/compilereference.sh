@@ -8,7 +8,7 @@ melaincdir=${CMSSW_BASE}/src
 export LD_LIBRARY_PATH=${melalibdir}:$LD_LIBRARY_PATH
 
 if [ "$1" == "" ]; then
-    echo "Please provide arguments to the script: site configuration, data type and MC type"
+    echo "Please provide an arguments to the script: 4e, 4mu, 2e2mu or all"
     exit
 fi
 
