@@ -1,6 +1,6 @@
-//////////////////////////////////////////////////////////
+ //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri May 13 15:46:14 2016 by ROOT version 6.02/13
+// Wed May 18 13:01:53 2016 by ROOT version 6.02/13
 // from TTree HZZ4LeptonsAnalysis/HZZ4Leptons Analysis Tree
 // found on file: /localdata/Syncr13TeV/roottree_leptons_sync_Fall15_HiggsToZZ_76x_vector.root
 //////////////////////////////////////////////////////////
@@ -15,13 +15,13 @@
 #include <fstream>
 #include <TLorentzVector.h>
 
-using namespace std;
-
 // Header file for the classes stored in the TTree if any.
 #include "vector"
 #include "vector"
 #include "vector"
 #include "vector"
+
+using namespace std;
 
 class MonoHiggsAnalysis2e2mu {
 public :
@@ -58,7 +58,7 @@ public :
    vector<float>   *RECO_TRACK_DZ;
    vector<float>   *RECO_TRACK_DZERR;
    Float_t         MC_GENMET;
-   Char_t          HLTPathsFired[7];
+   Char_t          HLTPathsFired;
    Int_t           RECO_nMuHLTMatch;
    Int_t           RECO_nEleHLTMatch;
    vector<float>   *RECOMU_PT_MuHLTMatch;
@@ -118,15 +118,15 @@ public :
    vector<float>   *RECOMU_PFneuHad;
    vector<float>   *RECOMU_PFphoton;
    vector<float>   *RECOMU_PFPUchAllPart;
+   vector<float>   *RECOMU_PFX_dB;
+   vector<float>    RECOMU_PFX_dB_new;
+   vector<float>   *RECOMU_PFX_rho;
    vector<float>   *RECOMU_SIP;
    vector<float>   *RECOMU_IP;
    vector<float>   *RECOMU_IPERROR;
    vector<float>   *RECOMU_SIP_KF;
    vector<float>   *RECOMU_IP_KF;
    vector<float>   *RECOMU_IPERROR_KF;
-   vector<float>   *RECOMU_PFX_dB;
-   vector<float>    RECOMU_PFX_dB_new;
-   vector<float>   *RECOMU_PFX_rho;
    vector<float>   *RECOMU_STIP;
    vector<float>   *RECOMU_SLIP;
    vector<float>   *RECOMU_TIP;
@@ -223,7 +223,7 @@ public :
    vector<float>   *RECOELE_PFPUchAllPart;
    vector<float>   *RECOELE_PFX_dB;
    vector<float>   *RECOELE_PFX_rho;
-   vector<float>    RECOELE_PFX_rho_new;
+   vector<float>   RECOELE_PFX_rho_new;
    vector<float>   *RECOELE_SIP;
    vector<float>   *RECOELE_IP;
    vector<float>   *RECOELE_IPERROR;
@@ -321,17 +321,17 @@ public :
    Float_t         PFMet_pz;
    Float_t         PFMet_sumEt;
    Double_t        METSign;
-   vector<int>     *tCHighEff_nb;
+   Int_t           tCHighEff_nb;
    vector<float>   *tCHighEff_BTagJet_PT;
    vector<float>   *tCHighEff_BTagJet_ETA;
    vector<float>   *tCHighEff_BTagJet_PHI;
    vector<float>   *tCHighEff_BTagJet_DISCR;
-   vector<int>     *tCHighPur_nb;
+   Int_t           tCHighPur_nb;
    vector<float>   *tCHighPur_BTagJet_PT;
    vector<float>   *tCHighPur_BTagJet_ETA;
    vector<float>   *tCHighPur_BTagJet_PHI;
    vector<float>   *tCHighPur_BTagJet_DISCR;
-   vector<int>     *cSV_nb;
+   Int_t           cSV_nb;
    vector<float>   *cSV_BTagJet_PT;
    vector<float>   *cSV_BTagJet_ETA;
    vector<float>   *cSV_BTagJet_PHI;
@@ -425,7 +425,6 @@ public :
    vector<float>   *RECOHzzEEMM_MatchingMCPhi;
    Int_t           num_PU_vertices;
    Int_t           PU_BunchCrossing;
-   vector<float>   *Rho2;
    vector<float>   *MC_weighting;
    vector<double>  *StdFitVertexX;
    vector<double>  *StdFitVertexY;
@@ -533,18 +532,15 @@ public :
    vector<double>  *RECORF_4mu_phi1RF_spin;
    vector<double>  *RECORF_4mu_phi2RF_spin;
    vector<double>  *RECORF_4mu_MELA;
-   vector<double>  *MCRF_cosTheta1_spin;
-   vector<double>  *MCRF_cosTheta2_spin;
-   vector<double>  *MCRF_cosThetaStar_spin;
-   vector<double>  *MCRF_Phi_spin;
-   vector<double>  *MCRF_Phi1_spin;
-   vector<double>  *MCRF_Phi2_spin;
-   vector<double>  *MCRF_phi1RF_spin;
-   vector<double>  *MCRF_phi2RF_spin;
-   vector<double>  *MCRF_MELA;
    Double_t        BeamSpot_X;
    Double_t        BeamSpot_Y;
    Double_t        BeamSpot_Z;
+   vector<int>     *nbPv;
+   vector<int>     *Nbdof;
+   vector<float>   *PositionRho;
+   vector<float>   *PositionX;
+   vector<float>   *PositionY;
+   vector<float>   *PositionZ;
    Int_t           RECO_PFJET_N;
    vector<int>     *RECO_PFJET_CHARGE;
    vector<float>   *RECO_PFJET_ET;
@@ -644,14 +640,14 @@ public :
    TBranch        *b_RECOMU_PFneuHad;   //!
    TBranch        *b_RECOMU_PFphoton;   //!
    TBranch        *b_RECOMU_PFPUchAllPart;   //!
+   TBranch        *b_RECOMU_PFX_dB;   //!
+   TBranch        *b_RECOMU_PFX_rho;   //!
    TBranch        *b_RECOMU_SIP;   //!
    TBranch        *b_RECOMU_IP;   //!
    TBranch        *b_RECOMU_IPERROR;   //!
    TBranch        *b_RECOMU_SIP_KF;   //!
    TBranch        *b_RECOMU_IP_KF;   //!
    TBranch        *b_RECOMU_IPERROR_KF;   //!
-   TBranch        *b_RECOMU_PFX_dB;   //!
-   TBranch        *b_RECOMU_PFX_rho;   //!
    TBranch        *b_RECOMU_STIP;   //!
    TBranch        *b_RECOMU_SLIP;   //!
    TBranch        *b_RECOMU_TIP;   //!
@@ -949,7 +945,6 @@ public :
    TBranch        *b_RECOHzzEEMM_MatchingMCPhi;   //!
    TBranch        *b_num_PU_vertices;   //!
    TBranch        *b_PU_BunchCrossing;   //!
-   TBranch        *b_Rho2;   //!
    TBranch        *b_MC_weighting;   //!
    TBranch        *b_StdFitVertexX;   //!
    TBranch        *b_StdFitVertexY;   //!
@@ -1057,18 +1052,15 @@ public :
    TBranch        *b_RECORF_4mu_phi1RF_spin;   //!
    TBranch        *b_RECORF_4mu_phi2RF_spin;   //!
    TBranch        *b_RECORF_4mu_MELA;   //!
-   TBranch        *b_MCRF_cosTheta1_spin;   //!
-   TBranch        *b_MCRF_cosTheta2_spin;   //!
-   TBranch        *b_MCRF_cosThetaStar_spin;   //!
-   TBranch        *b_MCRF_Phi_spin;   //!
-   TBranch        *b_MCRF_Phi1_spin;   //!
-   TBranch        *b_MCRF_Phi2_spin;   //!
-   TBranch        *b_MCRF_phi1RF_spin;   //!
-   TBranch        *b_MCRF_phi2RF_spin;   //!
-   TBranch        *b_MCRF_MELA;   //!
    TBranch        *b_BeamSpot_X;   //!
    TBranch        *b_BeamSpot_Y;   //!
    TBranch        *b_BeamSpot_Z;   //!
+   TBranch        *b_nbPv;   //!
+   TBranch        *b_Nbdof;   //!
+   TBranch        *b_PositionRho;   //!
+   TBranch        *b_PositionX;   //!
+   TBranch        *b_PositionY;   //!
+   TBranch        *b_PositionZ;   //!
    TBranch        *b_RECO_PFJET_N;   //!
    TBranch        *b_RECO_PFJET_CHARGE;   //!
    TBranch        *b_RECO_PFJET_ET;   //!
@@ -1091,17 +1083,17 @@ public :
    virtual void     Loop(Char_t *name);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+
    ofstream output_txt; 
    ofstream bnn_file;
    double DELTAPHI( double phi1, double phi2 );
    double EAele(int ,bool );
    double masserror( std::vector<TLorentzVector> Lep, std::vector<double> pterr );
    void initpuweights2011();
-
+   
    double invmass (float M1, float PT1, float ETA1, float PHI1, float M2, float PT2, float ETA2, float PHI2 );
    void printmubnn(int i);
    void printelebnn(int i);
-   
 };
 
 #endif
@@ -1114,7 +1106,7 @@ MonoHiggsAnalysis2e2mu::MonoHiggsAnalysis2e2mu(TTree *tree,Double_t weight_, str
   weight = weight_;
   DATA_type = DATA_type_;
   MC_type = MC_type_;
-
+  
    if (tree == 0) {
       TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("roottree_leptons_sync_Fall15_HiggsToZZ_76x_vector.root");
       if (!f || !f->IsOpen()) {
@@ -1238,14 +1230,14 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    RECOMU_PFneuHad = 0;
    RECOMU_PFphoton = 0;
    RECOMU_PFPUchAllPart = 0;
+   RECOMU_PFX_dB = 0;
+   RECOMU_PFX_rho = 0;
    RECOMU_SIP = 0;
    RECOMU_IP = 0;
    RECOMU_IPERROR = 0;
    RECOMU_SIP_KF = 0;
    RECOMU_IP_KF = 0;
    RECOMU_IPERROR_KF = 0;
-   RECOMU_PFX_dB = 0;
-   RECOMU_PFX_rho = 0;
    RECOMU_STIP = 0;
    RECOMU_SLIP = 0;
    RECOMU_TIP = 0;
@@ -1427,17 +1419,14 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    RECOPHOT_MatchingMCpT = 0;
    RECOPHOT_MatchingMCEta = 0;
    RECOPHOT_MatchingMCPhi = 0;
-   tCHighEff_nb = 0;
    tCHighEff_BTagJet_PT = 0;
    tCHighEff_BTagJet_ETA = 0;
    tCHighEff_BTagJet_PHI = 0;
    tCHighEff_BTagJet_DISCR = 0;
-   tCHighPur_nb = 0;
    tCHighPur_BTagJet_PT = 0;
    tCHighPur_BTagJet_ETA = 0;
    tCHighPur_BTagJet_PHI = 0;
    tCHighPur_BTagJet_DISCR = 0;
-   cSV_nb = 0;
    cSV_BTagJet_PT = 0;
    cSV_BTagJet_ETA = 0;
    cSV_BTagJet_PHI = 0;
@@ -1529,7 +1518,6 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    RECOHzzEEMM_MatchingMCmass = 0;
    RECOHzzEEMM_MatchingMCEta = 0;
    RECOHzzEEMM_MatchingMCPhi = 0;
-   Rho2 = 0;
    MC_weighting = 0;
    StdFitVertexX = 0;
    StdFitVertexY = 0;
@@ -1637,15 +1625,12 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    RECORF_4mu_phi1RF_spin = 0;
    RECORF_4mu_phi2RF_spin = 0;
    RECORF_4mu_MELA = 0;
-   MCRF_cosTheta1_spin = 0;
-   MCRF_cosTheta2_spin = 0;
-   MCRF_cosThetaStar_spin = 0;
-   MCRF_Phi_spin = 0;
-   MCRF_Phi1_spin = 0;
-   MCRF_Phi2_spin = 0;
-   MCRF_phi1RF_spin = 0;
-   MCRF_phi2RF_spin = 0;
-   MCRF_MELA = 0;
+   nbPv = 0;
+   Nbdof = 0;
+   PositionRho = 0;
+   PositionX = 0;
+   PositionY = 0;
+   PositionZ = 0;
    RECO_PFJET_CHARGE = 0;
    RECO_PFJET_ET = 0;
    RECO_PFJET_PT = 0;
@@ -1686,7 +1671,7 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    fChain->SetBranchAddress("RECO_TRACK_DZ", &RECO_TRACK_DZ, &b_RECO_TRACK_DZ);
    fChain->SetBranchAddress("RECO_TRACK_DZERR", &RECO_TRACK_DZERR, &b_RECO_TRACK_DZERR);
    fChain->SetBranchAddress("MC_GENMET", &MC_GENMET, &b_MC_GENMET);
-   fChain->SetBranchAddress("HLTPathsFired", HLTPathsFired, &b_HLTPathsFired);
+   fChain->SetBranchAddress("HLTPathsFired", &HLTPathsFired, &b_HLTPathsFired);
    fChain->SetBranchAddress("RECO_nMuHLTMatch", &RECO_nMuHLTMatch, &b_RECO_nMuHLTMatch);
    fChain->SetBranchAddress("RECO_nEleHLTMatch", &RECO_nEleHLTMatch, &b_RECO_nEleHLTMatch);
    fChain->SetBranchAddress("RECOMU_PT_MuHLTMatch", &RECOMU_PT_MuHLTMatch, &b_RECOMU_PT_MuHLTMatch);
@@ -1746,14 +1731,14 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    fChain->SetBranchAddress("RECOMU_PFneuHad", &RECOMU_PFneuHad, &b_RECOMU_PFneuHad);
    fChain->SetBranchAddress("RECOMU_PFphoton", &RECOMU_PFphoton, &b_RECOMU_PFphoton);
    fChain->SetBranchAddress("RECOMU_PFPUchAllPart", &RECOMU_PFPUchAllPart, &b_RECOMU_PFPUchAllPart);
+   fChain->SetBranchAddress("RECOMU_PFX_dB", &RECOMU_PFX_dB, &b_RECOMU_PFX_dB);
+   fChain->SetBranchAddress("RECOMU_PFX_rho", &RECOMU_PFX_rho, &b_RECOMU_PFX_rho);
    fChain->SetBranchAddress("RECOMU_SIP", &RECOMU_SIP, &b_RECOMU_SIP);
    fChain->SetBranchAddress("RECOMU_IP", &RECOMU_IP, &b_RECOMU_IP);
    fChain->SetBranchAddress("RECOMU_IPERROR", &RECOMU_IPERROR, &b_RECOMU_IPERROR);
    fChain->SetBranchAddress("RECOMU_SIP_KF", &RECOMU_SIP_KF, &b_RECOMU_SIP_KF);
    fChain->SetBranchAddress("RECOMU_IP_KF", &RECOMU_IP_KF, &b_RECOMU_IP_KF);
    fChain->SetBranchAddress("RECOMU_IPERROR_KF", &RECOMU_IPERROR_KF, &b_RECOMU_IPERROR_KF);
-   fChain->SetBranchAddress("RECOMU_PFX_dB", &RECOMU_PFX_dB, &b_RECOMU_PFX_dB);
-   fChain->SetBranchAddress("RECOMU_PFX_rho", &RECOMU_PFX_rho, &b_RECOMU_PFX_rho);
    fChain->SetBranchAddress("RECOMU_STIP", &RECOMU_STIP, &b_RECOMU_STIP);
    fChain->SetBranchAddress("RECOMU_SLIP", &RECOMU_SLIP, &b_RECOMU_SLIP);
    fChain->SetBranchAddress("RECOMU_TIP", &RECOMU_TIP, &b_RECOMU_TIP);
@@ -2051,7 +2036,6 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    fChain->SetBranchAddress("RECOHzzEEMM_MatchingMCPhi", &RECOHzzEEMM_MatchingMCPhi, &b_RECOHzzEEMM_MatchingMCPhi);
    fChain->SetBranchAddress("num_PU_vertices", &num_PU_vertices, &b_num_PU_vertices);
    fChain->SetBranchAddress("PU_BunchCrossing", &PU_BunchCrossing, &b_PU_BunchCrossing);
-   fChain->SetBranchAddress("Rho2", &Rho2, &b_Rho2);
    fChain->SetBranchAddress("MC_weighting", &MC_weighting, &b_MC_weighting);
    fChain->SetBranchAddress("StdFitVertexX", &StdFitVertexX, &b_StdFitVertexX);
    fChain->SetBranchAddress("StdFitVertexY", &StdFitVertexY, &b_StdFitVertexY);
@@ -2159,18 +2143,15 @@ void MonoHiggsAnalysis2e2mu::Init(TTree *tree)
    fChain->SetBranchAddress("RECORF_4mu_phi1RF_spin", &RECORF_4mu_phi1RF_spin, &b_RECORF_4mu_phi1RF_spin);
    fChain->SetBranchAddress("RECORF_4mu_phi2RF_spin", &RECORF_4mu_phi2RF_spin, &b_RECORF_4mu_phi2RF_spin);
    fChain->SetBranchAddress("RECORF_4mu_MELA", &RECORF_4mu_MELA, &b_RECORF_4mu_MELA);
-   fChain->SetBranchAddress("MCRF_cosTheta1_spin", &MCRF_cosTheta1_spin, &b_MCRF_cosTheta1_spin);
-   fChain->SetBranchAddress("MCRF_cosTheta2_spin", &MCRF_cosTheta2_spin, &b_MCRF_cosTheta2_spin);
-   fChain->SetBranchAddress("MCRF_cosThetaStar_spin", &MCRF_cosThetaStar_spin, &b_MCRF_cosThetaStar_spin);
-   fChain->SetBranchAddress("MCRF_Phi_spin", &MCRF_Phi_spin, &b_MCRF_Phi_spin);
-   fChain->SetBranchAddress("MCRF_Phi1_spin", &MCRF_Phi1_spin, &b_MCRF_Phi1_spin);
-   fChain->SetBranchAddress("MCRF_Phi2_spin", &MCRF_Phi2_spin, &b_MCRF_Phi2_spin);
-   fChain->SetBranchAddress("MCRF_phi1RF_spin", &MCRF_phi1RF_spin, &b_MCRF_phi1RF_spin);
-   fChain->SetBranchAddress("MCRF_phi2RF_spin", &MCRF_phi2RF_spin, &b_MCRF_phi2RF_spin);
-   fChain->SetBranchAddress("MCRF_MELA", &MCRF_MELA, &b_MCRF_MELA);
    fChain->SetBranchAddress("BeamSpot_X", &BeamSpot_X, &b_BeamSpot_X);
    fChain->SetBranchAddress("BeamSpot_Y", &BeamSpot_Y, &b_BeamSpot_Y);
    fChain->SetBranchAddress("BeamSpot_Z", &BeamSpot_Z, &b_BeamSpot_Z);
+   fChain->SetBranchAddress("nbPv", &nbPv, &b_nbPv);
+   fChain->SetBranchAddress("Nbdof", &Nbdof, &b_Nbdof);
+   fChain->SetBranchAddress("PositionRho", &PositionRho, &b_PositionRho);
+   fChain->SetBranchAddress("PositionX", &PositionX, &b_PositionX);
+   fChain->SetBranchAddress("PositionY", &PositionY, &b_PositionY);
+   fChain->SetBranchAddress("PositionZ", &PositionZ, &b_PositionZ);
    fChain->SetBranchAddress("RECO_PFJET_N", &RECO_PFJET_N, &b_RECO_PFJET_N);
    fChain->SetBranchAddress("RECO_PFJET_CHARGE", &RECO_PFJET_CHARGE, &b_RECO_PFJET_CHARGE);
    fChain->SetBranchAddress("RECO_PFJET_ET", &RECO_PFJET_ET, &b_RECO_PFJET_ET);
@@ -2223,4 +2204,4 @@ Int_t MonoHiggsAnalysis2e2mu::Cut(Long64_t entry)
 /*     //              << RECOELE_scl_Eta[i] << " " */
 /*     << RECOELE_mvaNonTrigV0->at(i) << " "; */
 /* } */
-#endif // #ifdef MonoHiggsAnalysis4mu_cxx
+#endif // #ifdef MonoHiggsAnalysis2e2mu_cxx
