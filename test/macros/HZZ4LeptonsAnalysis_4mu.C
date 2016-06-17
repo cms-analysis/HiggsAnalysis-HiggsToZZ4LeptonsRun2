@@ -948,7 +948,9 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       nb = fChain->GetEntry(jentry);   nbytes += nb;
         
       //if (!(Run==1 && LumiSection==2591 && Event==497247)) continue;
-      
+      if (Run==LumiSection && Run==Event) continue;   
+      //if (jentry!=1276102) continue;
+
       if(jentry%1 == 5000) cout << "Analyzing entry: " << jentry << endl;   
 
       if( RECO_NMU > 100 ) RECO_NMU = 100;
@@ -972,12 +974,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       
       hPUvertices_ReWeighted->Fill(num_PU_vertices,weight*pu_weight);
       cout << "Pileup interations and weight is= " << num_PU_vertices << " " << " and weight= " << pu_weight << endl;  
-      
+
+      if (num_PU_vertices < 0) continue;
+
       // Changing the weight for pileup
       newweight=weight*pu_weight;
       cout << "Starting weight + pileup = " << newweight << endl;
             
-      // Weight for MCNLO samples                                                                                                                                     
+      // Weight for MCNLO samples  
+
       if( datasetName.Contains("amcatnlo")) {
         cout << "Reweighting sample of amcatnlo with weight= " << MC_weighting << endl;
         newweight=weight*pu_weight*MC_weighting;

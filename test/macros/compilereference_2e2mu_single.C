@@ -38,8 +38,8 @@ int main(int argc, char ** argv){
     sprintf(nome,"dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/cmsdas/2013/HZZ4lExercise/sig/roottree_leptons_GluGluToHToZZTo4L_M-1000_8TeV-powheg-pythia6.root");
   }
   else {
+    sprintf(nome,"/localdata/Syncr13TeV/roottree_leptons_sync_Fall15_HiggsToZZ_76x.root");
     //sprintf(nome,"roottree_leptons.root");
-    sprintf(nome,"/localdata/Syncr13TeV/roottree_leptons_sync_Spring15_HiggsToZZ_74Xv2.root");
   }
 
 

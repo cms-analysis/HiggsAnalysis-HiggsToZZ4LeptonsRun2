@@ -90,7 +90,7 @@ int main (int argc, char ** argv){
       }
       else {
         if ( name.find("2015")<100){
-          dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged";
+          dirInput="/lustreold/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged";
         }
       }
 

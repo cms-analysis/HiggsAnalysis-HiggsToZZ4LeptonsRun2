@@ -48,13 +48,8 @@ int main (int argc, char ** argv){
 
   float lumifb=0.;
 
-  if (mcconf.find("Fall11")<5) lumifb=5051./1000.;
-  if (mcconf.find("Summer12")<5){
-    lumifb=19712./1000.;
-    if (dataconf.find("2012_postICHEP")<15) lumifb=12200./1000.;
-  }
-  if (mcconf.find("Phys14")<5) lumifb=300000./1000.;
   if (mcconf.find("Fall15")<5) lumifb=2.8;
+
 
   // running on each signal and all bkg
   for(int i=0;i<signlines;i++){
@@ -84,7 +79,11 @@ int main (int argc, char ** argv){
        dirInput="/lustre/cms/store/user/defilip/MonoHiggs/Phys14_720_merged";  
     }
     else if (mcconf.find("Fall15")<5){
-       dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Signal_MonoHiggs_76X_merged";  
+       dirInput="/lustreold/cms/store/user/gminiell/MonoHiggs/Signal_MonoHiggs_76X_merged";  
+    }
+
+    if (mcconf.find("Fall15")<5 && name.find("private")<100 ){
+       dirInput="/lustre/cms/store/user/defilip/MonoHiggs/Signal_MonoHiggs_76X_merged";  
     }
 
     TString sigFile=name;
@@ -113,15 +112,6 @@ int main (int argc, char ** argv){
     
     
     float weight= lumifb*(sigxsection[i]*1000.*signskim[i]/signinput[i])/signskim[i];
-
-    // filter eff for ttH, WH and ZH
-    if ( mcconf.find("Summer12")<5 && sigFile.Contains("TTbarH")) weight=weight*0.029658;
-    if ( mcconf.find("Summer12")<5 && sigFile.Contains("ZH")) weight=weight*0.028544;
-    if ( mcconf.find("Summer12")<5 && sigFile.Contains("WH")) weight=weight*0.010384;
-    if ( mcconf.find("Fall11")<5 && sigFile.Contains("TTbarH")) weight=weight*0.029902;
-    if ( mcconf.find("Fall11")<5 && sigFile.Contains("ZH")) weight=weight*0.028698;
-    if ( mcconf.find("Fall11")<5 && sigFile.Contains("WH")) weight=weight*0.010056;
-    
 
     cout << "mH= " << mH << " weight= " << weight << endl;
 

@@ -970,6 +970,8 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
      hPUvertices_ReWeighted->Fill(num_PU_vertices,weight*pu_weight);
      cout << "Pileup interations and weight is= " << num_PU_vertices << " " << " and weight= " << pu_weight << endl;  
      
+      if (num_PU_vertices < 0) continue;
+
      // Changing the weight for pileup
      newweight=weight*pu_weight;
      cout << "Starting weight + pileup = " << newweight << endl;

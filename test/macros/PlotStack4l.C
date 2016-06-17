@@ -149,13 +149,13 @@ PlotStack4l::PlotStack4l(){
 
   //std::string histolabel = "hPFMET_8"; // PFMET
  
-  useLogY = true;
+  useLogY = false;
   useLogX = false;
 
   useDYJets=true;
   useDYJetsFromData=false;
   
-  nRebin=1;
+  nRebin=4;
   std::cout << "Histogram label is= " << histolabel << std::endl;
   
   // Final yields
@@ -310,8 +310,8 @@ void PlotStack4l::plotm4l(std::string histlabel){
 
   if (histlabel.find("hM4l_7")<10 && 
       (whichchannel.find("4e")<20 || whichchannel.find("4#mu")<20 || whichchannel.find("2e2#mu")<20)){
-    hframe= new TH2F("hframe","hframe",80,70.,182.,500,0.004,350.);// 4l analysis mass nrebin=3 GeV
-    hframe2= new TH2F("hframe2","hframe2",6000, 70., 182., 1000, 0.5, 2.);// 
+    hframe= new TH2F("hframe","hframe",80,70.,180.,500,0.004,12.);// 4l analysis mass nrebin=3 GeV
+    hframe2= new TH2F("hframe2","hframe2",6000, 70., 180., 1000, 0.5, 2.);// 
   }
   if (histlabel.find("hM4l_7")<10 && whichchannel.find("4l")<20){
     hframe= new TH2F("hframe","hframe",80,70.,182.,500,0.004,350.);// 4l analysis mass nrebin=3

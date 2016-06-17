@@ -1,6 +1,6 @@
 #if !defined(__CINT__) || defined(__MAKECINT__)
 
-#include "HZZ4LeptonsAnalysis_4mu.h"
+#include "MonoHiggsAnalysis4mu.h"
 #include <TTree.h>
 #include <TFile.h>
 #include <TString.h>
@@ -37,8 +37,9 @@ int main(int argc, char ** argv){
     sprintf(nome,"dcap://cmsgridftp.fnal.gov:24125/pnfs/fnal.gov/usr/cms/WAX/11/store/user/cmsdas/2013/HZZ4lExercise/sig/roottree_leptons_GluGluToHToZZTo4L_M-1000_8TeV-powheg-pythia6.root");
   }
   else {
-    sprintf(nome,"/localdata/Syncr13TeV/roottree_leptons_sync_Fall15_HiggsToZZ_76x.root");
-    //sprintf(nome,"roottree_leptons.root");
+    // sprintf(nome,"/lustre/cms/store/user/defilip/MonoHiggs/Spring15_25ns_merged/roottree_leptons_MZP1000_MA0300.root");
+    //sprintf(nome,"roottree_leptons_vector.root");
+    sprintf(nome,"/localdata/Syncr13TeV/roottree_leptons_sync_Fall15_HiggsToZZ_76x_vector.root");
   }
 
 
@@ -54,10 +55,11 @@ int main(int argc, char ** argv){
 
   cout << "Read file with name: " << nome << endl;
   TTree *tree3 = (TTree*)file3->Get("HZZ4LeptonsAnalysis");
-  HZZ4LeptonsAnalysis make3(tree3,1.,dataconf,mcconf);
-  //HZZ4LeptonsAnalysis make3(tree3);
+  cout << "Tree has " << tree3->GetEntries() << endl;
+  MonoHiggsAnalysis4mu make3(tree3,1.,dataconf,mcconf);
+  //MonoHiggsAnalysis4mu make3(tree3);
 
-  sprintf(nome,"output_Fall15_Higgs.root");
+  sprintf(nome,"output_Fall15_Higgs_vector_4mu.root");
   make3.Loop(nome);
 
   cout << "Create file with name: " << nome << endl;
