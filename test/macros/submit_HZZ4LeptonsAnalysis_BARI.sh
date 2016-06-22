@@ -1,11 +1,9 @@
 #!/bin/bash
 
 
-mkdir -p $_CONDOR_SCRATCH_DIR/histodir
 mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/76X/jobdir
 mkdir -p /lustre/cms/store/user/defilip/MonoHiggs/76X/histodir
 
-workdir=${PWD}
 echo "Running HtoZZto4Leptons Analysis with executables RunHZZ4LeptonsAnalysis"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
@@ -25,8 +23,11 @@ export LD_LIBRARY_PATH=${melalibdir}:$LD_LIBRARY_PATH
 #export PATH=path:$PATH
 
 
-if [ -d "$_CONDOR_SCRATCH_DIR/" ]; then
-    workdir=`echo $_CONDOR_SCRATCH_DIR/`;
+if [ -d "$_CONDOR_SCRATCH_DIR" ]; then
+    workdir=`echo $_CONDOR_SCRATCH_DIR`;
+    cd ${workdir};
+else 
+    workdir=`echo $PWD`;
     cd ${workdir};
 fi
 
@@ -83,7 +84,7 @@ fi
 savedir=`echo /lustre/cms/store/user/defilip/MonoHiggs/76X/histodir`
 
 echo "Working dir is $workdir"
-echo "Executable dir is $exedir"
+#echo "Executable dir is $exedir"
 echo "Saving dir is $savedir"
 
 echo "Compiling the macros"
