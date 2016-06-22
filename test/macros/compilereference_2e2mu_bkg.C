@@ -98,7 +98,7 @@ int main (int argc, char ** argv){
           dirInput="/lustre/cms/store/user/defilip/Summer12_53X_paper_step_analysis_merged";
 	}
         else if (mcconf.find("Fall15")<5){
-	  dirInput="/lustreold/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged";  
+	  dirInput="/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged";  
 	}
 	
 
