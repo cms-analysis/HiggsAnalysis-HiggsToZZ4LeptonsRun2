@@ -32,9 +32,9 @@ while [ $n -lt ${nlines} ]; do
   (( n = n + 1 ))
   (( m = ${nlines} - n ))
   echo $n $m
-  mkdir -p  DataCards$4$3
-  rm -f DataCards$4$3/data_input_${n}.txt
-  cat data_input.txt | head -1 > DataCards$4$3/data_input_${n}.txt
+  mkdir -p  DataCards$4$2
+  rm -f DataCards$4$2/data_input_${n}.txt
+  cat data_input.txt | head -1 > DataCards$4$2/data_input_${n}.txt
   samplename=`cat DataCards$4$2/data_input_${n}.txt | awk '{print $1}'`
   echo $samplename
   cat data_input.txt | tail -n $m >  data_input_tmp.txt
@@ -49,7 +49,7 @@ while [ $n -lt ${nlines} ]; do
       cat submit_HZZ4LeptonsAnalysis_DESY.sh | sed "s?site?$1?g" | sed "s?mc?$3?g" |sed "s?year?$2?g" | sed "s?HZZ4LeptonsAnalysis?RunReferenceAnalysis?g" | sed "s?jobdir?jobs4mu?g" | sed "s?histodir?histos4mu?g" | sed "s?output?output_${samplename}?g" | sed "s?jobs/?jobs4mu/?g" | sed "s?RunReferenceAnalysis?RunReference4mu_data?g" | sed "s?data_input.txt?DataCards4mu$2/data_input_${n}.txt?g" | sed "s?_log?_${samplename}_4mu.log?g" > jobs4mu/submit_ReferenceAnalysis_${samplename}_4mu.sh
   elif  [ $1 = ${SBARI} ]; then
       cat submit_HZZ4LeptonsAnalysis_BARI.sh | sed "s?CMSSW_BASE_DIR?${CMSSW_BASE}?g" | sed "s?path?$PATH?g"  | sed "s?lib:?$LD_LIBRARY_PATH:?g" | sed "s?4mu?$4?g" | sed "s?mc?$3?g" |sed "s?year?$2?g" | sed "s?HZZ4LeptonsAnalysis?RunReferenceAnalysis_data?g" | sed "s?jobdir?jobs$4_25ns?g" | sed "s?histodir?histos$4_25ns?g" | sed "s?output?output_${samplename}?g" | sed "s?RunReferenceAnalysis?RunReference$4_data?g" | sed "s?data_input.txt?data_input_${n}.txt?g" | sed "s?_log?_${samplename}_$4.log?g" > jobs$4/submit_ReferenceAnalysis_data_${samplename}_$4.sh
-      cat condor_template.cfg  | sed "s?4mu?$4?g" | sed "s?submit_HZZ4LeptonsAnalysis_BARI?submit_ReferenceAnalysis_data_${samplename}_$4?g" | sed "s?RunReferenceAnalysis?RunReference$4_data?g" | sed "s?sig_input_h150.txt?DataCards$4$3/data_input_${n}.txt?g" | sed "s?mail?`whoami`?g" > jobs$4/condor_ReferenceAnalysis_data_${samplename}_$4.cfg      
+      cat condor_template.cfg  | sed "s?4mu?$4?g" | sed "s?submit_HZZ4LeptonsAnalysis_BARI?submit_ReferenceAnalysis_data_${samplename}_$4?g" | sed "s?RunReferenceAnalysis?RunReference$4_data?g" | sed "s?sig_input_h150.txt?DataCards$4$2/data_input_${n}.txt?g" | sed "s?mail?`whoami`?g" > jobs$4/condor_ReferenceAnalysis_data_${samplename}_$4.cfg      
   else
       cat submit_HZZ4LeptonsAnalysis.sh | sed "s?mc?$3?g" |sed "s?year?$2?g" | sed "s?HZZ4LeptonsAnalysis?RunReferenceAnalysis?g" | sed "s?jobdir?jobs4mu_25ns?g" | sed "s?histodir?histos4mu_25ns?g" | sed "s?output?output_${samplename}?g" | sed "s?RunReferenceAnalysis?RunReference4mu_data?g" | sed "s?data_input.txt?DataCards4mu$2/data_input_${n}.txt?g" | sed "s?_log?_${samplename}_4mu.log?g" > jobs4mu/submit_ReferenceAnalysis_${samplename}_4mu.sh
   fi
@@ -69,7 +69,7 @@ while [ $n -lt ${nlines} ]; do
       qsub submit_ReferenceAnalysis_${samplename}_4mu.sh   
   elif  [ $1 = ${SBARI} ]; then
       echo "Submitting jobs via CONDOR at BARI"
-      condor_submit -name ettore  condor_ReferenceAnalysis_data_${samplename}_$4.cfg
+      # condor_submit -name ettore  condor_ReferenceAnalysis_data_${samplename}_$4.cfg
   else
       echo "Submitting jobs4mu via PBS"    
       qsub -q local submit_ReferenceAnalysis_${samplename}_4mu.sh

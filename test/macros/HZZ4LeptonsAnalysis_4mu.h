@@ -1090,6 +1090,10 @@ public :
    double masserror( std::vector<TLorentzVector> Lep, std::vector<double> pterr );
    void printmubnn(int i);
    float RECOMU_PFX_dB_new[100],RECOELE_PFX_rho_new[100];
+   float kfactor_qqZZ_qcd_dPhi(float GENdPhiZZ, int finalState);
+   float kfactor_qqZZ_qcd_M(float GENmassZZ, int finalState);
+   float kfactor_qqZZ_qcd_Pt(float GENpTZZ, int finalState);
+   float kfactor_ggZZ(float GENmassZZ, int finalState);     
 };
 
 #endif
@@ -1718,3 +1722,4 @@ void HZZ4LeptonsAnalysis::printmubnn(int i){
 }
 
 #endif // #ifdef HZZ4LeptonsAnalysis_cxx
+
