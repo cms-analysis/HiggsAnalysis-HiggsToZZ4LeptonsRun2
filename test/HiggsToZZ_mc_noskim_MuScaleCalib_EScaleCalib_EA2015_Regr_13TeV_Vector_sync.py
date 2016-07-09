@@ -72,7 +72,7 @@ process.calibratedElectrons.correctionFile = cms.string("EgammaAnalysis/Electron
 process.calibratedElectrons.isSynchronization = cms.bool(True)
 
 process.hTozzTo4leptonsMCDumper.status = cms.vint32(22)
-
+process.genZ.status = cms.vint32(22)
 
 process.hTozzTo4leptonsHLTInfo.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 process.hTozzTo4leptonsRootTreePresel.use2011EA = cms.untracked.bool(False)
