@@ -1,4 +1,3 @@
-
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process('MonoHiggs')
@@ -19,7 +18,6 @@ process.load('Configuration/EventContent/EventContent_cff')
 
 
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-#process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_v12', '')
 process.GlobalTag = GlobalTag(process.GlobalTag, '76X_mcRun2_asymptotic_RunIIFall15DR76_v1', '')
 
 # Random generator
@@ -71,6 +69,8 @@ process.calibratedElectrons.isMC = cms.bool(True)
 process.calibratedElectrons.correctionFile = cms.string("EgammaAnalysis/ElectronTools/data/76X_16DecRereco_2015")
 process.calibratedElectrons.isSynchronization = cms.bool(True)
 
+process.hTozzTo4leptonsMCDumper.status=cms.vint32(25)
+process.hTozzTo4leptonsMCDumper.status = cms.vint32(22)
 
 process.hTozzTo4leptonsHLTInfo.TriggerResultsTag = cms.InputTag("TriggerResults","","HLT")
 process.hTozzTo4leptonsCommonRootTreePresel.use2011EA = cms.untracked.bool(False)
@@ -117,57 +117,64 @@ process.schedule = cms.Schedule( process.Path_BunchSpacingproducer,
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
 
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )
 readFiles = cms.untracked.vstring()
 secFiles = cms.untracked.vstring()
 readFiles = cms.untracked.vstring(
-'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_10.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_11.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_12.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_13.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_14.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_15.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_16.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_17.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_18.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_19.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_1.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_20.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_21.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_22.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_23.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_24.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_25.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_2.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_3.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_4.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_5.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_6.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_7.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_8.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_9.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_1.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_2.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_3.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_4.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_10.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_11.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_12.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_13.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_14.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_15.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_16.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_17.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_18.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_1.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_2.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_3.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_4.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_5.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_6.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_7.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_8.root',
-#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_9.root'
+#'file:run_4mu.root'
+#'file:run_4e.root',
+#'file:run_4mu_fsr.root'
+#'file:step2.root'
+'file:/lustre/cms/store/user/gminiell/MonoHiggs/jobsreco_MZP600_MA0300/reco_MZP600_MA0300_17001.root'
+)
+newreadFiles = cms.untracked.vstring(
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_10.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_11.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_12.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_13.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_14.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_15.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_16.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_17.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_18.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_19.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_1.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_20.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_21.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_22.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_23.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_24.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_25.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_2.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_3.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_4.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_5.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_6.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_7.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_8.root',
+#'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_201428/0000/pickevents_9.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_1.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_2.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_3.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x_v1/crab_pickEvents/160309_222700/0000/pickevents_4.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_10.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_11.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_12.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_13.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_14.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_15.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_16.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_17.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_18.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_1.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_2.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_3.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_4.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_5.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_6.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_7.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_8.root',
+'file:/lustre/cms/store/user/defilip/MonoHiggs/Syncr13TeV/Fall15/WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8_76x/crab_pickEvents/160309_222348/0000/pickevents_9.root'
   )
 
 
