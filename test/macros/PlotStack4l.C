@@ -74,7 +74,7 @@ PlotStack4l::PlotStack4l(){
   //LoadLib.Load("/cmshome/nicola/slc6/MonoHiggs/Analysis13TeV/CMSSW_7_2_0/lib/slc6_amd64_gcc481/libHiggsHiggs_CS_and_Width.so");
   //getMassWindow(500.);
     
-  inputfile="filelist_4mu_2015_Fall15_AN_Bari.txt";
+  inputfile="filelist_4e_2015_Fall15_AN_Bari.txt";
 
   setSamplesNames4l(); 
   cout << "\t Analysing samples for " << whichchannel << " analysis" << endl; 
@@ -1278,6 +1278,9 @@ void PlotStack4l::plotm4l(std::string histlabel){
   
   TH1F *hfourlepbestmass_4l_afterSel_new_monoH_MZP1700 = new TH1F("hfourlepbestmass_4l_afterSel_new_monoH_MZP1700", "hfourlepbestmass_4l_afterSel_new_monoH_MZP1700", Nbins, Xmin, Xmax);
 
+  TH1F *hfourlepbestmass_4l_afterSel_new_monoH_MZP2000 = new TH1F("hfourlepbestmass_4l_afterSel_new_monoH_MZP2000", "hfourlepbestmass_4l_afterSel_new_monoH_MZP2000", Nbins, Xmin, Xmax);
+
+  TH1F *hfourlepbestmass_4l_afterSel_new_monoH_MZP2500 = new TH1F("hfourlepbestmass_4l_afterSel_new_monoH_MZP2500", "hfourlepbestmass_4l_afterSel_new_monoH_MZP2500", Nbins, Xmin, Xmax);
 
 
   int* arraysizesig = new int[1];
@@ -1350,7 +1353,8 @@ void PlotStack4l::plotm4l(std::string histlabel){
     if(datasetnamesig.find("MZP1200")<200) hfourlepbestmass_4l_afterSel_new_monoH_MZP1200->Add(hfourlepbestmass_4l_afterSel_new_new);
     if(datasetnamesig.find("MZP1400")<200) hfourlepbestmass_4l_afterSel_new_monoH_MZP1400->Add(hfourlepbestmass_4l_afterSel_new_new);
     if(datasetnamesig.find("MZP1700")<200) hfourlepbestmass_4l_afterSel_new_monoH_MZP1700->Add(hfourlepbestmass_4l_afterSel_new_new);
-
+    if(datasetnamesig.find("MZP2000")<200) hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->Add(hfourlepbestmass_4l_afterSel_new_new);
+    if(datasetnamesig.find("MZP2500")<200) hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->Add(hfourlepbestmass_4l_afterSel_new_new);
     
     //cout << "Nbins=" << hfourlepbestmass_4l_afterSel_new_new->GetNbinsX() << endl;
     for (int nbins=1;nbins<=hfourlepbestmass_4l_afterSel_new_new->GetNbinsX(); nbins++){
@@ -1526,17 +1530,22 @@ void PlotStack4l::plotm4l(std::string histlabel){
   if (histlabel.find("hM4l_9")<10 ) 
     outputyields << "m_ZP1200 " << hfourlepbestmass_4l_afterSel_new_monoH_MZP1200->Integral(0,-1) << " +/- " << errorH125 << endl;  
   
-  
   cout << "Mono-Higgs Signal expected for MZP1400 GeV is " << hfourlepbestmass_4l_afterSel_new_monoH_MZP1400->Integral(0,-1) << " +/- " << errorH125 << endl;
   if (histlabel.find("hM4l_9")<10 ) 
     outputyields << "m_ZP1400 " << hfourlepbestmass_4l_afterSel_new_monoH_MZP1400->Integral(0,-1) << " +/- " << errorH125 << endl;  
   
   cout << "Mono-Higgs Signal expected for MZP1700 GeV is " << hfourlepbestmass_4l_afterSel_new_monoH_MZP1700->Integral(0,-1) << " +/- " << errorH125 << endl;
- if (histlabel.find("hM4l_9")<10 ) 
+  if (histlabel.find("hM4l_9")<10 ) 
     outputyields << "m_ZP1700 " << hfourlepbestmass_4l_afterSel_new_monoH_MZP1700->Integral(0,-1) << " +/- " << errorH125 << endl;  
 
-
-
+  cout << "Mono-Higgs Signal expected for MZP2000 GeV is " << hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->Integral(0,-1) << " +/- " << errorH125 << endl;
+  if (histlabel.find("hM4l_9")<10 )
+    outputyields << "m_ZP2000 " << hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->Integral(0,-1) << " +/- " << errorH125 << endl;
+ 
+  cout << "Mono-Higgs Signal expected for MZP2500 GeV is " << hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->Integral(0,-1) << " +/- " << errorH125 << endl;
+  if (histlabel.find("hM4l_9")<10 )
+    outputyields << "m_ZP2500 " << hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->Integral(0,-1) << " +/- " << errorH125 << endl;
+  
   
   hfourlepbestmass_4l_afterSel_new_signal350->SetLineColor(kOrange-3);
   hfourlepbestmass_4l_afterSel_new_signal200->SetLineColor(kOrange+7);
@@ -1620,6 +1629,14 @@ void PlotStack4l::plotm4l(std::string histlabel){
   hfourlepbestmass_4l_afterSel_new_monoH_MZP1700->SetMarkerColor(kCyan);
   hfourlepbestmass_4l_afterSel_new_monoH_MZP1700->SetLineColor(kCyan);
   
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->SetMarkerSize(0.95);
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->SetMarkerColor(kCyan);
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->SetLineColor(kCyan);
+
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->SetMarkerSize(0.95);
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->SetMarkerColor(kCyan);
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->SetLineColor(kCyan);
+
 
   htotal->Draw("hist same");
   //htotaldata->Draw("EPsame");
@@ -1675,7 +1692,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
     //htotal->Add(hfourlepbestmass_4l_afterSel_new_signal126);  // signal stacked on top of background
     //legend->AddEntry(hfourlepbestmass_4l_afterSel_new_signal126,"m_{H}=126 GeV","L");
     //htotal->Add(hfourlepbestmass_4l_afterSel_new_signal126);
-    cout << "Plotting 4l+MET" << endl;
+    //cout << "Plotting 4l+MET" << endl;
     //htotal->Add(hfourlepbestmass_4l_afterSel_new_monoH_DM1);
     //htotal->Add(hfourlepbestmass_4l_afterSel_new_monoH_DM10);
     //htotal->Add(hfourlepbestmass_4l_afterSel_new_monoH_DM100);
@@ -1700,6 +1717,8 @@ void PlotStack4l::plotm4l(std::string histlabel){
     legend->AddEntry(hfourlepbestmass_4l_afterSel_new_monoH_MZP1200,"m_{Z'}=1.2 TeV/c^{2}, m_{A_{0}}=300 GeV/c^{2}","L");
     legend->AddEntry(hfourlepbestmass_4l_afterSel_new_monoH_MZP1400,"m_{Z'}=1.4 TeV/c^{2}, m_{A_{0}}=300 GeV/c^{2}","L");
     legend->AddEntry(hfourlepbestmass_4l_afterSel_new_monoH_MZP1700,"m_{Z'}=1.7 TeV/c^{2}, m_{A_{0}}=300 GeV/c^{2}","L");
+    //legend->AddEntry(hfourlepbestmass_4l_afterSel_new_monoH_MZP2000,"m_{Z'}=2 TeV/c^{2}, m_{A_{0}}=300 GeV/c^{2}","L");
+    //legend->AddEntry(hfourlepbestmass_4l_afterSel_new_monoH_MZP2500,"m_{Z'}=2.5 TeV/c^{2}, m_{A_{0}}=300 GeV/c^{2}","L");       
     
   }
   else {
@@ -1850,11 +1869,19 @@ void PlotStack4l::plotm4l(std::string histlabel){
 
   // Write final histogram in a file 
   char htotalfinal[300];
-  sprintf(htotalfinal,"plots/htotalfinal_%s.root",histlabel.c_str());
+  sprintf(htotalfinal,"plots/htotalfinal_%s_%s.root",histlabel.c_str(),whichchannel.c_str());
   TFile *file1 = new TFile(htotalfinal, "RECREATE");
   file1->cd();
   htotalHisto->Write();
-  gr->Write();
+  htotaldata->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP600->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP800->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP1000->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP1200->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP1400->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP1700->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2000->Write();
+  hfourlepbestmass_4l_afterSel_new_monoH_MZP2500->Write();
   file1->Write();
   file1->Close();
 
