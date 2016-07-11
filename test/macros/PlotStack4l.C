@@ -1067,7 +1067,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
     else if (whichsample.find("13TeV")<200) sprintf(tempp,"%s/output_ZZTo4L_%s",histosdir.c_str(),whichsample.c_str());  
     //else if (whichsample.find("13TeV")<200) sprintf(tempp,"%s/output_ZZ_TuneCUETP8M1_%s",histosdir.c_str(),whichsample.c_str());    
     
-    if(datasetnamebkg.find(tempp) < 200) {
+    if(datasetnamebkg.find(tempp) < 500) {
       cout << "Stacking ZZ (ggZZ+qqZZ)" << endl;
       htotal->Add(hfourlepbestmass_4l_afterSel_new_ZZ);
       //htotal->Add(hfourlepbestmass_4l_afterSel_new_qqZZ); 
@@ -1848,6 +1848,15 @@ void PlotStack4l::plotm4l(std::string histlabel){
   c1->SaveAs(saveasrootratio.c_str()/*"plots/hfourlepbestmass_4l_afterSel_new_m4l.root"*/);
   
 
+  // Write final histogram in a file 
+  char htotalfinal[300];
+  sprintf(htotalfinal,"plots/htotalfinal_%s.root",histlabel.c_str());
+  TFile *file1 = new TFile(htotalfinal, "RECREATE");
+  file1->cd();
+  htotalHisto->Write();
+  gr->Write();
+  file1->Write();
+  file1->Close();
 
 }
 
@@ -1857,15 +1866,15 @@ void PlotStack4l::setSamplesNames4l()
   std::ifstream infile;
   infile.open(inputfile.c_str());
   
-  if (inputfile.find("2011")<100) { 
+  if (inputfile.find("2011")<500) { 
     whichenergy="7TeV";
     whichsample="7TeV";
   }
-  else if (inputfile.find("RunI")<100){
-    whichenergy="RunI";
+  else if (inputfile.find("RunI_")<500){
+    whichenergy="RunI_";
     whichsample="8TeV";
   }
-   else if (inputfile.find("25ns")<100){
+   else if (inputfile.find("2015")<500){
     whichenergy="13TeV";
     whichsample="13TeV";
   }

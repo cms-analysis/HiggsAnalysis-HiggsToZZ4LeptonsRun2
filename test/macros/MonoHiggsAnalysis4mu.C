@@ -5,6 +5,7 @@
 #include <TCanvas.h>
 #include <TLorentzVector.h>
 #include <TNtuple.h>
+#include <TSpline.h>
 #include <time.h>
 #include <TMath.h>
 #include <fstream>
@@ -324,8 +325,30 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
    TFile *ebe_corr2011= new TFile("ebeOverallCorrections.LegacyPaper.42x.root");
    TH2F *ebe_mu_reco42x= (TH2F*)gDirectory->Get("mu_reco42x");
    TH2F *ebe_mu_mc42x= (TH2F*)gDirectory->Get("mu_mc42x");
-
-// Book root file (for output):
+   
+   // kfactor_ggZZ(float GENmassZZ, int finalState)     
+   TString strSystTitle[9] ={
+     "Nominal",
+     "PDFScaleDn",
+     "PDFScaleUp",
+     "QCDScaleDn",
+     "QCDScaleUp",
+     "AsDn",
+     "AsUp",
+     "PDFReplicaDn",
+     "PDFReplicaUp"
+   };
+   
+   TFile* fin = TFile::Open("Kfactor_Collected_ggHZZ_2l2l_NNLO_NNPDF_NarrowWidth_13TeV.root");
+   // Open the files
+   TSpline3* ggZZ_kf[9]={NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL};
+   for(int f=0;f<9;f++){
+     ggZZ_kf[f] = (TSpline3*)fin->Get(Form("sp_kfactor_%s", strSystTitle[f].Data()));
+   }   
+   fin->Close();
+   
+   
+   // Book root file (for output):
    TFile * theFile = new TFile(output,"RECREATE");
 
    //TString Vars("Weight:Run:Event:LumiSection:massZ1:massZ2:mass4l:Iso_max:Sip_max:MELA:FSR");
@@ -976,13 +999,41 @@ void MonoHiggsAnalysis4mu::Loop(Char_t *output)
      newweight=weight*pu_weight;
      cout << "Starting weight + pileup = " << newweight << endl;
      
-     // Weight for MCNLO samples
-     if( datasetName.Contains("amcatnlo")) {      
+      // ggZZ kfactor
+      double ggzz_kf_wgt[9];
+      float  weight_kfactor=1.;
+      if( datasetName.Contains("GluGluHToZZ"))
+        for(int f=0;f<9;f++) ggzz_kf_wgt[f] = ggZZ_kf[f]->Eval(MC_MASS[0]); // Evaluate at the true m4l
+      else if ( datasetName.Contains("GluGluToZZ"))
+        for(int f=0;f<9;f++) ggzz_kf_wgt[f] = ggZZ_kf[f]->Eval(MC_ZZ_MASS[0][0]); // Evaluate at the true m4l
+      weight_kfactor=ggzz_kf_wgt[0]; // Using the nominal one
+      //weight_kfactor=2.3;
+      newweight=weight*pu_weight*weight_kfactor;
+      
+      // qqZZ kfactor
+      double qqzz_kf_wgt;
+      weight_kfactor=1.;
+      int finalState=-999;
+      if( datasetName.Contains("ZZTo4L_13TeV_powheg_pythia8") )  {
+        for (int l=0;l<4;l++){
+          if (MC_ZZ_MASS[l][0]>0. &&
+              fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][4]) && 
+              fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][5]) &&
+              fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][6])) finalState=1; // 4e, 4mu, 4tau
+          else finalState=2;
+          weight_kfactor=HZZ4LeptonsAnalysis::kfactor_qqZZ_qcd_M(MC_ZZ_MASS[l][0],finalState);
+          newweight=weight*pu_weight*weight_kfactor;
+        }
+      }
+
+      
+     // Weight for MCNLO samples  
+     if( datasetName.Contains("amcatnlo")) {
        cout << "Reweighting sample of amcatnlo with weight= " << MC_weighting->at(0) << endl;
-       newweight=weight*pu_weight*MC_weighting->at(0);
+       if (MC_weighting!=0) newweight=weight*pu_weight*weight_kfactor*MC_weighting->at(0);
      }
-     
-      float pFill[11];for(int pf=0;pf<11;pf++)pFill[11]=-999.;
+          
+     float pFill[11];for(int pf=0;pf<11;pf++)pFill[11]=-999.;
 
       // ** Step 0:
       // simply number of entries...
