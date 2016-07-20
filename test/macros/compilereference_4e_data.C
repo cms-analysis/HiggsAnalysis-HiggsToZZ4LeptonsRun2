@@ -90,7 +90,7 @@ int main (int argc, char ** argv){
       }
       else {
         if ( name.find("2015")<100){
-          dirInput="/lustreold/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged";
+          dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged";
         }
       }
 
@@ -105,25 +105,25 @@ int main (int argc, char ** argv){
       TFile *file3;
       TTree *tree3;
       
-      if (dataFile.Contains("SingleElectron_Run2015D-16Dec2015-v1")){
-        TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_1.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_1_1.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_2.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_2_1.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_3.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_3_1.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_3_2.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_4.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_4_1.root");
-        chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_4_2.root");
-        tree3 = chain;
-      }
-      else{
+      //if (dataFile.Contains("SingleElectron_Run2015D-16Dec2015-v1")){
+      //  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_1.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_1_1.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_2.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_2_1.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_3.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_3_1.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_3_2.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_4.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_4_1.root");
+      //  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Data2015_MonoHiggs_13TeV_76X_merged/roottree_leptons_crab_SingleElectron_Run2015D-16Dec2015-v1_part_4_2.root");
+      //  tree3 = chain;
+      //}
+      //{
 	file3 = TFile::Open(nome);
 	cout << "Read file with name: " << nome << endl;
 	tree3 = (TTree*)file3->Get("HZZ4LeptonsAnalysis");
-      }
+	//}
 
       HZZ4LeptonsAnalysis make3(tree3,1.,dataconf,mcconf);      
 

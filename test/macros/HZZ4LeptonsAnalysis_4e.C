@@ -76,7 +76,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 
 
    // isSignal DM
-   TString signal="Phys14_Higgs";
+   TString signal="MZP";
    Bool_t isSignal=false;
    isSignal=(datasetName.Contains(signal));
    cout << "isSignal= " << isSignal << endl;
@@ -883,6 +883,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    Float_t f_weight, f_int_weight, f_pu_weight, f_eff_weight, f_lept1_pt, f_lept1_eta, f_lept1_phi, f_lept1_charge, f_lept1_pfx, f_lept1_sip, f_lept1_mvaid, f_lept2_pt, f_lept2_eta, f_lept2_phi, f_lept2_charge, f_lept2_pfx, f_lept2_sip, f_lept2_mvaid, f_lept3_pt, f_lept3_eta, f_lept3_phi, f_lept3_charge, f_lept3_pfx, f_lept3_sip, f_lept3_mvaid, f_lept4_pt, f_lept4_eta, f_lept4_phi, f_lept4_charge, f_lept4_pfx, f_lept4_sip, f_lept4_mvaid, f_iso_max, f_sip_max, f_Z1mass, f_Z2mass, f_angle_costhetastar, f_angle_costheta1, f_angle_costheta2, f_angle_phi, f_angle_phistar1, f_eta4l, f_pt4l, f_mass4l, f_mass4lErr, f_njets_pass, f_deltajj, f_massjj, f_D_jet, f_jet1_pt, f_jet1_eta, f_jet1_phi, f_jet1_e, f_jet2_pt, f_jet2_eta, f_jet2_phi, f_jet2_e;
    Float_t f_D_bkg_kin,f_D_bkg,f_D_gg,f_D_g4,f_Djet_VAJHU; 
    Float_t f_pfmet;
+   Int_t f_lept1_pdgid,f_lept2_pdgid,f_lept3_pdgid,f_lept4_pdgid;
 
    Int_t f_run, f_lumi, f_event;
    
@@ -900,24 +901,28 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    TBranch *b_lept1_charge= newtree->Branch("f_lept1_charge", &f_lept1_charge,"f_lept1_charge/F");
    TBranch *b_lept1_pfx= newtree->Branch("f_lept1_pfx", &f_lept1_pfx,"f_lept1_pfx/F");
    TBranch *b_lept1_sip= newtree->Branch("f_lept1_sip", &f_lept1_sip,"f_lept1_sip/F");
+   TBranch *b_lept1_pdgid= newtree->Branch("f_lept1_pdgid", &f_lept1_pdgid,"f_lept1_pdgid/I");
    TBranch *b_lept2_pt= newtree->Branch("f_lept2_pt", &f_lept2_pt,"f_lept2_pt/F");
    TBranch *b_lept2_eta= newtree->Branch("f_lept2_eta", &f_lept2_eta,"f_lept2_eta/F");
    TBranch *b_lept2_phi= newtree->Branch("f_lept2_phi", &f_lept2_phi,"f_lept2_phi/F");
    TBranch *b_lept2_charge= newtree->Branch("f_lept2_charge", &f_lept2_charge,"f_lept2_charge/F");
    TBranch *b_lept2_pfx= newtree->Branch("f_lept2_pfx", &f_lept2_pfx,"f_lept2_pfx/F");
    TBranch *b_lept2_sip= newtree->Branch("f_lept2_sip", &f_lept2_sip,"f_lept2_sip/F");
+   TBranch *b_lept2_pdgid= newtree->Branch("f_lept2_pdgid", &f_lept2_pdgid,"f_lept2_pdgid/I");
    TBranch *b_lept3_pt= newtree->Branch("f_lept3_pt", &f_lept3_pt,"f_lept3_pt/F");
    TBranch *b_lept3_eta= newtree->Branch("f_lept3_eta", &f_lept3_eta,"f_lept3_eta/F");
    TBranch *b_lept3_phi= newtree->Branch("f_lept3_phi", &f_lept3_phi,"f_lept3_phi/F");
    TBranch *b_lept3_charge= newtree->Branch("f_lept3_charge", &f_lept3_charge,"f_lept3_charge/F");
    TBranch *b_lept3_pfx= newtree->Branch("f_lept3_pfx", &f_lept3_pfx,"f_lept3_pfx/F");
    TBranch *b_lept3_sip= newtree->Branch("f_lept3_sip", &f_lept3_sip,"f_lept3_sip/F");
+   TBranch *b_lept3_pdgid= newtree->Branch("f_lept3_pdgid", &f_lept3_pdgid,"f_lept3_pdgid/I");
    TBranch *b_lept4_pt= newtree->Branch("f_lept4_pt", &f_lept4_pt,"f_lept4_pt/F");
    TBranch *b_lept4_eta= newtree->Branch("f_lept4_eta", &f_lept4_eta,"f_lept4_eta/F");
    TBranch *b_lept4_phi= newtree->Branch("f_lept4_phi", &f_lept4_phi,"f_lept4_phi/F");
    TBranch *b_lept4_charge= newtree->Branch("f_lept4_charge", &f_lept4_charge,"f_lept4_charge/F");
    TBranch *b_lept4_pfx= newtree->Branch("f_lept4_pfx", &f_lept4_pfx,"f_lept4_pfx/F");
    TBranch *b_lept4_sip= newtree->Branch("f_lept4_sip", &f_lept4_sip,"f_lept4_sip/F");
+   TBranch *b_lept4_pdgid= newtree->Branch("f_lept4_pdgid", &f_lept4_pdgid,"f_lept4_pdgid/I");
    TBranch *b_iso_max= newtree->Branch("f_iso_max", &f_iso_max,"f_iso_max/F");
    TBranch *b_sip_max= newtree->Branch("f_sip_max", &f_sip_max,"f_sip_max/F");
    TBranch *b_Z1mass= newtree->Branch("f_Z1mass", &f_Z1mass,"f_Z1mass/F");
@@ -1012,30 +1017,38 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       // ggZZ kfactor
       double ggzz_kf_wgt[9];
       float  weight_kfactor=1.;
-      if( datasetName.Contains("GluGluHToZZ"))
-	for(int f=0;f<9;f++) ggzz_kf_wgt[f] = ggZZ_kf[f]->Eval(MC_MASS[0]); // Evaluate at the true m4l
-      else if ( datasetName.Contains("GluGluToZZ"))
-	for(int f=0;f<9;f++) ggzz_kf_wgt[f] = ggZZ_kf[f]->Eval(MC_ZZ_MASS[0][0]); // Evaluate at the true m4l
-      weight_kfactor=ggzz_kf_wgt[0]; // Using the nominal one
-      //weight_kfactor=2.3;
-      newweight=weight*pu_weight*weight_kfactor;
-      
+      if (DATA_type=="NO"){
+        if( datasetName.Contains("GluGluHToZZ")){
+          for(int f=0;f<9;f++) ggzz_kf_wgt[f] = ggZZ_kf[f]->Eval(MC_MASS[0]); // Evaluate at the true m4l                                                                              
+          weight_kfactor=ggzz_kf_wgt[0]; // Using the nominal one                                                                                                                   
+          newweight=weight*pu_weight*weight_kfactor;
+        }
+        else if ( datasetName.Contains("GluGluToZZ")){
+          for(int f=0;f<9;f++) ggzz_kf_wgt[f] = ggZZ_kf[f]->Eval(MC_ZZ_MASS[0][0]); // Evaluate at the true m4l                                                                         
+          weight_kfactor=ggzz_kf_wgt[0]; // Using the nominal one                                                                                                                   
+          newweight=weight*pu_weight*weight_kfactor;
+        }
+        //weight_kfactor=2.3;                                                                                                                                                          
+      }
+
       // qqZZ kfactor
       double qqzz_kf_wgt;
       weight_kfactor=1.;
       int finalState=-999;
-      if( datasetName.Contains("ZZTo4L_13TeV_powheg_pythia8") )  {	
-	for (int l=0;l<4;l++){
-	  if (MC_ZZ_MASS[l][0]>0. &&
-	      fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][4]) && 
-	      fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][5]) &&
-	      fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][6])) finalState=1; // 4e, 4mu, 4tau
-	  else finalState=2;
-	  weight_kfactor=HZZ4LeptonsAnalysis::kfactor_qqZZ_qcd_M(MC_ZZ_MASS[l][0],finalState);
-	  newweight=weight*pu_weight*weight_kfactor;
-	}	
+      if (DATA_type=="NO"){
+	if( datasetName.Contains("ZZTo4L_13TeV_powheg_pythia8") )  {	
+	  for (int l=0;l<4;l++){
+	    if (MC_ZZ_MASS[l][0]>0. &&
+		fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][4]) && 
+		fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][5]) &&
+		fabs(MC_ZZ_PDGID[l][3])==fabs(MC_ZZ_PDGID[l][6])) finalState=1; // 4e, 4mu, 4tau
+	    else finalState=2;
+	    weight_kfactor=HZZ4LeptonsAnalysis::kfactor_qqZZ_qcd_M(MC_ZZ_MASS[l][0],finalState);
+	    newweight=weight*pu_weight*weight_kfactor;
+	  }	
+	}
       }
-      
+
       // Weight for MCNLO samples                                                                                      
       if( datasetName.Contains("amcatnlo")) {
         cout << "Reweighting sample of amcatnlo with weight= " << MC_weighting << endl;
@@ -3532,19 +3545,27 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      if (RECOELE_CHARGE[indexleptonfinal[0]] == 1){
        L11PID=-11;
        L12PID=+11;
+       f_lept1_pdgid=-11;
+       f_lept2_pdgid=11;
      }
      else if (RECOELE_CHARGE[indexleptonfinal[0]] == -1){
        L11PID=11;
        L12PID=-11;
+       f_lept1_pdgid=11;
+       f_lept2_pdgid=-11;
      }
      else cout << "What the hell?!?!"<<endl;
      if (RECOELE_CHARGE[indexleptonfinal[2]] == 1){
        L21PID=-11;
        L22PID=11;
+       f_lept3_pdgid=-11;
+       f_lept4_pdgid=11;
      }
      else if (RECOELE_CHARGE[indexleptonfinal[2]] == -1){
        L21PID=11;
        L22PID=-11;
+       f_lept3_pdgid=11;
+       f_lept4_pdgid=-11;
      }
      else cout << "What the hell?!?!"<<endl;
      

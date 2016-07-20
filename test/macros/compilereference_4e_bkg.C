@@ -108,7 +108,8 @@ int main (int argc, char ** argv){
 	    bkgFile.Contains("WminusH_HToZZTo4L")  ||
 	    bkgFile.Contains("WplusH_HToZZTo4L") ||
 	    bkgFile.Contains("ZH_HToZZ_4L")  ||
-	    bkgFile.Contains("ttH_HToZZ_4L")  
+	    bkgFile.Contains("ttH_HToZZ_4L") ||
+	    bkgFile.Contains("ZZTo4L_13TeV_powheg")	  
 	    ){
 	  TString datasetName=bkgFile.ReplaceAll("_crab_","_");
 	  bkgFile=datasetName;
@@ -133,12 +134,6 @@ int main (int argc, char ** argv){
 	  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_3.root");
           tree3 = chain;
         }
-	else if (bkgFile.Contains("ZZTo4L_13TeV_powheg_pythia8")){
-	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
-	  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Fall15_25ns_LATEST_merged/roottree_leptons_crab_ZZTo4L_13TeV_powheg_pythia8.root");
-	  chain->Add("/lustre/cms/store/user/gminiell/MonoHiggs/Fall15_25ns_LATEST_merged/roottree_leptons_crab_ZZTo4L_13TeV_powheg_pythia8_1.root");
-	  tree3 = chain;
-	}
 	else if (bkgFile.Contains("TTTo2L2Nu_13TeV-powheg")){
 	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
 	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_TTTo2L2Nu_13TeV-powheg.root");
