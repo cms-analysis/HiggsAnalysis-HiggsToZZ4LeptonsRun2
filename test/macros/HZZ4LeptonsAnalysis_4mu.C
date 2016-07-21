@@ -2,7 +2,7 @@
 #include "HZZ4LeptonsAnalysis_4mu.h"
 #include <TH2.h>
 #include <TStyle.h>
-//#include <TCanvas.h>
+#include <TCanvas.h>
 #include <TLorentzVector.h>
 #include <TNtuple.h>
 #include <TSpline.h>
@@ -385,6 +385,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    int N_5 = 0;
    int N_6 = 0;
    int N_7 = 0;
+   int N_7_PFMET = 0;
    int N_8 = 0;
    int N_8_a = 0;
    int N_9 = 0;
@@ -397,6 +398,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    
    int N_9a_VBF = 0;
    int N_9b_VBF = 0;
+   int N_9_PFMET = 0;
    
    int N_VBF = 0;
 
@@ -420,6 +422,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    double N_5_w = 0;
    double N_6_w = 0;
    double N_7_w = 0;
+   double N_7_PFMET_w = 0;
    double N_8_w = 0;
    double N_8_a_w = 0;
    double N_9_w = 0;
@@ -432,13 +435,14 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    
    double N_9a_VBF_w = 0;
    double N_9b_VBF_w = 0;
-   
+   double N_9_PFMET_w = 0;
+
    double N_VBF_w = 0;
 
 
    // Book Histos ***
-   TH1D *nEvent_4l_w = new TH1D("nEvent_4l_w", "nEventComplete Weightd", 20, 0., 20.);
-   TH1D *nEvent_4l = new TH1D("nEvent_4l", "nEventComplete", 20, 0., 20.);
+   TH1D *nEvent_4l_w = new TH1D("nEvent_4l_w", "nEventComplete Weightd", 20, 0., 21.);
+   TH1D *nEvent_4l = new TH1D("nEvent_4l", "nEventComplete", 20, 0., 21.);
 
    TH1F *Gen_H_MASS              = new TH1F("Gen_H_MASS", "Gen_H_MASS",8000,0.,2000.);  
    TH1F *Gen_H_MASS_ReWeighted   = new TH1F("Gen_H_MASS_ReWeighted", "Gen_H_MASS_ReWeighted",8000,0.,2000.);  
@@ -450,12 +454,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    TH1F *hPUvertices_ReWeighted  = new TH1F("hPUvertices_ReWeighted", "hPUvertices_ReWeighted",70,0.,70.);  
 
    //step 3
-   TH1F * hMZ1_3 = new TH1F("hMZ1_3", "Mass of Z1 after selection step 3", 200 , -0.5 , 199.5 );
-   hMZ1_3->SetXTitle("mass_Z1  (GeV)");
-   TH1F * hPtZ1_3 = new TH1F("hPtZ1_3", "Pt of Z1 after selection step 3", 200 , -0.5 , 199.5 );
-   hPtZ1_3->SetXTitle("pt_Z1  (GeV)");
-   TH1F * hYZ1_3 = new TH1F("hYZ1_3", "Y of Z1 after selection step 3", 500 , -5. , 5.);
-   hYZ1_3->SetXTitle("Y_Z1");
+   TH1F * hMZ_3 = new TH1F("hMZ_3", "Mass of Z after selection step 3", 200 , -0.5 , 199.5 );
+   hMZ_3->SetXTitle("mass_Z  (GeV)");
+   TH1F * hPtZ_3 = new TH1F("hPtZ_3", "Pt of Z after selection step 3", 200 , -0.5 , 199.5 );
+   hPtZ_3->SetXTitle("pt_Z1  (GeV)");
+   TH1F * hYZ_3 = new TH1F("hYZ_3", "Y of Z after selection step 3", 500 , -5. , 5.);
+   hYZ_3->SetXTitle("Y_Z1");
    
    TH1F * hPtLep1_3 = new TH1F("hPtLep1_3", "Pt of Lep1 after selection step 3", 200 , -0.5 , 199.5 );
    hPtLep1_3->SetXTitle("pt_Lep1  (GeV)");
@@ -498,6 +502,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    hMjj_3->SetXTitle("Discriminant");
    
    TH1F * hPFMET_3 = new TH1F("hPFMET_3", "PF MET after selection step 3", 1000 , 0., 1000.);
+   hPFMET_3->SetXTitle("PF MET");
 
    //step 5
    TH1F * hM4l_5 = new TH1F("hM4l_5", "Mass of four leptons after selection step 5", 1200, 4.5,1204.5 );
@@ -662,7 +667,12 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    hSip_7->SetXTitle("Sip");
    TH1F * hIp_7 = new TH1F("hIp_7", "Ip maxima after selection step 7",  1000 , -20. , 40. );
    hIp_7->SetXTitle("Ip");
-   
+   TH1F * hPFMET_7 = new TH1F("hPFMET_7", "PF MET after selection step 7", 1000 , 0., 1000.);
+   hPFMET_7->SetXTitle("PF MET (GeV)"); 
+
+   TH1F * hDPHI_7 = new TH1F("DPHI_7", "polar angle between 4l and E_{T,miss}", 1000, 0., 5. );
+   hDPHI_7->SetXTitle("#DELTA#phi(4l,E_{T,miss})");
+
    //step 8
    TH1F * hM4l_8 = new TH1F("hM4l_8", "Mass of four leptons after selection step 8", 1200, 4.5, 1204.5 );
    hM4l_8->SetXTitle("4 lepton mass  (GeV)");
@@ -780,9 +790,28 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    hMZ2_8->SetXTitle("mass_Z2  (GeV)");
    
    TH1F * hPFMET_8 = new TH1F("hPFMET_8", "PF MET after selection step 8", 1000 , 0., 1000.);
+   hPFMET_8->SetXTitle("PF MET");
+
+   TH1F * hM4l_T_8 = new TH1F("hM4l_T_8", "Transverse Mass of four leptons after full selection + MET", 1200, 4.5, 1204.5 );
+   hM4l_T_8->SetXTitle("m_{T} + PF MET (GeV)");
+   
+   TH1F * hDPHI_8 = new TH1F("DPHI_8", "polar angle between 4l and E_{T,miss}", 1000, 0., 5. );
+   hDPHI_8->SetXTitle("#DELTA#phi(4l,E_{T,miss})");
+
 
    // Step 9 with PFMET cut
    
+   TH1F * hM4l_9 = new TH1F("hM4l_9", "Mass of four leptons after selection step 9", 1200, 4.5, 1204.5 );
+   hM4l_9->SetXTitle("4 lepton mass  (GeV)");
+    
+   TH1F * hPFMET_9 = new TH1F("hPFMET_9", "PF MET after selection step 9", 1000 , 0., 1000.);
+   hPFMET_9->SetXTitle("PF MET (GeV)");   
+   
+   TH1F * hM4l_T_9 = new TH1F("hM4l_T_9", "Transverse Mass of four leptons after full selection + MET", 1200, 4.5, 1204.5 );
+   hM4l_T_9->SetXTitle("m_{T} + PF MET (GeV)");
+   
+   TH1F * hDPHI_9 = new TH1F("DPHI_9", "polar angle between 4l and E_{T,miss}", 1000, 0., 5. );
+   hDPHI_9->SetXTitle("#DELTA#phi(4l,E_{T,miss})");
 
    //global histos (during step 2..)
    
@@ -1352,7 +1381,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	    && fabs(RECOELE_gsftrack_dxy[i]) < .5 
 	    && fabs(RECOELE_gsftrack_dz[i]) < 1. 
 	    ) {	  
-	  iL_loose_e[N_loose_e]=i;
+ 	  iL_loose_e[N_loose_e]=i;
 	  ++N_loose_e ;
 	  if( RECOELE_PFX_rho[i] > max_Iso_loose_e ) max_Iso_loose_e = RECOELE_PFX_rho[i] ;
 	  if( fabs( RECOELE_SIP[i] ) > max_Sip_loose_e ) max_Sip_loose_e = fabs( RECOELE_SIP[i] ) ;
@@ -2069,10 +2098,16 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       }
 
       cout << "Number of Z passing the isolation and the 12 << mll < 120 cut is= " << Zcandisolmassvector.size() << endl;
-      
+                
       ++N_3b ;  // fill counter
       N_3b_w=N_3b_w+newweight;
       
+      // MZ and PFMET
+      for (int index=0; index<Zcandisolmassvector.size();index++){
+	hMZ_3->Fill(Zcandisolmassvector.at(index).massvalue,newweight );
+      }
+      hPFMET_3->Fill(RECO_PFMET,newweight);
+
       /*
       // Execute Efficiency Reweighting
       int z1lept[2]={iL[i1],iL[j1]};
@@ -2279,8 +2314,6 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       }
       */
 
-      hPFMET_3->Fill(RECO_PFMET,newweight);
-      
       // **** Step 4:
        // a) 4 leptons
       // b) pair #2
@@ -3115,22 +3148,13 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 // 	}
 
 //       }
-
- 
-     // **** Step 8:
-     // mass4l > 100 
-
-     if( debug ) cout  << "\n Step 8: m4l > 100" 
-      		 << "\n mass4l " << mass4l
-		 << endl; 
-
-     if( mass4l <= 70.) continue ;     
-     ++N_8 ;  // fill counter     
-     N_8_w=N_8_w+newweight;
-     cout << " N_8_w= " << N_8_w << " " << newweight << endl;
-
-     hM4l_7->Fill( mass4l,newweight );
+      
+      ++N_7_PFMET;
+      N_7_PFMET_w=N_7_PFMET_w+newweight;
      
+    
+     hM4l_7->Fill( mass4l,newweight );
+     hPFMET_7->Fill(RECO_PFMET,newweight);
      hMZ1_7->Fill( massZ1,newweight );
      hPtZ1_7->Fill( ptZ1,newweight );
      hYZ1_7->Fill( Y_Z1,newweight );
@@ -3182,10 +3206,18 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      //hIp_7->Fill( Ip_max,newweight ) ;
      
 
-     if( mass4l <= 70.) continue; 
-     ++N_8_a;
-     N_8_a_w=N_8_a_w+newweight;
+     // **** Step 8:
+     // mass4l > 100 
      
+     //if( debug ) cout  << "\n Step 8: m4l > 100" 
+     //		 << "\n mass4l " << mass4l
+     //	 << endl; 
+     // if( mass4l <= 70.) continue ;     
+     
+     ++N_8 ;  // fill counter     
+     N_8_w=N_8_w+newweight;
+     cout << " N_8_w= " << N_8_w << " " << newweight << endl;
+          
      hM4l_8->Fill( mass4l,newweight );
      if (mass4l>=100. && mass4l<=800.) hM4l_8_100_800->Fill( mass4l,newweight );
      
@@ -3665,6 +3697,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      float Psig,Pbkg;
      float psPsig,psPbkg,psD,gravPsig,gravPbkg,gravD;     
      double pt4l=0.,eta4l=0.;
+
+     // 4l transverse mass + met
+     float DPHI = 0.;
+     DPHI = fabs(hP4.Phi()-RECO_PFMET_PHI);
+     if (DPHI>mPI) DPHI-=float(2*mPI); 
+     float m4l_T=sqrt(2*hP4.Pt()*RECO_PFMET*(1-cos(DPHI)));
+     hM4l_T_8->Fill(m4l_T,newweight);       
+     hDPHI_8->Fill(DPHI,newweight);
+
      cout << "Mass of Higgs passed to MELA= " << massofhiggs << endl;
 
      //if(massofhiggs>100. && massofhiggs<1000. && massofZ2>4.){
@@ -3781,6 +3822,8 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
 	 ++N_9PS;
 	 N_9PS_w=N_9PS_w+newweight;
        }
+      
+
      }
      else {
        cout<<endl;
@@ -3788,6 +3831,15 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
      }
      
      // end of KD
+
+     if( RECO_PFMET <100.) continue;
+     ++N_9_PFMET;
+     N_9_PFMET_w=N_9_PFMET_w+newweight;     
+     hPFMET_9->Fill(RECO_PFMET,newweight);
+     hM4l_9->Fill( mass4l,newweight );
+     hM4l_T_9->Fill(m4l_T,newweight);  
+     hDPHI_9->Fill(DPHI,newweight);
+
      
      //if( debug )
      cout << "EVENT CANDIDATE: \n" 
@@ -4018,6 +4070,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    nEvent_4l->SetBinContent(18,N_9);
    nEvent_4l->SetBinContent(19,N_9_1FSR);
    nEvent_4l->SetBinContent(20,N_9_2FSR);
+   nEvent_4l->SetBinContent(21,N_9_PFMET);
 
    nEvent_4l_w->SetBinContent(1,N_0_w);
    nEvent_4l_w->SetBinContent(2,N_01_w);
@@ -4039,6 +4092,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    nEvent_4l_w->SetBinContent(18,N_9_w);
    nEvent_4l_w->SetBinContent(19,N_9_1FSR_w);
    nEvent_4l_w->SetBinContent(20,N_9_2FSR_w);
+   nEvent_4l_w->SetBinContent(21,N_9_PFMET_w);
    
    // write on output root file:
    _filePU->Close();
