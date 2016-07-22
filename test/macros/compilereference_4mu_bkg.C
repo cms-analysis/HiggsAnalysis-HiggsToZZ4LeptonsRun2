@@ -111,7 +111,7 @@ int main (int argc, char ** argv){
 	    bkgFile.Contains("ZH_HToZZ_4L")  ||
 	    bkgFile.Contains("ttH_HToZZ_4L")  ||
 	    bkgFile.Contains("ZZTo4L_13TeV_powheg") ||
-            bkgFile.Contains("h2l2v_ll_unweighted") 
+            bkgFile.Contains("ZH_ll_h2l2v") 
 	    ){
 	  TString datasetName=bkgFile.ReplaceAll("_crab_","_");
 	  bkgFile=datasetName;
