@@ -81,10 +81,6 @@ int main (int argc, char ** argv){
     else if (mcconf.find("Fall15")<5){
       dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Signal_MonoHiggs_76X_merged";  
     }
-
-    if (mcconf.find("Fall15")<5 && name.find("private")<100 ){
-       dirInput="/lustre/cms/store/user/defilip/MonoHiggs/Signal_MonoHiggs_76X_merged";        
-    }
   
 
     TString sigFile=name;

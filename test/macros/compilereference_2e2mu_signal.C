@@ -79,12 +79,9 @@ int main (int argc, char ** argv){
        dirInput="/lustre/cms/store/user/defilip/MonoHiggs/Phys14_720_merged";  
     }
     else if (mcconf.find("Fall15")<5){
-       dirInput="/lustreold/cms/store/user/gminiell/MonoHiggs/Signal_MonoHiggs_76X_merged";  
+       dirInput="/lustre/cms/store/user/gminiell/MonoHiggs/Signal_MonoHiggs_76X_merged";  
     }
 
-    if (mcconf.find("Fall15")<5 && name.find("private")<100 ){
-       dirInput="/lustre/cms/store/user/defilip/MonoHiggs/Signal_MonoHiggs_76X_merged";  
-    }
 
     TString sigFile=name;
     sigFile=sigFile.ReplaceAll("-2e2mu","");

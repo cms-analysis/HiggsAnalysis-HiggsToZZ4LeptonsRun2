@@ -463,18 +463,18 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    TH1F * hYZ_3 = new TH1F("hYZ_3", "Y of Z after selection step 3", 500 , -5. , 5.);
    hYZ_3->SetXTitle("Y_Z");
    
-   TH1F * hPtLep1_3 = new TH1F("hPtLep1_3", "Pt of Lep1 after selection step 3", 200 , -0.5 , 199.5 );
-   hPtLep1_3->SetXTitle("pt_Lep1  (GeV)");
-   TH1F * hYLep1_3 = new TH1F("hEtaLep1_3", "Y of Lep1 after selection step 3", 500 , -5. , 5. );
-   hYLep1_3->SetXTitle("Y of Lep2");
-   TH1F * hIsoLep1_3 = new TH1F("hIsoLep1_3", "Isolation of Lep1 after selection step 3", 2000 , -10., 10.);
-   hIsoLep1_3->SetXTitle("Iso");
-   TH1F * hSipLep1_3 = new TH1F("hSipLep1_3", "Sip of Lep1 after selection step 3",  1000 , -20. , 40. );
-   hSipLep1_3->SetXTitle("Sip");
-   TH1F * hIpLep1_3 = new TH1F("hIpLep1_3", "Ip of Lep1 after selection step 3",  1000 , -20. , 40. );
-   hIpLep1_3->SetXTitle("Ip");
-   TH1F * hIpErLep1_3 = new TH1F("hIpErLep1_3", "IpEr of Lep1 after selection step 3",  1000 , 0. , 10. );
-   hIpErLep1_3->SetXTitle("IpEr");
+   TH1F * hPtLep_3 = new TH1F("hPtLep_3", "Pt of Lep after selection step 3", 500 , -0.5 , 499.5 );
+   hPtLep_3->SetXTitle("pt_Lep  (GeV)");
+   TH1F * hYLep_3 = new TH1F("hEtaLep_3", "Y of Lep after selection step 3", 500 , -5. , 5. );
+   hYLep_3->SetXTitle("Y of Lep");
+   TH1F * hIsoLep_3 = new TH1F("hIsoLep_3", "Isolation of Lep after selection step 3", 2000 , -10., 10.);
+   hIsoLep_3->SetXTitle("Iso");
+   TH1F * hSipLep_3 = new TH1F("hSipLep_3", "Sip of Lep after selection step 3",  1000 , -20. , 40. );
+   hSipLep_3->SetXTitle("Sip");
+   TH1F * hIpLep_3 = new TH1F("hIpLep_3", "Ip of Lep after selection step 3",  1000 , -20. , 40. );
+   hIpLep_3->SetXTitle("Ip");
+   TH1F * hIpErLep_3 = new TH1F("hIpErLep_3", "IpEr of Lep after selection step 3",  1000 , 0. , 10. );
+   hIpErLep_3->SetXTitle("IpEr");
 
    TH1F * hPtLep2_3 = new TH1F("hPtLep2_3", "Pt of Lep2 after selection step 3", 200 , -0.5 , 199.5 );
    hPtLep2_3->SetXTitle("pt_Lep2  (GeV)");

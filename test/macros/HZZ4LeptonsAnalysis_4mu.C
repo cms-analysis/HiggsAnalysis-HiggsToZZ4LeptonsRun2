@@ -481,10 +481,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    TH1F * hYZ_3 = new TH1F("hYZ_3", "Y of Z after selection step 3", 500 , -5. , 5.);
    hYZ_3->SetXTitle("Y_Z");
    
-   TH1F * hPtLep_3 = new TH1F("hPtLep_3", "Pt of Lep after selection step 3", 200 , -0.5 , 199.5 );
-   hPtLep_3->SetXTitle("pt_Lep1  (GeV)");
+   TH1F * hPtLep_3 = new TH1F("hPtLep_3", "Pt of Lep after selection step 3", 500 , -0.5 , 499.5 );
+   hPtLep_3->SetXTitle("pt_Lep  (GeV)");
    TH1F * hYLep_3 = new TH1F("hEtaLep_3", "Y of Lep after selection step 3", 500 , -5. , 5. );
-   hYLep_3->SetXTitle("Y of Lep2");
+   hYLep_3->SetXTitle("Y of Lep");
    TH1F * hIsoLep_3 = new TH1F("hIsoLep_3", "Isolation of Lep after selection step 3", 2000 , -10., 10.);
    hIsoLep_3->SetXTitle("Iso");
    TH1F * hSipLep_3 = new TH1F("hSipLep_3", "Sip of Lep after selection step 3",  1000 , -20. , 40. );
@@ -1341,15 +1341,17 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       for( int i = 0; i < RECO_NMU; ++i ){
 	
 	if (RECOMU_PT[i] <5.) continue;
-	hPtLep_0->Fill( RECOMU_PT[i],newweight );
-        hIsoLep_0->Fill( RECOMU_PFX_dB[i],newweight );
-        hSipLep_0->Fill( RECOMU_SIP[i],newweight );
-	hDxyLep_0->Fill( RECOMU_mubesttrkDxy[i],newweight );
-	hDzLep_0->Fill( RECOMU_mubesttrkDz[i],newweight );
-	hMuHitLep_0->Fill( RECOMU_mutrkNMuonHits[i],newweight );
-	hPxHitLep_0->Fill( RECOMU_muInnertrkNPixHits[i],newweight );
-	hTKLayLep_0->Fill( RECOMU_muInnertrktrackerLayersWithMeasurement[i],newweight );
-	hTKIsoLep_0->Fill( RECOMU_TRACKISO_SUMPT[i],newweight );
+	if( ( RECOMU_isGlobalMu[i] || (RECOMU_isTrackerMu[i] && RECOMU_numberOfMatches[i]>0))){
+	  hPtLep_0->Fill( RECOMU_PT[i],newweight );
+	  hIsoLep_0->Fill( RECOMU_PFX_dB[i],newweight );
+	  hSipLep_0->Fill( RECOMU_SIP[i],newweight );
+	  hDxyLep_0->Fill( RECOMU_mubesttrkDxy[i],newweight );
+	  hDzLep_0->Fill( RECOMU_mubesttrkDz[i],newweight );
+	  hMuHitLep_0->Fill( RECOMU_mutrkNMuonHits[i],newweight );
+	  hPxHitLep_0->Fill( RECOMU_muInnertrkNPixHits[i],newweight );
+	  hTKLayLep_0->Fill( RECOMU_muInnertrktrackerLayersWithMeasurement[i],newweight );
+	  hTKIsoLep_0->Fill( RECOMU_TRACKISO_SUMPT[i],newweight );
+	}
 	
         if( debug ) cout << "\n Lepton i="<< i <<" properties: "
 			 << "\nRECOMU_isGlobalMu[i] " << int(RECOMU_isGlobalMu[i])

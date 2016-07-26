@@ -74,7 +74,7 @@ PlotStack4l::PlotStack4l(){
   //LoadLib.Load("/cmshome/nicola/slc6/MonoHiggs/Analysis13TeV/CMSSW_7_2_0/lib/slc6_amd64_gcc481/libHiggsHiggs_CS_and_Width.so");
   //getMassWindow(500.);
     
-  inputfile="filelist_4e_2015_Fall15_AN_Bari.txt";
+  inputfile="filelist_4mu_2015_Fall15_AN_Bari.txt";
 
   setSamplesNames4l(); 
   cout << "\t Analysing samples for " << whichchannel << " analysis" << endl; 
@@ -86,19 +86,30 @@ PlotStack4l::PlotStack4l(){
   //std::string histolabel = "hPUvertices";    // numPU
   //std::string histolabel = "hPUvertices_ReWeighted";    // numPY reweighted
 
+  // Step 0
+  //std::string histolabel = "hPtLep_0"; // pt not cuts (only pt>5)
+  std::string histolabel = "hIsoLep_0"; // PF isol _ delta B
+  //std::string histolabel = "hSipLep_0"; // SIP
+  //std::string histolabel = "hDxyLep_0"; // d_xy
+  //std::string histolabel = "hDzLep_0"; // d_z
+  //std::string histolabel = "hMuHitLep_0"; // n. muon hits
+  //std::string histolabel = "hPxHitLep_0"; // n. pixel hits
+  //std::string histolabel = "hTKLayLep_0"; // n. tracker layers
+  //std::string histolabel = "hTKIsoLep_0"; // track isolation = sumpT
 
   // ****** Standard candle: Z1 selection: step 3 ******
 
-  //std::string histolabel = "hMZ1_3";    // Z1 mass 
-  //std::string histolabel = "hMZ1BB_3";    // Z1 mass 
-  //std::string histolabel = "hMZ1EE_3";    // Z1 mass 
-  //std::string histolabel = "hPtZ1_3"; // Z1 pt 
-  //std::string histolabel = "hYZ1_3"; // Z1 Y
+  //std::string histolabel = "hMZ_3";    // Z mass 
+  //std::string histolabel = "hMZBB_3";    // Z mass 
+  //std::string histolabel = "hMZEE_3";    // Z mass 
+  //std::string histolabel = "hPtZ_3"; // Z pt 
+  //std::string histolabel = "hYZ_3"; // Z Y
 
-  //std::string histolabel = "hIsoLep1_3";    // isolation of lowest pT lepton from Z1 
-  //std::string histolabel = "hSipLep2_3";  // sip the lowest pT lepton from Z1
-  //std::string histolabel = "hIpLep2_3";   // IP of the lowest pT lepton from Z1
-  //std::string histolabel = "hIpErLep2_3";   // Iperror of the lowest pT lepton from Z1
+  //std::string histolabel = "hPtLep_3";    // pT lepton from Z 
+  //std::string histolabel = "hIsoLep_3";    // isolation of lowest pT lepton from Z 
+  //std::string histolabel = "hSipLep_3";  // sip the lowest pT lepton from Z
+  //std::string histolabel = "hIpLep_3";   // IP of the lowest pT lepton from Z
+  //std::string histolabel = "hIpErLep_3";   // Iperror of the lowest pT lepton from Z
 
   //std::string histolabel = "hIso_3";    // worst isolation value of lepton not coming from Z1
   //std::string histolabel = "hSip_3";  // worst sip value of lepton not coming from Z1
@@ -122,7 +133,7 @@ PlotStack4l::PlotStack4l(){
 
 
   // After full selection
-  std::string histolabel = "hM4l_7"; // 4l mass after full selection but m4l > 70
+  // std::string histolabel = "hM4l_7"; // 4l mass after full selection but m4l > 70
 
   //std::string histolabel = "hM4l_8"; // 4l mass after full selection
   //std::string histolabel = "hM4l_9"; // 4l mass after full selection
@@ -149,7 +160,7 @@ PlotStack4l::PlotStack4l(){
 
   //std::string histolabel = "hPFMET_8"; // PFMET
  
-  useLogY = false;
+  useLogY = true;
   useLogX = false;
 
   useDYJets=true;
@@ -236,7 +247,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
     ll->AddText(0.65, 0.6, text);
   }
   else if (whichenergy.find("13TeV")<50) {
-    text = "#sqrt{s} = 13 TeV, L = 3 fb^{-1}" ;
+    text = "#sqrt{s} = 13 TeV, L = 2.9 fb^{-1}" ;
     ll->AddText(0.65, 0.6, text);
   }
   //ll->Draw();
@@ -308,6 +319,21 @@ void PlotStack4l::plotm4l(std::string histlabel){
   //hframe= new TH2F("hframe","hframe",80,70.,900.,500,0.004,25.);// 4l analysis mass // animate gif 
   //hframe2= new TH2F("hframe","hframe",80,70.,182.,1000, 0.5, 4.);// 4l analysis mass
 
+  if (histlabel.find("hPtLep_0")<10){
+    hframe= new TH2F("hframe","hframe",80,5.,200.,500,0.01,10000000.);// pT                                                                 
+    hframe2= new TH2F("hframe2","hframe2",80,5.,200.,500, 0.5, 2.);// pT                                                                                                              
+  }
+
+  if (histlabel.find("hIsoLep_0")<10){
+    hframe= new TH2F("hframe","hframe",80,0.,10.,500,0.01,10000000.);// Isolation                                                                                                 
+    hframe2= new TH2F("hframe2","hframe2",80,0.,10.,500, 0.5, 2.);// Isolation                                                                                                                  
+  }
+  
+  if (histlabel.find("hTKIsoLep_0")<10){
+    hframe= new TH2F("hframe","hframe",80,0.,10.,500,0.01,10000000.);// Tracker Isolation                                                                                                 
+    hframe2= new TH2F("hframe2","hframe2",80,0.,10.,500, 0.5, 2.);// Tk Isolation                                                                                                                  
+  }
+
   if (histlabel.find("hM4l_7")<10 && 
       (whichchannel.find("4e")<20 || whichchannel.find("4#mu")<20 || whichchannel.find("2e2#mu")<20)){
     hframe= new TH2F("hframe","hframe",80,70.,180.,500,0.004,12.);// 4l analysis mass nrebin=3 GeV
@@ -333,17 +359,28 @@ void PlotStack4l::plotm4l(std::string histlabel){
   //hframe= new TH2F("hframe","hframe",80,60.,120.,500,0.4,2600000.);// mZ1 ee/mumu
   //hframe2= new TH2F("hframe2","hframe2",6000, 60., 120., 1000, 0.5, 2.);// mZ1 ee/mumu
   
-  if (histlabel.find("hMZ1_3")<10 && whichchannel.find("4#mu")<20){
-    hframe= new TH2F("hframe","hframe",80,60.,160.,500,0.4,1700000000.);// mZ1 mumu
-    hframe2= new TH2F("hframe2","hframe2",6000, 60., 160., 1000, 0.5, 2.);// mZ1 mumu
+  if (histlabel.find("hMZ_3")<10 && whichchannel.find("4#mu")<20){
+    hframe= new TH2F("hframe","hframe",80,60.,120.,500,0.4,1700000000.);// mZ1 mumu
+    hframe2= new TH2F("hframe2","hframe2",6000, 60., 120., 1000, 0.5, 2.);// mZ1 mumu
   }
   //hframe= new TH2F("hframe","hframe",80,60.,120.,500,0.4,400000.);// mZ1 mumu  7TeV
   //hframe2= new TH2F("hframe2","hframe2",6000, 60., 120., 1000, 0.5, 2.);// mZ1 mumu 7TeV
   
-  if (histlabel.find("hMZ1_3")<10 && whichchannel.find("4e")<20){
+  if (histlabel.find("hMZ_3")<10 && whichchannel.find("4e")<20){
     hframe= new TH2F("hframe","hframe",80,60.,120.,500,0.4,1100000.);// mZ1 ee                                             
     hframe2= new TH2F("hframe2","hframe2",6000, 60., 120., 1000, 0.5, 2.);// mZ1 ee
   }
+
+  if (histlabel.find("hPtLep_3")<10){
+    hframe= new TH2F("hframe","hframe",80,5.,300.,500,0.001,10000.);// pT                                                                 
+    hframe2= new TH2F("hframe2","hframe2",80,5.,200.,500, 0.5, 2.);// pT                                                                                                              
+  }
+  
+  if (histlabel.find("hIsoLep_3")<10){
+    hframe= new TH2F("hframe","hframe",80,0.,5.,500,0.001,100000.);// Isolation                                                                                                 
+    hframe2= new TH2F("hframe2","hframe2",80,0.,5.,500, 0.5, 2.);// Isolation                                                                                                                  
+  }
+  
 
   //hframe= new TH2F("hframe","hframe",80,60.,120.,500,0.4,1100000.);// mZ1 ee
   //hframe2= new TH2F("hframe2","hframe2",6000, 60., 120., 1000, 0.5, 2.);// mZ1 ee
@@ -390,7 +427,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
   }
 
   if (histlabel.find("hPFMET_3")<10){
-    hframe= new TH2F("hframe","hframe",1000, 0., 1000., 1000, 0.0004, 10000000.);// PFMET
+    hframe= new TH2F("hframe","hframe",1000, 0., 1000., 1000, 0.000001, 10000.);// PFMET
     hframe2= new TH2F("hframe2","hframe2",1000, 0., 1000., 1000, 0.5, 2.);// PFMET
   }
   
@@ -437,9 +474,9 @@ void PlotStack4l::plotm4l(std::string histlabel){
   }
 
   //hframe->SetXTitle("M_{Z2} [GeV]");
-  if ((histlabel.find("hMZ1_3")<10 || histlabel.find("hMZ1_8")<10) && whichchannel.find("4#mu")<20) 
+  if ((histlabel.find("hMZ_3")<10 || histlabel.find("hMZ1_8")<10) && whichchannel.find("4#mu")<20) 
     hframe->SetXTitle("M_{Z#rightarrow#mu#mu} [GeV]");
-  if ((histlabel.find("hMZ1_3")<10 || histlabel.find("hMZ1_8")<10) && whichchannel.find("4e")<20) 
+  if ((histlabel.find("hMZ_3")<10 || histlabel.find("hMZ1_8")<10) && whichchannel.find("4e")<20) 
     hframe->SetXTitle("M_{Z#rightarrow ee} [GeV]");
   //hframe->SetXTitle("M_{Z#rightarrow ee} (BB)  [GeV]");
   //hframe->SetXTitle("M_{Z#rightarrow ee} (EE)  [GeV]");
@@ -633,6 +670,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
   TH1F *hfourlepbestmass_4l_afterSel_new_qcdDEM  = new TH1F("hfourlepbestmass_4l_afterSel_new_qcdDEM", "hfourlepbestmass_4l_afterSel_new_qcdDEM", Nbins, Xmin, Xmax);
   TH1F *hfourlepbestmass_4l_afterSel_new_qcdMu   = new TH1F("hfourlepbestmass_4l_afterSel_new_qcdMu", "hfourlepbestmass_4l_afterSel_new_qcdMu", Nbins, Xmin, Xmax);
   TH1F *hfourlepbestmass_4l_afterSel_new_qcdBC   = new TH1F("hfourlepbestmass_4l_afterSel_new_qcdBC", "hfourlepbestmass_4l_afterSel_new_qcdBC", Nbins, Xmin, Xmax);
+  TH1F *hfourlepbestmass_4l_afterSel_new_qcd     = new TH1F("hfourlepbestmass_4l_afterSel_new_qcd", "hfourlepbestmass_4l_afterSel_new_qcd", Nbins, Xmin, Xmax);
   TH1F *hfourlepbestmass_4l_afterSel_new_singlet = new TH1F("hfourlepbestmass_4l_afterSel_new_singlet", "hfourlepbestmass_4l_afterSel_new_singlet", Nbins, Xmin, Xmax);
 
   TH1F *hfourlepbestmass_4l_afterSel_new_DY      = new TH1F("hfourlepbestmass_4l_afterSel_new_DY", "hfourlepbestmass_4l_afterSel_new_DY",Nbins, Xmin, Xmax);    
@@ -763,7 +801,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
 	
 	char temp[328];
 	sprintf(temp,"%s",histosdir.c_str());
-	if(datasetnamebkg.find(temp) < 200 && (datasetnamebkg.find(whichenergy) < 200 || datasetnamebkg.find(whichsample) < 200) && hfourlepbestmass_4l_afterSel_new_VH->GetEntries()>0. ) legend->AddEntry(hfourlepbestmass_4l_afterSel_new_new,Vlabelbkg.at(datasetId).c_str(), "F");  
+	if(datasetnamebkg.find("ZH_H") < 200 && datasetnamebkg.find(temp) < 200 && (datasetnamebkg.find(whichenergy) < 200 || datasetnamebkg.find(whichsample) < 200) && hfourlepbestmass_4l_afterSel_new_VH->GetEntries()>0. ) legend->AddEntry(hfourlepbestmass_4l_afterSel_new_new,Vlabelbkg.at(datasetId).c_str(), "F");  
 	//hfourlepbestmass_4l_afterSel_new_new->Draw("sameP");    
       }
       
@@ -1032,6 +1070,32 @@ void PlotStack4l::plotm4l(std::string histlabel){
 	}  
 	cout << "Label= " << Vlabelbkg.at(datasetId) << "  Entries= " << hfourlepbestmass_4l_afterSel_new_new->Integral(0,-1) <<endl;
 	//legend->AddEntry(hfourlepbestmass_4l_afterSel_new_new,Vlabelbkg.at(datasetId).c_str(), "F");  
+      }
+       else if(datasetnamebkg.find("QCD_Pt") ){
+	
+	cout << "Here is QCD=" << endl;
+	hfourlepbestmass_4l_afterSel_new_new=hfourlepbestmass_4l_afterSel_new->Rebin(nRebin,histlabel.c_str() /*"hfourlepbestmass_4l_afterSel_new_new"*/);
+	hfourlepbestmass_4l_afterSel_new_qcd->Add(hfourlepbestmass_4l_afterSel_new_new);      
+	//hfourlepbestmass_4l_afterSel_new_new->SetFillStyle(1001); 
+	hfourlepbestmass_4l_afterSel_new_qcd->SetLineColor(kTeal-2);
+	hfourlepbestmass_4l_afterSel_new_qcd->SetFillColor(kTeal-2);
+	hfourlepbestmass_4l_afterSel_new_qcd->SetLineWidth(1);
+
+	char temp[328];
+	//sprintf(temp,"%s/output_QCD_Pt_10to15",histosdir.c_str());
+        sprintf(temp,"%s/output_QCD_Pt_1000to1400",histosdir.c_str());
+	
+	cout << "alpha" << temp << datasetnamebkg.find(temp) << endl;
+	//sprintf(temp,"%s",histosdir.c_str());
+	//if(datasetnamebkg.find(temp) < 200 && (datasetnamebkg.find(whichenergy) < 200 || datasetnamebkg.find(whichsample) < 200) && hfourlepbestmass_4l_afterSel_new_Wj->GetEntries()>0. ) legend->AddEntry(hfourlepbestmass_4l_afterSel_new_new,Vlabelbkg.at(datasetId).c_str(), "F"); 
+
+	if(datasetnamebkg.find(temp) < 200){ // provided that this is the last single-top sample
+	  leg0->AddEntry(hfourlepbestmass_4l_afterSel_new_qcd,"QCD", "F");  
+	  legend->AddEntry(hfourlepbestmass_4l_afterSel_new_qcd,"QCD", "F");  
+	  cout << "Label= QCD Entries= " << hfourlepbestmass_4l_afterSel_new_qcd->Integral(0,-1) <<endl;
+	}  
+	cout << "Label= " << Vlabelbkg.at(datasetId) << "  Entries= " << hfourlepbestmass_4l_afterSel_new_new->Integral(0,-1) <<endl;
+	//legend->AddEntry(hfourlepbestmass_4l_afterSel_new_new,Vlabelbkg.at(datasetId).c_str(), "F"); 
       }       
       // single top
       //else if (datasetId>=12 && datasetId<=14){
@@ -1206,6 +1270,11 @@ void PlotStack4l::plotm4l(std::string histlabel){
 	 htotal->Add(hfourlepbestmass_4l_afterSel_new_qcdBC);   
 	 htotalHisto->Add(hfourlepbestmass_4l_afterSel_new_qcdBC);
        }   
+
+       if(datasetnamebkg.find(temppp) < 200 && datasetnamebkg.find("output_QCD_Pt_1000to1400") < 200 ){
+	 htotal->Add(hfourlepbestmass_4l_afterSel_new_qcd);   
+	 htotalHisto->Add(hfourlepbestmass_4l_afterSel_new_qcd);
+       }
        
        if(datasetnamebkg.find(temppp) < 200 && datasetnamebkg.find("output_ST_") < 200 && datasetnamebkg.find("s-channel") < 200 ){     	 
 	 htotal->Add(hfourlepbestmass_4l_afterSel_new_singlet); 
@@ -1855,6 +1924,9 @@ void PlotStack4l::plotm4l(std::string histlabel){
 
   c1->Update();
   
+  if (histosdir.find("4mu")<25) whichchannel="4mu";
+  if (histosdir.find("2e2mu")<25) whichchannel="2e2mu";
+
   std::string saveaspdfratio = useLogY ? "plots/h_"+histlabel+"_"+whichchannel+"_"+whichenergy+"_ratio_log.pdf" : "plots/h_"+histlabel+"_"+whichchannel+"_"+whichenergy+"_ratio.pdf";
   std::string saveaspngratio = useLogY ? "plots/h_"+histlabel+"_"+whichchannel+"_"+whichenergy+"_ratio_log.png" : "plots/h_"+histlabel+"_"+whichchannel+"_"+whichenergy+"_ratio.png";
   std::string saveasepsratio = useLogY ? "plots/h_"+histlabel+"_"+whichchannel+"_"+whichenergy+"_ratio_log.eps" : "plots/h_"+histlabel+"_"+whichchannel+"_"+whichenergy+"_ratio.eps";
@@ -1867,6 +1939,7 @@ void PlotStack4l::plotm4l(std::string histlabel){
   c1->SaveAs(saveasrootratio.c_str()/*"plots/hfourlepbestmass_4l_afterSel_new_m4l.root"*/);
   
 
+  
   // Write final histogram in a file 
   char htotalfinal[300];
   sprintf(htotalfinal,"plots/htotalfinal_%s_%s.root",histlabel.c_str(),whichchannel.c_str());
@@ -2045,6 +2118,19 @@ void PlotStack4l::setSamplesNames4l()
 	Vxsectionsig.push_back(1.); //pb
 	Vcolorsig.push_back(kOrange-3);
       }	      
+      if( (inputfilename.find("2000")<200) ){
+        Vdatasetnamesig.push_back(inputfilename);
+        Vlabelsig.push_back("m_{Z'}=2. TeV/c^{2}, Zprime");
+        Vxsectionsig.push_back(1.); //pb                                                                                                                                                     
+        Vcolorsig.push_back(kOrange-3);
+      }
+      if( (inputfilename.find("2500")<200) ){
+        Vdatasetnamesig.push_back(inputfilename);
+        Vlabelsig.push_back("m_{Z'}=2.5 TeV/c^{2}, Zprime");
+        Vxsectionsig.push_back(1.); //pb                                                                                                                                                     
+        Vcolorsig.push_back(kOrange-3);
+      }
+      
       
     }	    
     // background higgs
@@ -2055,6 +2141,7 @@ void PlotStack4l::setSamplesNames4l()
 	    inputfilename.find("TTbarH_HToZZTo4L")<100  ||
 	    inputfilename.find("ttH_HToZZ_4L")<100  ||
 	    inputfilename.find("ZH_HToZZ_4LFilter")<100  || 
+	    inputfilename.find("ZH_ll_h2l2v_private")<100 ||
 	    inputfilename.find("WplusH_HToZZTo4L")<100  |
             inputfilename.find("WminusH_HToZZTo4L")<100  || 
 	    inputfilename.find("WH_ZH_HToZZ_4LFilter")<100 ){  // provided that signal samples contain 'GluGluHToZZTo4L'
@@ -2084,6 +2171,15 @@ void PlotStack4l::setSamplesNames4l()
 	Vcolorbkg.push_back(kOrange-1);
 	//cout << "VH" << endl;
       }
+      
+      if( (inputfilename.find("ZH_ll_h2l2v_private")<200)){
+	  Vdatasetnamebkg.push_back(inputfilename);
+	  Vlabelbkg.push_back("ZH,ll,2l2#nu, m_{H}=125 GeV/c^{2}");
+	  Vxsectionbkg.push_back(1.); //pb                                                                                                                                                          
+	  Vcolorbkg.push_back(kOrange-1);
+	  //cout << "ZH" << endl;               
+      }
+
 
       if( (inputfilename.find("M125")<200 && (inputfilename.find("WplusH")<200)) ){
 	Vdatasetnamebkg.push_back(inputfilename);
@@ -2450,7 +2546,127 @@ void PlotStack4l::setSamplesNames4l()
 	Vcolorbkg.push_back(kTeal-2);
       }
 
+        // NEW QCD Pythia 8
+      if(inputfilename.find("QCD_Pt_1000to1400")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_10to15")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_120to170")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_1400to1800")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_15to30")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_170to300")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_1800to2400")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_2400to3200")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_300to470")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_30to50")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_3200toInf")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_3200toInf_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_470to600")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
       
+      if(inputfilename.find("QCD_Pt_50to80")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_5to10")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_5to10_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_600to800")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_800to1000")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+      if(inputfilename.find("QCD_Pt_80to120")<200){
+	Vdatasetnamebkg.push_back(inputfilename);
+	Vlabelbkg.push_back("QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8");
+	Vxsectionbkg.push_back(1.); //pb
+	Vcolorbkg.push_back(kTeal-2);
+      }
+
+
       // TTbar 
       if(inputfilename.find("TT_Tune")<200){
 	Vdatasetnamebkg.push_back(inputfilename);

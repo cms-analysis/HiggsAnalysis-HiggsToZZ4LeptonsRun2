@@ -148,6 +148,73 @@ int main (int argc, char ** argv){
 	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_3.root");
 	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_4.root");
   	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_2.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_3.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_4.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_5.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_6.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_15to30_TuneCUETP8M1_13TeV_pythia8_7.root");
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8_1.root");	  
+	  tree3 = chain;
+	}	  
+	else if (bkgFile.Contains("QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8_1.root");	  
+	  tree3 = chain;
+	}	  
+	else if (bkgFile.Contains("QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8_1.root");	  
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8_2.root");
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_5to10_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_5to10_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_5to10_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  tree3 = chain;
+	}
+	else if (bkgFile.Contains("QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8")){
+	  TChain* chain = new TChain("HZZ4LeptonsAnalysis","");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8.root");
+	  chain->Add("/lustre/cms/store/user/dburns/MonoHiggs/Fall15_25ns_merged/roottree_leptons_crab_QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8_1.root");
+	  tree3 = chain;
 	}	
 	else {	          
 	  file3 = TFile::Open(nome);
