@@ -22,6 +22,13 @@
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_MZP2500_MA0300.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_MZP600_MA0300.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_MZP800_MA0300.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_ZZTo4L_13TeV_powheg_pythia8.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM.root
+/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluHToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_ttH_HToZZ_4LFilter_M125_13TeV_powheg2_JHUgenV6_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8.root
@@ -36,13 +43,6 @@
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_WJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_WWTo2L2Nu_13TeV-powheg.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_WZ_TuneCUETP8M1_13TeV-pythia8.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_ZZTo4L_13TeV_powheg_pythia8.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo2e2mu_BackgroundOnly_13TeV_MCFM.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo2e2tau_BackgroundOnly_13TeV_MCFM.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo2mu2tau_BackgroundOnly_13TeV_MCFM.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo4e_BackgroundOnly_13TeV_MCFM.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo4mu_BackgroundOnly_13TeV_MCFM.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_GluGluToZZTo4tau_BackgroundOnly_13TeV_MCFM.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_QCD_Pt_10to15_TuneCUETP8M1_13TeV_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos2e2mu_25ns/output_QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8.root
