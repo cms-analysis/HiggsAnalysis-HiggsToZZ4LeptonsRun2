@@ -920,7 +920,7 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
    Int_t f_lept1_pdgid,f_lept2_pdgid,f_lept3_pdgid,f_lept4_pdgid;
 
    Int_t f_run, f_lumi, f_event;
-   
+
    TBranch *b_run= newtree->Branch("f_run", &f_run,"f_run/I");
    TBranch *b_lumi= newtree->Branch("f_lumi", &f_lumi,"f_lumi/I");    
    TBranch *b_event= newtree->Branch("f_event", &f_event,"f_event/I");    
@@ -1010,7 +1010,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-        
+
+      // Initialize reduced tree variables
+      f_weight=1., f_int_weight=1., f_pu_weight=1., f_eff_weight=1., f_lept1_pt=-999., f_lept1_eta=-999., f_lept1_phi=-999., f_lept1_charge=-999., f_lept1_pfx=-999., f_lept1_sip=-999., f_lept1_mvaid=-999., f_lept2_pt=-999., f_lept2_eta=-999., f_lept2_phi=-999., f_lept2_charge=-999., f_lept2_pfx=-999., f_lept2_sip=-999., f_lept2_mvaid=-999., f_lept3_pt=-999., f_lept3_eta=-999., f_lept3_phi=-999., f_lept3_charge=-999., f_lept3_pfx=-999., f_lept3_sip=-999., f_lept3_mvaid=-999., f_lept4_pt=-999., f_lept4_eta=-999., f_lept4_phi=-999., f_lept4_charge=-999., f_lept4_pfx=-999., f_lept4_sip=-999., f_lept4_mvaid=-999., f_iso_max=-999., f_sip_max=-999., f_Z1mass=-999., f_Z2mass=-999., f_angle_costhetastar=-999., f_angle_costheta1=-999., f_angle_costheta2=-999., f_angle_phi=-999., f_angle_phistar1=-999., f_eta4l=-999., f_pt4l=-999., f_mass4l=-999., f_mass4lErr=-999., f_njets_pass=-999., f_deltajj=-999., f_massjj=-999., f_D_jet=-999., f_jet1_pt=-999., f_jet1_eta=-999., f_jet1_phi=-999., f_jet1_e=-999., f_jet2_pt=-999., f_jet2_eta=-999., f_jet2_phi=-999., f_jet2_e=-999.,f_D_bkg_kin=-999.,f_D_bkg=-999.,f_D_gg=-999.,f_D_g4=-999.,f_Djet_VAJHU=-999.,f_pfmet=-999.,f_mT=-999.,f_dphi=-999.,f_lept1_pdgid=-999,f_lept2_pdgid=-999,f_lept3_pdgid=-999,f_lept4_pdgid=-999,f_run=-999, f_lumi=-999, f_event=-999;
+
       //if (!(Run==1 && LumiSection==2591 && Event==497247)) continue;
       //if (Run==LumiSection && Run==Event) continue;   
       //if (jentry!=1276102) continue;
@@ -3632,6 +3635,10 @@ void HZZ4LeptonsAnalysis::Loop(Char_t *output)
        f_jet1_e = RECO_PFJET_ET[jet1];
      }
      else if (njets_pass>=2) { // store the second highest pT jets passing the criteria
+       f_jet1_pt = RECO_PFJET_PT[jet1];
+       f_jet1_eta = RECO_PFJET_ETA[jet1];
+       f_jet1_phi = RECO_PFJET_PHI[jet1];
+       f_jet1_e = RECO_PFJET_ET[jet1];
        f_jet2_pt = RECO_PFJET_PT[jet2];
        f_jet2_eta = RECO_PFJET_ETA[jet2];
        f_jet2_phi = RECO_PFJET_PHI[jet2];
