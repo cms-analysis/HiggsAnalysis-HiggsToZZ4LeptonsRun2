@@ -34,7 +34,6 @@
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_ttH_HToZZ_4LFilter_M125_13TeV_powheg2_JHUgenV6_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_VBF_HToZZTo4L_M125_13TeV_powheg2_JHUgenV6_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_ZH_HToZZ_4LFilter_M125_13TeV_powheg2-minlo-HZJ_JHUgenV6_pythia8.root
-/lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_ZH_ll_h2l2v_M125_13TeV_MadGraph_private.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_WminusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_WplusH_HToZZTo4L_M125_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8.root
 /lustre/cms/store/user/defilip/MonoHiggs/76X/histos4e_25ns/output_TTTo2L2Nu_13TeV-powheg.root
